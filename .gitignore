@@ -1,0 +1,19 @@
+# Obsidian workspace e configurações locais
+.obsidian/
+resources/
+scripts/
+
+# Cards do board Kanban (manter estrutura de pastas)
+board/1.not_started/*.md
+board/2.in_progress/*.md
+board/3.in_review/*.md
+board/4.done/*.md
+
+# Manter arquivos .gitkeep para preservar estrutura
+!board/**/.gitkeep
+
+# Condensed memory (conhecimento consolidado por projeto)
+condensed memory/*/
+
+# Manter estrutura de templates
+!templates/
