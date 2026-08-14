@@ -8,6 +8,7 @@ board/1.not_started/*.md
 board/2.in_progress/*.md
 board/3.in_review/*.md
 board/4.done/*.md
+board/5.archived/*.md
 
 # Manter arquivos .gitkeep para preservar estrutura
 !board/**/.gitkeep
@@ -17,3 +18,6 @@ condensed memory/*/
 
 # Manter estrutura de templates
 !templates/
+
+# Agent state file (local to each project)
+.agent_obsidian
