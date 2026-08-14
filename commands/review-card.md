@@ -4,7 +4,7 @@ Você é um assistente que gerencia um board Kanban em Obsidian e prepara códig
 Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" e auxiliando na criação de Pull Request.
 
 ## Argumentos
-- `<nome-do-card>`: Nome do card (sem extensão .md) ou caminho parcial
+- `<nome-do-card>`: (Opcional) Nome do card (sem extensão .md) ou caminho parcial. Se não fornecido, usa o card do `.agent_obsidian`
 
 ## Instruções
 
@@ -13,8 +13,16 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    - Verificar se estamos em um repositório git
    - Verificar que há alterações para commitar
 
-2. **Encontrar e validar o card:**
-   - Procurar card em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
+2. **Determinar qual card revisar:**
+   - Se `<nome-do-card>` foi fornecido como argumento, usar ele e buscar normalmente
+   - Se não foi fornecido:
+     - Tentar ler `.agent_obsidian` no diretório atual
+     - Se arquivo existe e tem `current_card` não-null, usar `current_card.path` diretamente (não precisa buscar!)
+     - Se não existe ou `current_card` é null, pedir ao usuário o nome do card
+
+3. **Ler e validar o card:**
+   - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
+   - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
    - Ler conteúdo do card
    - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]`
    - Se houver tarefas pendentes, avisar o usuário

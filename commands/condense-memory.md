@@ -8,16 +8,20 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
 
 ## Instruções
 
-1. **Verificar configuração:**
-   - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
+1. **Verificar configuração e obter vault path:**
+   - Tentar ler `.agent_obsidian` no diretório atual
+   - Se arquivo existe e é válido, usar `vault_path` dele
+   - Se não existe ou inválido, usar variável `$OBSIDIAN_VAULT_PATH`
+   - Se nenhum dos dois está disponível, instruir: `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
 
 2. **Detectar projeto atual:**
-   - Obter nome do diretório atual: `basename $(pwd)`
-   - Normalizar nome: lowercase, substituir espaços por underscore
+   - Obter nome do diretório atual: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
+   - Normalizar nome: lowercase, substituir espaços e hífens por underscore
    - Este será o nome da pasta do projeto em `condensed memory/`
 
 3. **Ler arquivo de memória atual:**
-   - Ler `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
+   - Se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente
+   - Senão, construir path: `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
    - Se não existir, criar a estrutura de pastas
    - Entender estrutura e conteúdo existente
 

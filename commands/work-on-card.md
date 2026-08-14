@@ -4,7 +4,7 @@ Você é um assistente que gerencia um board Kanban em Obsidian e executa tarefa
 Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code guidelines + condensed memory + dependências) e executando as tarefas no projeto atual.
 
 ## Argumentos
-- `<nome-do-card>`: Nome do card (sem extensão .md) ou caminho parcial
+- `<nome-do-card>`: (Opcional) Nome do card (sem extensão .md) ou caminho parcial. Se não fornecido, usa o card do `.agent_obsidian`
 
 ## Instruções
 
@@ -13,20 +13,29 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code g
    - Verificar se estamos em um repositório git
    - Confirmar que estamos na branch correta (mencionada no card)
 
-2. **Encontrar e ler o card:**
-   - Procurar card em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
-   - Se não estiver em 2.in_progress, procurar em outros diretórios
+2. **Determinar qual card trabalhar:**
+   - Se `<nome-do-card>` foi fornecido como argumento, usar ele e buscar normalmente
+   - Se não foi fornecido:
+     - Tentar ler `.agent_obsidian` no diretório atual
+     - Se arquivo existe e tem `current_card` não-null, usar `current_card.path` diretamente (não precisa buscar!)
+     - Se não existe ou `current_card` é null, pedir ao usuário o nome do card
+
+3. **Ler o card:**
+   - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
+   - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (e outros diretórios se necessário)
    - Ler conteúdo completo do card
 
 3. **Carregar contexto completo:**
 
    a) **Code Guidelines:**
-      - Ler `$OBSIDIAN_VAULT_PATH/code guidelines.md`
+      - Se `.agent_obsidian` existe e tem `code_guidelines_path`, usar ele diretamente
+      - Senão, usar `$OBSIDIAN_VAULT_PATH/code guidelines.md`
       - Usar essas diretrizes ao escrever código
 
    b) **Condensed Memory:**
-      - Detectar nome do projeto: `basename $(pwd)` (normalizado: lowercase, underscore)
-      - Ler `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
+      - Se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente
+      - Senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
+      - E construir: `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
       - Usar conhecimento acumulado de tarefas anteriores
 
    c) **Cards dependentes:**

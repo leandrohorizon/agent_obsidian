@@ -4,15 +4,23 @@ Você é um assistente que gerencia um board Kanban em Obsidian e finaliza taref
 Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que toda documentação está completa.
 
 ## Argumentos
-- `<nome-do-card>`: Nome do card (sem extensão .md) ou caminho parcial
+- `<nome-do-card>`: (Opcional) Nome do card (sem extensão .md) ou caminho parcial. Se não fornecido, usa o card do `.agent_obsidian`
 
 ## Instruções
 
 1. **Verificar configuração:**
    - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
 
-2. **Encontrar e validar o card:**
-   - Procurar card em `$OBSIDIAN_VAULT_PATH/board/3.in_review/`
+2. **Determinar qual card completar:**
+   - Se `<nome-do-card>` foi fornecido como argumento, usar ele e buscar normalmente
+   - Se não foi fornecido:
+     - Tentar ler `.agent_obsidian` no diretório atual
+     - Se arquivo existe e tem `current_card` não-null, usar `current_card.path` diretamente (não precisa buscar!)
+     - Se não existe ou `current_card` é null, pedir ao usuário o nome do card
+
+3. **Ler e validar o card:**
+   - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
+   - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/3.in_review/`
    - Ler conteúdo completo do card
    - Verificar se o PR foi merged (se houver PR mencionado)
 
@@ -42,7 +50,13 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
    - Mover arquivo de `$OBSIDIAN_VAULT_PATH/board/3.in_review/card.md`
    - Para: `$OBSIDIAN_VAULT_PATH/board/4.done/card.md`
 
-7. **Consolidar conhecimento automaticamente:**
+7. **Limpar .agent_obsidian:**
+   - Ler `.agent_obsidian` do diretório atual (se existir)
+   - Manter todos os campos existentes (version, vault_path, code_guidelines_path, condensed_memory_path)
+   - Atualizar campo `current_card` para `null`
+   - Escrever de volta usando Write tool preservando estrutura completa
+
+8. **Consolidar conhecimento automaticamente:**
    - Executar `/condense-memory "{nome-do-card}"` automaticamente
    - Isso irá extrair e consolidar o conhecimento do card recém-finalizado
    - O conhecimento será imediatamente disponível para futuras tarefas
