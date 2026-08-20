@@ -190,8 +190,69 @@ $OBSIDIAN_VAULT_PATH/
 ├── templates/
 │   └── card template.md  # Template para novos cards
 ├── code guidelines.md    # Diretrizes de código (sempre carregadas)
-└── condensed memory.md   # Conhecimento consolidado
+└── condensed memory/     # Conhecimento consolidado por projeto
+    ├── fraud-payout/
+    ├── platform/
+    └── calculator/
 ```
+
+## Arquivo de Estado `.agent_obsidian`
+
+O sistema cria automaticamente um arquivo `.agent_obsidian` na **raiz de cada projeto** para rastrear qual card está ativo.
+
+### Localização
+
+O arquivo fica na raiz do seu projeto (não no vault):
+
+```
+/workspace/fraud-payout/          (seu projeto)
+├── .git/
+├── .agent_obsidian               ← arquivo de estado
+├── .gitignore                    ← deve incluir .agent_obsidian
+└── app/
+```
+
+### Estrutura
+
+```json
+{
+  "version": "1.0",
+  "vault_path": "/Users/you/workspace/obsidian/vault",
+  "current_card": {
+    "name": "pix in - consult dict 2",
+    "path": "/Users/you/workspace/obsidian/vault/board/2.in_progress/pix in - consult dict 2.md"
+  }
+}
+```
+
+Quando não há card ativo:
+
+```json
+{
+  "version": "1.0",
+  "vault_path": "/Users/you/workspace/obsidian/vault",
+  "current_card": null
+}
+```
+
+### Criação Automática
+
+O arquivo é criado automaticamente quando você usa qualquer comando:
+- `/start-card` cria e registra o card iniciado
+- `/work-on-card` cria se não existir
+- `/complete-card` limpa o `current_card` (seta para `null`)
+
+### Benefícios
+
+1. **Comandos sem argumentos:** Após `/start-card`, você pode usar `/work-on-card` sem passar o nome do card
+2. **Múltiplos projetos:** Cada projeto tem seu próprio estado independente
+3. **Zero configuração manual:** Tudo é gerenciado automaticamente pela IA
+
+### Importante
+
+- Adicione `.agent_obsidian` ao `.gitignore` do projeto (feito automaticamente pelo `/start-card`)
+- Não edite manualmente o arquivo (deixe a IA gerenciar)
+- Se corrompido, será recriado automaticamente
 
 ## Troubleshooting
 
