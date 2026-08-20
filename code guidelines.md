@@ -10,6 +10,17 @@
 - Evitar abreviações desnecessárias.
 - Manter consistência nos padrões de nomenclatura.
 
+## Comentários
+- **Não escrever comentários** - o código deve se auto explicar na leitura.
+- Se surgir a necessidade de comentar, refatorar: extrair função com nome descritivo, renomear variável ou simplificar a lógica.
+- Nunca escrever comentários narrativos que apenas repetem o código (ex: `# incrementa o contador`, `// valida o input`).
+- Nunca escrever comentários explicando o que a IA fez ou marcando etapas de implementação.
+- Exceções aceitáveis:
+  - Documentação exigida por convenção da linguagem ou ferramenta (YARD, JSDoc público, docstrings de API).
+  - Diretivas de lint ou compilador (ex: `# rubocop:disable`, `// eslint-disable-next-line`).
+  - Referência externa que o código não consegue expressar - link para issue, spec ou changelog justificando um workaround não óbvio.
+- Ao alterar código existente, não introduzir comentários novos; remover comentários narrativos e obsoletos dos trechos que já estão sendo modificados.
+
 ## Funções
 - Devem possuir responsabilidade única.
 - Devem ser pequenas e focadas.
