@@ -8,80 +8,57 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
 
 ## Instruções
 
-1. **Verificar configuração:**
-   - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
-   - Se não estiver, instruir: `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
-   - Verificar se estamos em um repositório git (executar `git rev-parse --git-dir`)
-
-2. **Gerenciar arquivo de estado (.agent_obsidian):**
+1. **Inicializar estado (se necessário):**
    - Tentar ler `.agent_obsidian` no diretório atual (raiz do projeto)
-   - Detectar nome do projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
-   - Se não existir, criar com Read tool retornando erro e então usar Write tool:
-     ```json
-     {
-       "version": "1.0",
-       "vault_path": "{valor de $OBSIDIAN_VAULT_PATH}",
-       "code_guidelines_path": "{$OBSIDIAN_VAULT_PATH}/code guidelines.md",
-       "condensed_memory_path": "{$OBSIDIAN_VAULT_PATH}/condensed memory/{project_name}/condensed memory.md",
-       "current_card": null
-     }
-     ```
-   - Se existir mas JSON inválido (erro ao parsear), recriar com estrutura acima
-   - Verificar se `.gitignore` existe no projeto
-   - Se `.gitignore` não contém `.agent_obsidian`, adicionar linha `.agent_obsidian` ao arquivo
+   - Se NÃO existe ou JSON inválido:
+     - Executar `/init-agent-state` para criar estrutura
+     - Se falhar, abortar comando
+   - Se existe e válido, continuar
+
+2. **Obter vault path:**
+   - Ler `.agent_obsidian`
+   - Extrair `vault_path` (agora garantido que existe)
+   - Usar esse valor para todas as operações
 
 3. **Encontrar o card:**
-   - Procurar por arquivos correspondentes em `$OBSIDIAN_VAULT_PATH/board/1.not_started/`
-   - Se o card não existir em 1.not_started, verificar se já está em outro status
+   - Procurar em `{vault_path}/board/1.not_started/{nome}.md`
+   - Se não encontrar em 1.not_started, verificar outras pastas
    - Se não encontrar, listar cards disponíveis
 
-3. **Ler o card:**
-   - Ler o conteúdo completo do card
-   - Extrair informação sobre a tarefa
-   - Mostrar um resumo breve para o usuário
+4. **Ler o card:**
+   - Ler conteúdo completo
+   - Mostrar resumo breve ao usuário
 
-4. **Detectar informações do projeto:**
-   - Obter URL do repositório remoto: `git remote get-url origin`
-   - Obter branch atual: `git branch --show-current`
-   - Obter nome do repositório do URL
+5. **Detectar informações git:**
+   - Obter URL: `git remote get-url origin` (ou "Local (sem remote)")
+   - Obter branch base: `git branch --show-current`
 
-5. **Criar branch git:**
-   - Criar nome de branch baseado no card (substituir espaços por hífens, lowercase)
-   - Seja criativo ao criar o nome da branch
+6. **Criar branch git:**
+   - Criar nome baseado no card (lowercase, hífens)
    - Executar: `git checkout -b feature/nome-da-branch`
 
-6. **Atualizar frontmatter do card:**
-   - Se o card não tiver frontmatter YAML, adicionar no início:
-     ```yaml
-     ---
-     repo: {url-do-repo ou "Local (sem remote configurado)"}
-     branch: feature/nome-do-card
-     status: In Progress
-     created: {YYYY-MM-DD quando criado originalmente}
-     started: {YYYY-MM-DD de hoje}
-     ---
-     ```
-   - Se já tiver frontmatter, atualizar campos:
-     - `status: In Progress`
-     - `started: {YYYY-MM-DD}`
+7. **Atualizar frontmatter do card:**
+   - Adicionar ou atualizar campos:
+     - `repo: {url-do-repo}`
      - `branch: feature/nome-do-card`
+     - `status: In Progress`
+     - `started: {YYYY-MM-DD de hoje}`
 
-7. **Mover o card:**
-   - Mover arquivo de `$OBSIDIAN_VAULT_PATH/board/1.not_started/card.md`
-   - Para: `$OBSIDIAN_VAULT_PATH/board/2.in_progress/card.md`
-   - Usar `mv` para mover o arquivo
+8. **Mover o card:**
+   - Mover de `{vault_path}/board/1.not_started/card.md`
+   - Para `{vault_path}/board/2.in_progress/card.md`
 
-8. **Atualizar .agent_obsidian com card atual:**
-   - Ler `.agent_obsidian` do diretório atual
-   - Manter todos os campos existentes (version, vault_path, code_guidelines_path, condensed_memory_path)
-   - Atualizar campo `current_card` com:
+9. **Atualizar .agent_obsidian:**
+   - Ler arquivo atual
+   - Manter todos os campos existentes
+   - Atualizar apenas `current_card`:
      ```json
      {
        "name": "nome-do-card",
-       "path": "/path/absoluto/para/board/2.in_progress/card.md"
+       "path": "{vault_path}/board/2.in_progress/card.md"
      }
      ```
-   - Escrever de volta usando Write tool preservando estrutura completa
+   - Escrever de volta
 
 9. **Confirmar:**
    ```
