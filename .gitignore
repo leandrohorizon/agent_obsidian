@@ -1,23 +1,25 @@
-# Obsidian workspace e configurações locais
-.obsidian/
-resources/
-scripts/
+# Estratégia whitelist: ignora tudo e libera explicitamente apenas o sistema
+# de comandos. O conteúdo do vault (cards, condensed memory, daily, imagens,
+# configurações do Obsidian) fica fora do versionamento.
+*
 
-# Cards do board Kanban (manter estrutura de pastas)
-board/1.not_started/*.md
-board/2.in_progress/*.md
-board/3.in_review/*.md
-board/4.done/*.md
-board/5.archived/*.md
+# Documentação e setup
+!.gitignore
+!README.md
+!CLAUDE.md
+!SETUP.md
+!code guidelines.md
+!sync-commands.sh
 
-# Manter arquivos .gitkeep para preservar estrutura
-!board/**/.gitkeep
+# Definições dos slash commands (incluindo commands/lib/)
+!commands/
+!commands/**
 
-# Condensed memory (conhecimento consolidado por projeto)
-condensed memory/*/
-
-# Manter estrutura de templates
+# Template de card
 !templates/
+!templates/**
 
-# Agent state file (local to each project)
-.agent_obsidian
+# Estrutura de pastas do board, sem os cards
+!board/
+!board/*/
+!board/**/.gitkeep
