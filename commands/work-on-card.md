@@ -32,7 +32,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code g
       - Senão, usar `$OBSIDIAN_VAULT_PATH/code guidelines.md`
       - Usar essas diretrizes ao escrever código
 
-   b) **Condensed Memory:**
+   b) **Condensed Memory:** **Carregar somente o necessário para tarefa**
       - Se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente
       - Senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
       - E construir: `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
@@ -70,9 +70,23 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code g
    - Funções pequenas e focadas
    - Tratamento adequado de erros
    - Escrever ou atualizar testes quando necessário
-   - Executar lint antes de finalizar
 
-8. **Status final:**
+8. **Testes e lint - escopo conforme o tamanho do projeto:**
+   - Obter a lista de arquivos alterados: `git status --porcelain` e `git diff --name-only`
+   - **Avaliar o tamanho da suíte** antes de decidir o escopo (ex: `ls **/*_spec.rb | wc -l`, `find . -name "*.test.*" | wc -l`)
+     - **Suíte pequena/rápida** (poucas dezenas de arquivos ou roda em segundos): rodar tudo, é mais seguro e pega quebras em consumidores do código alterado
+     - **Suíte grande/lenta** (centenas de arquivos ou minutos de execução): restringir aos arquivos modificados
+   - **Escopo restrito - testes:**
+     - Rodar o spec do arquivo alterado (ex: `app/models/foo.rb` → `spec/models/foo_spec.rb`)
+     - Se o arquivo alterado for um teste, rodar apenas esse teste
+     - Se alterou interface pública ou assinatura, rodar também os specs dos consumidores diretos
+     - Ex: `bundle exec rspec <specs>`, `npx jest <arquivos>`
+   - **Escopo restrito - lint:** apenas nos arquivos modificados
+     - Ex: `bundle exec rubocop <arquivos>`, `npx eslint <arquivos>`
+   - **Rationale:** em projeto grande a suíte completa é lenta e traz falhas pré-existentes não relacionadas ao card; em projeto pequeno o custo é irrelevante e a cobertura extra compensa
+   - Se surgirem falhas em arquivos que você não modificou, documentar na seção "Discussões" e não corrigir sem alinhar com o usuário
+
+9. **Status final:**
    ```
    ✅ Trabalho em progresso no card: nome-do-card
 
@@ -93,4 +107,6 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code g
 - SEMPRE documente decisões na seção "Discussões"
 - SEMPRE atualize o card com o progresso
 - Se encontrar bloqueios, documente na seção "Discussões" e pergunte ao usuário
+- Sempre execute testes e lint antes de commitar - suíte completa se o projeto for pequeno, escopo dos arquivos modificados se for grande
 - Faça commits incrementais conforme completa tarefas significativas
+
