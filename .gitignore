@@ -10,6 +10,7 @@
 !SETUP.md
 !code guidelines.md
 !sync-commands.sh
+!sync-commands.ps1
 
 # Definições dos slash commands (incluindo commands/lib/)
 !commands/

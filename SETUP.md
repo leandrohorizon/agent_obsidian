@@ -7,7 +7,7 @@ Este documento explica como configurar a integração entre seu vault Obsidian e
 - Claude Code instalado
 - Git instalado
 - GitHub CLI (`gh`) instalado (opcional, para criar PRs automaticamente)
-- Shell: bash ou zsh
+- Shell: bash, zsh ou PowerShell (Windows)
 
 ## Instalação
 
@@ -17,15 +17,26 @@ Adicione a seguinte linha ao seu arquivo de configuração do shell:
 
 **Para zsh (macOS padrão):**
 ```bash
-echo 'export OBSIDIAN_VAULT_PATH="/Users/leandrocoutomessias/workspace/obisidian/leanddro"' >> ~/.zshrc
+echo 'export OBSIDIAN_VAULT_PATH="/Users/user/workspace/obisidian/agent_obsidian"' >> ~/.zshrc
 source ~/.zshrc
 ```
 
 **Para bash:**
 ```bash
-echo 'export OBSIDIAN_VAULT_PATH="/Users/leandrocoutomessias/workspace/obisidian/leanddro"' >> ~/.bashrc
+echo 'export OBSIDIAN_VAULT_PATH="/Users/user/workspace/obisidian/agent_obsidian"' >> ~/.bashrc
 source ~/.bashrc
 ```
+
+**Para PowerShell (Windows):**
+```powershell
+# Definir permanentemente (persiste entre sessões)
+setx OBSIDIAN_VAULT_PATH "C:\Users\seu-usuario\workspace\agent_obsidian"
+
+# Definir na sessão atual (necessário após setx para uso imediato)
+$env:OBSIDIAN_VAULT_PATH = "C:\Users\seu-usuario\workspace\agent_obsidian"
+```
+
+> **Nota:** No Windows, `setx` define a variável permanentemente, mas só afeta **novas** sessões de terminal. Use o comando `$env:...` na sessão atual para que funcione imediatamente.
 
 ### 2. Verificar instalação
 
