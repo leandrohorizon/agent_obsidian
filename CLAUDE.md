@@ -580,6 +580,7 @@ Commands are defined in `commands/*.md` and synced to `~/.claude/commands/` via:
 This script:
 - Copies all `commands/*.md` to `~/.claude/commands/`
 - Makes them available as slash commands globally in Claude Code
+- Generates VS Code skills in `~/.agent_obsidian/skills/` (structure below)
 
 Verify installation:
 ```bash
@@ -587,6 +588,34 @@ ls ~/.claude/commands/
 ```
 
 Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `complete-card.md`, `load-context.md`, `update-card.md`, `refine-card.md`, `condense-memory.md`
+
+### VS Code Skills Installation
+
+Skills are installed in `~/.agent_obsidian/skills/` with the correct VS Code structure:
+
+```
+~/.agent_obsidian/skills/
+├── board-status/
+│   └── SKILL.md
+├── start-card/
+│   └── SKILL.md
+├── work-on-card/
+│   └── SKILL.md
+└── ...
+```
+
+**Important:** Each skill must be in its own folder with a `SKILL.md` file. The `SKILL.md` must start with YAML frontmatter where `name` is **exactly equal to the folder name** (lowercase with hyphens/numbers):
+
+```yaml
+---
+name: start-card
+description: Skill do Agent Obsidian para gerenciar o board Kanban em Obsidian.
+---
+```
+
+If the `name` doesn't match the folder name, VS Code may silently ignore the skill.
+
+The `sync-commands.sh` script automatically generates these skills from `commands/*.md`.
 
 ### Git & GitHub CLI
 
