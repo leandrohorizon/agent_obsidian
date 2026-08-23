@@ -17,13 +17,13 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
 2. **Detectar projeto atual:**
    - Obter nome do diretório atual: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
    - Normalizar nome: lowercase, substituir espaços e hífens por underscore
-   - Este será o nome da pasta do projeto em `condensed memory/`
+   - Este será o nome do arquivo de projeto em `condensed memory/projects/`
 
-3. **Ler arquivo de memória atual:**
-   - Se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente
-   - Senão, construir path: `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
-   - Se não existir, criar a estrutura de pastas
-   - Entender estrutura e conteúdo existente
+3. **Ler arquivos de memória (dois eixos):**
+   - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
+   - **Memória de feature:** derivar do campo `feature:` do card via `get_feature_memory_path()` → `$OBSIDIAN_VAULT_PATH/condensed memory/features/{feature}.md`
+   - Se não existirem, criar a estrutura de pastas (`projects/` e `features/`)
+   - Entender estrutura e conteúdo existente de cada eixo
 
 4. **Determinar cards a processar:**
    - Se `<nome-do-card>` foi fornecido:
@@ -50,7 +50,22 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
    - Priorizar decisões arquiteturais e "por quês" sobre detalhes de implementação
    - Gerar resumos compactos e menos verbosos
 
-   **Categorizar por tipo:**
+   **Classificar cada item em um eixo (projeto OU feature) antes de escrever:**
+
+   **Critério de classificação (com desempate explícito):**
+   - **Projeto** — o que é estável e transversal ao repositório: arquitetura,
+     convenções de código, ferramentas, setup, gotchas do stack. Responde a
+     "como se escreve código neste repo?".
+   - **Feature** — regra de negócio, fluxo ponta a ponta, contratos entre
+     serviços, decisões e edge cases daquela feature. Responde a "como funciona
+     X ponta a ponta?".
+   - **Desempate:** se o item descreve um fluxo, contrato ou regra de negócio
+     que atravessa serviços/repositórios → **feature**. Se descreve como o
+     código do repo é estruturado, configurado ou convencionado → **projeto**.
+     Em caso de dúvida, perguntar: "este conhecimento é útil para quem trabalha
+     em outro repositório desta mesma feature?" Se sim → feature; se não → projeto.
+
+   **Categorias de projeto (5):**
 
    a) **🏗️ Arquitetura**
       - Decisões estruturais e seus motivos (sempre destacar com **Decisão:** ou **Rationale:**)
@@ -82,9 +97,36 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
       - Edge cases importantes
       - Insights e "gotchas"
 
-6. **Atualizar condensed memory.md:**
+   **Categorias de feature (próprias, não reaproveitam as de projeto):**
 
-   **NOVO FORMATO - Estrutura obrigatória:**
+   a) **🔀 Fluxo Ponta a Ponta**
+      - Sequência completa da feature atravessando serviços/repositórios
+      - Ordem das chamadas, quem chama quem, onde cada etapa vive
+
+   b) **🤝 Contratos entre Serviços**
+      - Payloads, schemas, campos trocados entre serviços
+      - Formato esperado/produzido por cada lado do contrato
+      - Exemplo: `status_invoice` — o que o `platform` envia e o que o `fraud-payout` consome
+
+   c) **📐 Regras de Negócio**
+      - Regras e validações específicas da feature
+      - Comportamento esperado em cada cenário
+
+   d) **⚠️ Edge Cases**
+      - Casos limite, intermitências, comportamentos inesperados
+      - Problemas conhecidos e como foram resolvidos
+
+6. **Atualizar os arquivos de memória (roteamento por eixo):**
+
+   **Roteamento:**
+   - Itens classificados como **projeto** → escrever em `condensed memory/projects/{projeto}.md`
+   - Itens classificados como **feature** → escrever em `condensed memory/features/{feature}.md`
+   - Se o card tem `feature:` no frontmatter → escrever nos dois arquivos (projeto + feature)
+   - Se o card NÃO tem `feature:` → escrever só no de projeto e avisar no output:
+     `⚠️ Card sem feature: — conhecimento de feature não roteado. Preencha feature: no frontmatter.`
+   - Se `feature:` é uma lista YAML (`feature: [a, b]`) → escrever o recorte pertinente de cada item em cada arquivo de feature correspondente
+
+   **FORMATO DO ARQUIVO DE PROJETO - Estrutura obrigatória:**
 
    ```markdown
    # Condensed Memory - {nome_projeto}
@@ -190,16 +232,80 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
 
    5. **Emojis para navegação:** Use os emojis definidos para cada categoria (🏗️📋🛠️⚙️💡)
 
+   **FORMATO DO ARQUIVO DE FEATURE - Estrutura obrigatória:**
+
+   ```markdown
+   # Feature - {slug-da-feature}
+
+   > Última atualização: YYYY-MM-DD
+   > Repositórios envolvidos: [repo1, repo2, ...]
+   > Cards de origem: [card1, card2, ...]
+
+   ---
+
+   ## 🔀 Fluxo Ponta a Ponta
+
+   ### Nome do Fluxo
+   Sequência completa atravessando serviços/repositórios
+   - Etapa 1 (em {repo}): o que acontece
+   - Etapa 2 (em {repo}): o que acontece
+   - Exemplo inline quando relevante: `código ou comando`
+
+   **Decisão:** Por que o fluxo é assim e qual problema resolve.
+
+   ---
+
+   ## 🤝 Contratos entre Serviços
+
+   ### Nome do Contrato
+   O que cada lado envia/consome
+   - {serviço A} envia: campos, formato
+   - {serviço B} consome: campos, formato
+   - Exemplo de payload quando relevante
+
+   ---
+
+   ## 📐 Regras de Negócio
+
+   ### Nome da Regra
+   Regra ou validação específica da feature
+   - Comportamento esperado em cada cenário
+
+   **Rationale:** Por que a regra existe.
+
+   ---
+
+   ## ⚠️ Edge Cases
+
+   - Caso limite, intermitência ou comportamento inesperado
+   - Problema conhecido e como foi resolvido
+   ```
+
+   **REGRAS DE FORMATAÇÃO DO ARQUIVO DE FEATURE:**
+   1. **Cabeçalho com repositórios e cards de origem:** liste os repositórios
+      envolvidos e os cards de origem uma vez no topo, não repita em cada item
+   2. **Categorias próprias de feature:** use 🔀🤝📐⚠️ (fluxo, contratos, regras,
+      edge cases) — NÃO reaproveite as 5 categorias de projeto
+   3. **Destaque decisões:** use `**Decisão:**` ou `**Rationale:**` para o "por quê"
+   4. **Compactar:** agrupe itens relacionados, evite verbosidade
+   5. **Deduplicação por eixo:** ao consolidar múltiplos cards da mesma feature,
+      deduplique dentro do arquivo de feature (mesma regra do eixo de projeto)
+
 7. **Evitar duplicação:**
-   - Antes de adicionar conhecimento, verificar se já existe
-   - Consolidar informações similares
+   - Antes de adicionar conhecimento, verificar se já existe em cada eixo
+   - Consolidar informações similares dentro do mesmo arquivo (projeto OU feature)
    - Manter apenas o mais relevante e atual
 
 8. **Marcar cards processados:**
-   - Adicionar comentário no final de cada card processado:
+   - Adicionar comentário no final de cada card processado, registrando os dois destinos:
      ```markdown
      ---
-     > ✅ Conhecimento consolidado em condensed memory/{nome-do-projeto}/condensed memory.md em YYYY-MM-DD
+     > ✅ Conhecimento consolidado em condensed memory/projects/{projeto}.md e condensed memory/features/{feature}.md em YYYY-MM-DD
+     ```
+   - Se o card não tem `feature:`, registrar apenas o destino de projeto:
+     ```markdown
+     ---
+     > ✅ Conhecimento consolidado em condensed memory/projects/{projeto}.md em YYYY-MM-DD (sem feature:)
      ```
 
 9. **Confirmar:**
@@ -210,14 +316,24 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
 
    📝 Card processado: {nome-do-card}
    💡 Insights extraídos e consolidados
-   📄 Condensed memory atualizado
+   📄 Memória de projeto atualizada: condensed memory/projects/{projeto}.md
+   📄 Memória de feature atualizada: condensed memory/features/{feature}.md
 
-   Categorias atualizadas:
+   Categorias de projeto atualizadas:
    - 🏗️ Arquitetura: +N itens
    - 📋 Padrões e Convenções: +N itens
    - 🛠️ Ferramentas e Comandos: +N itens
    - ⚙️ Configuração: +N itens
    - 💡 Aprendizados Chave: +N itens
+
+   Categorias de feature atualizadas:
+   - 🔀 Fluxo Ponta a Ponta: +N itens
+   - 🤝 Contratos entre Serviços: +N itens
+   - 📐 Regras de Negócio: +N itens
+   - ⚠️ Edge Cases: +N itens
+
+   {Se o card não tem feature:}
+   ⚠️ Card sem feature: — conhecimento de feature não roteado. Preencha feature: no frontmatter.
 
    O conhecimento deste card estará disponível automaticamente
    em todos os comandos /work-on-card futuros.
@@ -229,17 +345,25 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
 
    📚 Cards processados: X
    💡 Insights consolidados: Y
-   📄 Condensed memory atualizado em novo formato
+   📄 Memória de projeto atualizada (condensed memory/projects/)
+   📄 Memórias de feature atualizadas (condensed memory/features/)
 
-   Categorias atualizadas:
+   Categorias de projeto atualizadas:
    - 🏗️ Arquitetura: N subsistemas
    - 📋 Padrões e Convenções: N padrões
    - 🛠️ Ferramentas e Comandos: N ferramentas
    - ⚙️ Configuração: N configurações
    - 💡 Aprendizados Chave: N insights
 
+   Categorias de feature atualizadas:
+   - 🔀 Fluxo Ponta a Ponta: N fluxos
+   - 🤝 Contratos entre Serviços: N contratos
+   - 📐 Regras de Negócio: N regras
+   - ⚠️ Edge Cases: N edge cases
+
    ✨ Melhorias aplicadas:
-   - Deduplicação de informações repetidas
+   - Roteamento do conhecimento em dois eixos (projeto + feature)
+   - Deduplicação de informações repetidas dentro de cada eixo
    - Decisões arquiteturais destacadas
    - Formato mais compacto e estruturado
    - Origem consolidada no header
@@ -264,8 +388,11 @@ Use este modo para fazer uma consolidação geral de todos os cards que ainda n�
 
 ## Notas Importantes
 - **SEMPRE use o novo formato** com emojis de categoria e decisões destacadas
+- **Classifique cada item em um eixo** (projeto OU feature) antes de escrever, usando o critério de desempate
+- **Roteie para o arquivo correto** - projeto em `projects/{projeto}.md`, feature em `features/{feature}.md`
+- **Card sem `feature:`** - escreva só no de projeto e avise no output
 - **NÃO repita** a origem em cada item - liste uma vez no header
-- **Deduplique** informações - se 3 cards falam de git, consolide em uma seção só
+- **Deduplique** informações dentro de cada eixo - se 3 cards falam de git, consolide em uma seção só
 - **Priorize decisões** arquiteturais e "por quês" sobre detalhes de implementação
 - **Seja compacto** - agrupe informações relacionadas, evite verbosidade
 - **Destaque decisões** - sempre use `**Decisão:**` ou `**Rationale:**` quando explicar escolhas

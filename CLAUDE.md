@@ -12,7 +12,9 @@ This system uses a **distributed state architecture** with centralized knowledge
 ~/workspace/
 ├── obisidian/leanddro/          # Centralized vault (this repo)
 │   ├── board/                    # Kanban board (all projects)
-│   ├── condensed memory/         # Per-project knowledge bases
+│   ├── condensed memory/         # Knowledge bases in two axes
+│   │   ├── projects/             # Per-repository memory
+│   │   └── features/             # Per-feature memory (crosses repos)
 │   ├── commands/                 # Slash command definitions
 │   └── code guidelines.md        # Development standards
 │
@@ -27,7 +29,7 @@ This system uses a **distributed state architecture** with centralized knowledge
 
 - **Centralized Vault:** Single Obsidian vault stores all cards and knowledge across projects
 - **Distributed State:** Each project has its own `.agent_obsidian` file tracking current work
-- **Knowledge Consolidation:** Completed cards contribute to project-specific condensed memory
+- **Two-Axis Knowledge:** Completed cards route knowledge to project memory (repo-specific) and feature memory (crosses repositories)
 - **Zero Configuration:** State files auto-created on first command use
 
 ### The `.agent_obsidian` State File
@@ -39,14 +41,20 @@ This system uses a **distributed state architecture** with centralized knowledge
 **Structure:**
 ```json
 {
-  "version": "1.0",
+  "version": "2.0",
   "vault_path": "/Users/leandrocoutomessias/workspace/obisidian/leanddro",
+  "condensed_memory_path": "/Users/leandrocoutomessias/workspace/obisidian/leanddro/condensed memory/projects/agent_obsidian.md",
   "current_card": {
     "name": "card-name",
     "path": "/absolute/path/to/board/2.in_progress/card.md"
   }
 }
 ```
+
+**Version 2.0 (two-axis model):**
+- `condensed_memory_path` points to `condensed memory/projects/{projeto}.md`
+- The feature memory path is NOT stored in state — it's derived from the card's `feature:` field at load time via `get_feature_memory_path()`
+- Migration: if an existing valid state has `version` < 2.0, `validate_agent_state()` rewrites `condensed_memory_path` to the new layout (instead of keeping the old path)
 
 **Lifecycle:**
 - Created automatically by any command if missing
@@ -124,19 +132,27 @@ Business rules, patterns identified, gotchas, insights
 
 ### Knowledge Consolidation System
 
-**Condensed Memory** is the system's long-term memory, organized per project:
+**Condensed Memory** is the system's long-term memory, organized in **two axes** with disjoint responsibilities:
 
 ```
 condensed memory/
-├── agent_obsidian/
-│   └── condensed memory.md
-├── calculator/
-│   └── condensed memory.md
-└── ecommerce/
-    └── condensed memory.md
+├── projects/                    # Per-repository memory (stable, transversal)
+│   ├── agent_obsidian.md
+│   ├── calculator.md
+│   └── ecommerce.md
+└── features/                    # Per-feature memory (crosses repositories)
+    ├── analise-pix-in.md
+    ├── analise-boleto-out.md
+    └── consulta-balance.md
 ```
 
-**Format (NEW - as of recent cards):**
+**Two-Axis Model:**
+- **Project memory** (`projects/{projeto}.md`) — what is stable and transversal to the repository: architecture, code conventions, tools, setup, stack gotchas. **No feature knowledge.**
+- **Feature memory** (`features/{feature}.md`) — business rules, end-to-end flow, contracts between services, decisions and edge cases of that feature, **crossing repositories**.
+
+A card declares its feature in the frontmatter (`feature: boleto-out`) and `/condense-memory` **routes** each extracted piece of knowledge to the correct axis, instead of dumping everything into one file. This solves the case where a feature (e.g. boleto out) spans three repositories — the full-flow knowledge lives in a single feature file, accessible from any project.
+
+**Format of the project memory file:**
 ```markdown
 # Condensed Memory - {project_name}
 
@@ -192,12 +208,57 @@ What it does (1 line)
 - Valuable edge case to know
 ```
 
+**Format of the feature memory file (own categories, not reusing project's):**
+```markdown
+# Feature - {slug-da-feature}
+
+> Última atualização: YYYY-MM-DD
+> Repositórios envolvidos: [repo1, repo2, ...]
+> Cards de origem: [card1, card2, ...]
+
+---
+
+## 🔀 Fluxo Ponta a Ponta
+
+### Flow Name
+Complete sequence crossing services/repositories
+- Step 1 (in {repo}): what happens
+- Step 2 (in {repo}): what happens
+
+**Decisão:** Why the flow is this way.
+
+---
+
+## 🤝 Contratos entre Serviços
+
+### Contract Name
+What each side sends/consumes
+- {service A} sends: fields, format
+- {service B} consumes: fields, format
+
+---
+
+## 📐 Regras de Negócio
+
+### Rule Name
+Specific rule or validation of the feature
+- Expected behavior in each scenario
+
+---
+
+## ⚠️ Edge Cases
+
+- Edge case, intermittency or unexpected behavior
+- Known problem and how it was solved
+```
+
 **Design Principles:**
-- **Deduplication:** Consolidate similar information from multiple cards
+- **Two-Axis Routing:** Classify each extracted item as project OR feature before writing, with explicit tie-break (does this knowledge help someone working in another repo of the same feature? → feature)
+- **Deduplication:** Consolidate similar information from multiple cards within each axis
 - **Highlight Decisions:** Always use `**Decisão:**` or `**Rationale:**` to explain "why"
 - **Compact:** Group related items, avoid verbosity
 - **Source Once:** List processed cards in header, don't repeat per item
-- **Category Navigation:** Use emojis (🏗️📋🛠️⚙️💡) for quick scanning
+- **Category Navigation:** Use emojis (🏗️📋🛠️⚙️💡 for project; 🔀🤝📐⚠️ for feature) for quick scanning
 
 ## Command Workflow
 
@@ -218,7 +279,8 @@ cd ~/workspace/project-calculator
 /work-on-card
 # → Loads card from current_card.path directly
 # → Loads code guidelines.md
-# → Loads condensed memory/calculator/condensed memory.md
+# → Loads condensed memory/projects/calculator.md (project memory)
+# → Loads condensed memory/features/{feature}.md (feature memory, if card has feature:)
 # → Loads dependent cards
 # → Executes tasks
 # → Updates card with progress
@@ -303,8 +365,9 @@ Executes tasks in a card with full context.
 **Context Loaded:**
 1. Card content (via direct path if from state)
 2. `code guidelines.md` - development standards
-3. `condensed memory/{project}/condensed memory.md` - accumulated knowledge
-4. Dependent cards referenced as `[[card-name]]`
+3. `condensed memory/projects/{project}.md` - project memory (architecture, conventions, tools)
+4. `condensed memory/features/{feature}.md` - feature memory (if card has `feature:` frontmatter)
+5. Dependent cards referenced as `[[card-name]]`
 
 **Actions:**
 - Identifies pending tasks (`- [ ]`)
@@ -345,8 +408,9 @@ Analyzes and refines vague or incomplete cards BEFORE starting work.
    - Integration questions
    - Code analysis findings
 3. Adds questions to "Discussões" section with timestamp
-4. **Converses with user** to resolve each question
-5. Updates card during conversation:
+4. **Validates/fills `feature:` in frontmatter** - ensures the card declares its feature (slug) so `/condense-memory` can route knowledge to the correct axis
+5. **Converses with user** to resolve each question
+6. Updates card during conversation:
    - Replaces generic tasks with specific actions
    - Updates description if needed
    - Marks questions as resolved
@@ -470,7 +534,7 @@ Loads complete context for a card (read-only, for understanding).
 **Actions:**
 1. Reads card (via direct path if from state)
 2. Loads code guidelines
-3. Loads condensed memory
+3. Loads condensed memory (both axes: project + feature)
 4. Loads dependent cards
 5. Checks git status, branch, last commit
 6. **Analyzes branch modifications:**
@@ -490,7 +554,7 @@ Loads complete context for a card (read-only, for understanding).
    - Git context
    - Branch modifications (commits, staged, unstaged)
    - Code guidelines loaded
-   - Condensed memory categories
+   - Condensed memory categories (project + feature)
 
 **Use Cases:**
 - Start new work session
@@ -510,7 +574,7 @@ Consolidates knowledge from completed cards into condensed memory.
 **Actions:**
 1. Gets vault path (from `.agent_obsidian` or `$OBSIDIAN_VAULT_PATH`)
 2. Detects project: `basename $(pwd)` normalized (lowercase, underscores)
-3. Reads `condensed memory/{project}/condensed memory.md`
+3. Reads the card's `feature:` from frontmatter to determine the target axis
 4. For specified card or all unprocessed cards:
    - Extracts from sections:
      - "Descrição"
@@ -522,20 +586,28 @@ Consolidates knowledge from completed cards into condensed memory.
    - Consolidates related concepts
    - Prioritizes architectural decisions and "why" over implementation details
    - Generates compact summaries
-6. Categorizes knowledge:
-   - 🏗️ **Arquitetura:** Structural decisions, patterns, integrations
-   - 📋 **Padrões e Convenções:** Rules, code conventions, templates
-   - 🛠️ **Ferramentas e Comandos:** Slash commands, scripts, libraries
-   - ⚙️ **Configuração:** Environment variables, setup, dependencies
-   - 💡 **Aprendizados Chave:** Problems/solutions, trade-offs, insights
-7. Updates condensed memory with NEW FORMAT (structured, emoji categories)
+6. **Routes each item to the correct axis** (two-axis model):
+   - **Project memory** (`condensed memory/projects/{projeto}.md`) — stable, transversal to the repo:
+     - 🏗️ **Arquitetura:** Structural decisions, patterns, integrations
+     - 📋 **Padrões e Convenções:** Rules, code conventions, templates
+     - 🛠️ **Ferramentas e Comandos:** Slash commands, scripts, libraries
+     - ⚙️ **Configuração:** Environment variables, setup, dependencies
+     - 💡 **Aprendizados Chave:** Problems/solutions, trade-offs, insights
+   - **Feature memory** (`condensed memory/features/{feature}.md`) — crosses repositories:
+     - 🔀 **Fluxo Ponta a Ponta:** Complete sequence crossing services/repos
+     - 🤝 **Contratos entre Serviços:** What each side sends/consumes
+     - 📐 **Regras de Negócio:** Specific rules and validations of the feature
+     - ⚠️ **Edge Cases:** Intermittencies, known problems and solutions
+   - **Tie-break:** does this knowledge help someone working in another repo of the same feature? → feature
+7. Updates the target memory file(s) with the structured, emoji-categorized format
 8. Marks processed cards:
    ```markdown
    ---
-   > ✅ Conhecimento consolidado em condensed memory/{project}/condensed memory.md em YYYY-MM-DD
+   > ✅ Conhecimento consolidado em condensed memory (projects/{projeto}.md e/ou features/{feature}.md) em YYYY-MM-DD
    ```
 
 **Key Principles:**
+- **Two-Axis Routing:** Classify each item as project OR feature before writing
 - **Deduplicate:** If 3 cards mention git, consolidate into one section
 - **Highlight Decisions:** Always use `**Decisão:**` or `**Rationale:**`
 - **Be Compact:** Group related info, avoid verbosity
@@ -703,8 +775,10 @@ Commands automatically load and apply these guidelines when writing code.
 
 Each project has its own:
 - `.agent_obsidian` (independent state)
-- Condensed memory folder (independent knowledge base)
+- Project memory file (`condensed memory/projects/{projeto}.md`)
 - Active card (one per project)
+
+Feature memory (`condensed memory/features/{feature}.md`) is **shared across projects** — a feature spanning multiple repos consolidates its knowledge in one file, accessible from any project.
 
 Switch between projects by just `cd`-ing - commands adapt automatically.
 
@@ -725,13 +799,14 @@ Reference cards in "Dependências" section:
 
 The system builds knowledge over time:
 1. **Per Card:** "Conhecimento Adquirido" section
-2. **Per Project:** `condensed memory/{project}/condensed memory.md`
-3. **Code Guidelines:** Shared standards across all projects
+2. **Per Project:** `condensed memory/projects/{projeto}.md` (project memory)
+3. **Per Feature:** `condensed memory/features/{feature}.md` (feature memory, crosses repos)
+4. **Code Guidelines:** Shared standards across all projects
 
 This creates a feedback loop:
-- New task → Load condensed memory
+- New task → Load condensed memory (both axes)
 - Complete task → Document learnings
-- Finalize card → Consolidate into condensed memory
+- Finalize card → Consolidate into condensed memory (routed to project and/or feature)
 - Future tasks → Benefit from past learnings
 
 ### Refinement Workflow for Vague Cards
@@ -804,13 +879,14 @@ If you're unsure which card you were working on:
 │   ├── complete-card.md
 │   ├── load-context.md
 │   └── condense-memory.md
-├── condensed memory/         # Per-project knowledge bases
-│   ├── agent_obsidian/
-│   │   └── condensed memory.md
-│   ├── {project1}/
-│   │   └── condensed memory.md
-│   └── {project2}/
-│       └── condensed memory.md
+├── condensed memory/         # Knowledge bases in two axes
+│   ├── projects/             # Per-repository memory (stable, transversal)
+│   │   ├── agent_obsidian.md
+│   │   ├── {project1}.md
+│   │   └── {project2}.md
+│   └── features/             # Per-feature memory (crosses repositories)
+│       ├── analise-pix-in.md
+│       └── analise-boleto-out.md
 ├── templates/
 │   └── card template.md      # Template for new cards
 ├── scripts/
@@ -828,7 +904,7 @@ If you're unsure which card you were working on:
 - Uses Obsidian as a Kanban board (folders = states)
 - Integrates with Claude Code via custom slash commands
 - Tracks state per project via `.agent_obsidian` files
-- Consolidates knowledge per project via condensed memory
+- Consolidates knowledge per project and per feature via condensed memory (two-axis model)
 - Automates git workflow (branches, commits, PRs)
 - Builds long-term memory through completed cards
 - Enables AI to work on tasks with full context and standards
