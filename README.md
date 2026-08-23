@@ -54,13 +54,13 @@ Cada tarefa completada contribui para uma **condensed memory** que o Claude carr
 - **Memória de projeto** (`condensed memory/projects/{projeto}.md`) — o que é estável e transversal ao repositório: arquitetura, convenções de código, ferramentas, setup, gotchas do stack. **Sem conhecimento de feature.**
 - **Memória de feature** (`condensed memory/features/{feature}.md`) — regra de negócio, fluxo ponta a ponta, contratos entre serviços, decisões e edge cases daquela feature, **atravessando repositórios**.
 
-O card declara sua feature no frontmatter (`feature: boleto-out`) e o `/condense-memory` **roteia** cada pedaço de conhecimento para o eixo correto, em vez de despejar tudo num arquivo só. Isso resolve o caso em que uma feature (ex: boleto out) atravessa três repositórios — o conhecimento do fluxo completo fica num único arquivo de feature, acessível de qualquer projeto.
+O card declara sua feature no frontmatter (`feature: feature-x`) e o `/condense-memory` **roteia** cada pedaço de conhecimento para o eixo correto, em vez de despejar tudo num arquivo só. Isso resolve o caso em que uma feature (ex: feature-x) atravessa três repositórios — o conhecimento do fluxo completo fica num único arquivo de feature, acessível de qualquer projeto.
 
 ### 🔄 Suporte Multi-Projetos
 Um vault centralizado, estado independente por projeto:
 ```
 ~/workspace/
-├── obsidian/leanddro/          # Vault centralizado (este repo)
+├── obsidian/user/              # Vault centralizado (este repo)
 │   ├── board/                   # Todos os cards
 │   └── condensed memory/        # Conhecimento em dois eixos
 │       ├── projects/            # Memória por repositório
@@ -190,7 +190,7 @@ Cada card segue um template:
 repo: git@github.com:user/project.git
 branch: feature/card-name
 status: In Progress
-feature: analise-pix-in
+feature: feature-x
 started: 2026-01-15
 ---
 
@@ -262,24 +262,24 @@ Operations flow through: validate → calculate → format
 Regra de negócio, fluxo ponta a ponta, contratos entre serviços e edge cases daquela feature, **atravessando repositórios**. Categorias próprias (não reaproveita as de projeto).
 
 ```markdown
-# Feature - analise-boleto-out
+# Feature - feature-x
 
 > Última atualização: 2026-01-15
-> Repositórios envolvidos: [platform, iugu_bank, fraud-payout]
-> Cards de origem: [boleto-out-platform, boleto-out-iugu, boleto-out-fraud]
+> Repositórios envolvidos: [service-a, service-b, service-c]
+> Cards de origem: [card-feature-x-a, card-feature-x-b, card-feature-x-c]
 
 ## 🔀 Fluxo Ponta a Ponta
 
-### Enriquecimento de boleto out
-- platform envia dados de enriquecimento
-- iugu_bank repassa ao fraud-payout
-- fraud-payout consome payload e para de consultar
+### Enriquecimento de feature-x
+- service-a envia dados de enriquecimento
+- service-b repassa ao service-c
+- service-c consome payload e para de consultar
 
 ## 🤝 Contratos entre Serviços
 
-### status_invoice
-- platform envia: {campos}
-- fraud-payout consome: {campos}
+### campo_status
+- service-a envia: {campos}
+- service-c consome: {campos}
 
 ## 📐 Regras de Negócio
 

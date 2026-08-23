@@ -106,7 +106,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
    b) **🤝 Contratos entre Serviços**
       - Payloads, schemas, campos trocados entre serviços
       - Formato esperado/produzido por cada lado do contrato
-      - Exemplo: `status_invoice` — o que o `platform` envia e o que o `fraud-payout` consome
+      - Exemplo: `campo_status` — o que o `service-a` envia e o que o `service-c` consome
 
    c) **📐 Regras de Negócio**
       - Regras e validações específicas da feature

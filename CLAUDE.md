@@ -10,7 +10,7 @@ This system uses a **distributed state architecture** with centralized knowledge
 
 ```
 ~/workspace/
-├── obisidian/leanddro/          # Centralized vault (this repo)
+├── obsidian/user/              # Centralized vault (this repo)
 │   ├── board/                    # Kanban board (all projects)
 │   ├── condensed memory/         # Knowledge bases in two axes
 │   │   ├── projects/             # Per-repository memory
@@ -42,8 +42,8 @@ This system uses a **distributed state architecture** with centralized knowledge
 ```json
 {
   "version": "2.0",
-  "vault_path": "/Users/leandrocoutomessias/workspace/obisidian/leanddro",
-  "condensed_memory_path": "/Users/leandrocoutomessias/workspace/obisidian/leanddro/condensed memory/projects/agent_obsidian.md",
+  "vault_path": "/Users/user/workspace/obsidian/user",
+  "condensed_memory_path": "/Users/user/workspace/obsidian/user/condensed memory/projects/agent_obsidian.md",
   "current_card": {
     "name": "card-name",
     "path": "/absolute/path/to/board/2.in_progress/card.md"
@@ -141,16 +141,16 @@ condensed memory/
 │   ├── calculator.md
 │   └── ecommerce.md
 └── features/                    # Per-feature memory (crosses repositories)
-    ├── analise-pix-in.md
-    ├── analise-boleto-out.md
-    └── consulta-balance.md
+    ├── feature-x.md
+    ├── feature-y.md
+    └── feature-z.md
 ```
 
 **Two-Axis Model:**
 - **Project memory** (`projects/{projeto}.md`) — what is stable and transversal to the repository: architecture, code conventions, tools, setup, stack gotchas. **No feature knowledge.**
 - **Feature memory** (`features/{feature}.md`) — business rules, end-to-end flow, contracts between services, decisions and edge cases of that feature, **crossing repositories**.
 
-A card declares its feature in the frontmatter (`feature: boleto-out`) and `/condense-memory` **routes** each extracted piece of knowledge to the correct axis, instead of dumping everything into one file. This solves the case where a feature (e.g. boleto out) spans three repositories — the full-flow knowledge lives in a single feature file, accessible from any project.
+A card declares its feature in the frontmatter (`feature: feature-x`) and `/condense-memory` **routes** each extracted piece of knowledge to the correct axis, instead of dumping everything into one file. This solves the case where a feature (e.g. feature-x) spans three repositories — the full-flow knowledge lives in a single feature file, accessible from any project.
 
 **Format of the project memory file:**
 ```markdown
@@ -633,7 +633,7 @@ Analyzes codebase and creates CLAUDE.md file (standard onboarding command).
 Add to your shell config (`~/.zshrc` or `~/.bashrc`):
 
 ```bash
-export OBSIDIAN_VAULT_PATH="/Users/leandrocoutomessias/workspace/obisidian/leanddro"
+export OBSIDIAN_VAULT_PATH="/Users/user/workspace/obsidian/user"
 ```
 
 Verify:
@@ -862,7 +862,7 @@ If you're unsure which card you were working on:
 ## File Structure Reference
 
 ```
-/Users/leandrocoutomessias/workspace/obisidian/leanddro/
+/Users/user/workspace/obsidian/user/
 ├── board/
 │   ├── 1.not_started/        # New cards
 │   ├── 2.in_progress/        # Active cards
@@ -885,8 +885,8 @@ If you're unsure which card you were working on:
 │   │   ├── {project1}.md
 │   │   └── {project2}.md
 │   └── features/             # Per-feature memory (crosses repositories)
-│       ├── analise-pix-in.md
-│       └── analise-boleto-out.md
+│       ├── feature-x.md
+│       └── feature-y.md
 ├── templates/
 │   └── card template.md      # Template for new cards
 ├── scripts/
