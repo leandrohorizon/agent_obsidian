@@ -39,10 +39,11 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
       - Se `.agent_obsidian` existe e tem `code_guidelines_path`, usar ele diretamente
       - Senão, usar `$OBSIDIAN_VAULT_PATH/code guidelines.md`
 
-   c) **Carregar Condensed Memory:**
-      - Se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente
-      - Senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
-      - E construir: `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
+   c) **Carregar Condensed Memory (dois eixos):**
+      - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
+      - **Memória de feature:** derivar do campo `feature:` do card via `get_feature_memory_path()` → `$OBSIDIAN_VAULT_PATH/condensed memory/features/{feature}.md`
+      - **Comportamento quando o card não tem `feature:` ou o arquivo da feature não existe:** carregar só a memória de projeto, sem erro
+      - **Reportar no output** quais arquivos foram carregados (projeto e/ou feature)
       - Se não existir, informar que não há conhecimento consolidado
 
    d) **Carregar cards dependentes:**
@@ -57,7 +58,19 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
       - Se menciona "banco de dados", verificar schema/migrations
       - Usar `grep`, `find` e `Read` para explorar o código mencionado
 
-4. **Analisar clareza do card:**
+4. **Validar/preencher `feature:` no frontmatter:**
+   - Ler o campo `feature:` do frontmatter do card (via `parse_frontmatter`)
+   - Se ausente ou vazio:
+     - Listar os arquivos existentes em `$OBSIDIAN_VAULT_PATH/condensed memory/features/`
+     - Sugerir a feature mais próxima do card (slug lowercase com hífens)
+     - Se não houver correspondência, propor uma nova feature seguindo a régua
+       de granularidade (a feature nomeia a análise ponta a ponta, não o campo
+       nem o repositório)
+   - Adicionar a dúvida sobre a feature na seção "Discussões" e perguntar ao
+     usuário durante a conversa (passo 7)
+   - Após a resposta, preencher `feature:` no frontmatter do card
+
+5. **Analisar clareza do card:**
 
    Verificar cada seção do card:
 
@@ -83,7 +96,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
       - Existem trade-offs ou alternativas a considerar?
       - Há pontos ambíguos que precisam ser esclarecidos?
 
-5. **Identificar pontos nebulosos e gerar dúvidas:**
+6. **Identificar pontos nebulosos e gerar dúvidas:**
 
    Para cada ponto identificado, formular dúvidas específicas:
 
@@ -107,7 +120,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
      - "Qual padrão está sendo usado em Y?"
      - "Esta alteração quebra implementação existente?"
 
-6. **Adicionar dúvidas na seção Discussões:**
+7. **Adicionar dúvidas na seção Discussões:**
 
    - Obter timestamp: `date +"%Y-%m-%d %H:%M"`
    - Verificar se a seção "### Discussões" existe no card
@@ -136,7 +149,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    ```
    - Adicionar na seção "### Discussões" do card
 
-7. **Conversar com o usuário sobre as dúvidas (modo conversacional):**
+8. **Conversar com o usuário sobre as dúvidas (modo conversacional):**
 
    - Após adicionar as dúvidas nas Discussões, PERGUNTAR ao usuário sobre cada dúvida
    - Usar o formato de perguntas com opções (A, B, C) quando aplicável
@@ -147,7 +160,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
      - Adicionar dependências identificadas
    - Confirmar cada mudança antes de aplicar
 
-8. **Sugerir tarefas específicas:**
+9. **Sugerir tarefas específicas:**
 
    Substituir tarefas genéricas por tarefas concretas baseadas em:
    - Análise do código existente
@@ -170,7 +183,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    - [ ] Adicionar migration para tabela users
    ```
 
-9. **Apresentar resumo inicial da análise:**
+10. **Apresentar resumo inicial da análise:**
    ```
    🔍 Refinamento do Card: {nome-do-card}
 
@@ -194,7 +207,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    Agora vou conversar com você para esclarecer cada dúvida e aplicar as melhorias durante a conversa.
    ```
 
-10. **Após conversa, apresentar resumo final:**
+11. **Após conversa, apresentar resumo final:**
    ```
    ✅ Card refinado com sucesso!
 

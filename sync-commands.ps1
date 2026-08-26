@@ -48,6 +48,7 @@ if ($TargetAI -ne "claude") {
 if (-not (Test-Path $SkillsTargetDir)) { New-Item -ItemType Directory -Force -Path $SkillsTargetDir | Out-Null }
 
 # Funcao para converter MD para TOML (formato Gemini)
+# Idempotente: escreve em arquivo temporario e so substitui se o conteudo mudou.
 function Convert-MdToToml {
     param($InputFile, $OutputFile)
 
@@ -65,7 +66,16 @@ function Convert-MdToToml {
     $escapedContent = $content.Replace('\', '\\').Replace('"""', '\"\"\"')
 
     $toml = "description = `"$description`"`nprompt = `"`"`"`n$escapedContent`n`"`"`"`n"
-    Set-Content -Path $OutputFile -Value $toml -Encoding UTF8
+    $tmpFile = "$OutputFile.tmp"
+    Set-Content -Path $tmpFile -Value $toml -Encoding UTF8
+
+    # So substitui se o conteudo mudou
+    if ((Test-Path $OutputFile) -and (Get-FileHash $tmpFile).Hash -eq (Get-FileHash $OutputFile).Hash) {
+        Remove-Item -Path $tmpFile -Force
+        return $false  # inalterado
+    }
+    Move-Item -Path $tmpFile -Destination $OutputFile -Force
+    return $true  # atualizado
 }
 
 # Funcao para converter MD para SKILL.md (formato VS Code)
@@ -75,6 +85,7 @@ function Convert-MdToToml {
 #   │   └── SKILL.md
 # Cada SKILL.md precisa de frontmatter YAML com `name` (lowercase, hifens/numeros)
 # exatamente igual ao nome da pasta.
+# Idempotente: escreve em arquivo temporario e so substitui se o conteudo mudou.
 function Convert-ToSkill {
     param($InputFile, $OutputFile, $SkillName)
 
@@ -88,8 +99,35 @@ function Convert-ToSkill {
     # Combinar frontmatter + conteudo original
     $newContent = $frontmatter + $originalContent.TrimEnd() + "`n"
 
-    # Escrever SKILL.md
-    [System.IO.File]::WriteAllText($OutputFile, $newContent, [System.Text.UTF8Encoding]::new($false))
+    # Escrever em arquivo temporario
+    $tmpFile = "$OutputFile.tmp"
+    [System.IO.File]::WriteAllText($tmpFile, $newContent, [System.Text.UTF8Encoding]::new($false))
+
+    # So substitui se o conteudo mudou
+    if ((Test-Path $OutputFile) -and (Get-FileHash $tmpFile).Hash -eq (Get-FileHash $OutputFile).Hash) {
+        Remove-Item -Path $tmpFile -Force
+        return $false  # inalterado
+    }
+    Move-Item -Path $tmpFile -Destination $OutputFile -Force
+    return $true  # atualizado
+}
+
+# Funcao para sincronizar a pasta lib/ (common.sh) para um destino
+function Sync-Lib {
+    param($DestinationLib)
+
+    $srcLib = Join-Path $SourceDir "lib"
+    if (Test-Path $srcLib) {
+        New-Item -ItemType Directory -Force -Path $DestinationLib | Out-Null
+        Get-ChildItem -Path $srcLib -File | ForEach-Object {
+            $dstFile = Join-Path $DestinationLib $_.Name
+            if ((Test-Path $dstFile) -and (Get-FileHash $_.FullName).Hash -eq (Get-FileHash $dstFile).Hash) {
+                return  # inalterado
+            }
+            Copy-Item -Path $_.FullName -Destination $dstFile -Force
+            $script:syncedLib++
+        }
+    }
 }
 
 $files = Get-ChildItem -Path $SourceDir -Filter "*.md"
@@ -99,6 +137,7 @@ Write-Host ""
 $syncedClaude = 0
 $syncedGemini = 0
 $syncedSkills = 0
+$syncedLib = 0
 
 foreach ($file in $files) {
     $baseName = $file.BaseName
@@ -106,15 +145,20 @@ foreach ($file in $files) {
     # --- Claude Sync (.md) ---
     if ($TargetAI -ne "gemini") {
         $targetPath = Join-Path $ClaudeTargetDir $file.Name
-        Copy-Item -Path $file.FullName -Destination $targetPath -Force
-        $syncedClaude++
+        if ((Test-Path $targetPath) -and (Get-FileHash $file.FullName).Hash -eq (Get-FileHash $targetPath).Hash) {
+            # inalterado
+        } else {
+            Copy-Item -Path $file.FullName -Destination $targetPath -Force
+            $syncedClaude++
+        }
     }
 
     # --- Gemini Sync (.toml) ---
     if ($TargetAI -ne "claude") {
         $targetPath = Join-Path $GeminiTargetDir "$baseName.toml"
-        Convert-MdToToml -InputFile $file.FullName -OutputFile $targetPath
-        $syncedGemini++
+        if (Convert-MdToToml -InputFile $file.FullName -OutputFile $targetPath) {
+            $syncedGemini++
+        }
     }
 
     # --- VS Code Skills Sync (SKILL.md) ---
@@ -123,12 +167,19 @@ foreach ($file in $files) {
         $skillDir = Join-Path $SkillsTargetDir $baseName
         $skillFile = Join-Path $skillDir "SKILL.md"
         New-Item -ItemType Directory -Path $skillDir -Force | Out-Null
-        Convert-ToSkill -InputFile $file.FullName -OutputFile $skillFile -SkillName $baseName
-        $syncedSkills++
+        if (Convert-ToSkill -InputFile $file.FullName -OutputFile $skillFile -SkillName $baseName) {
+            $syncedSkills++
+        }
     }
 
     Write-Host "  OK: $baseName" -ForegroundColor Green
 }
+
+# --- Sincronizar lib/ (common.sh) para destinos ---
+if ($TargetAI -ne "gemini") {
+    Sync-Lib -DestinationLib (Join-Path $ClaudeTargetDir "lib")
+}
+Sync-Lib -DestinationLib (Join-Path $SkillsTargetDir "lib")
 
 Write-Host ""
 Write-Host "Sincronizacao concluida!" -ForegroundColor Green
@@ -137,6 +188,7 @@ Write-Host "Resumo:"
 if ($TargetAI -ne "gemini") { Write-Host "  - Claude Code: $syncedClaude arquivos atualizados/copiados" }
 if ($TargetAI -ne "claude") { Write-Host "  - Gemini CLI: $syncedGemini arquivos (.toml) gerados" }
 Write-Host "  - VS Code Skills: $syncedSkills skills (SKILL.md) geradas em $SkillsTargetDir"
+Write-Host "  - lib/ (common.sh) sincronizados: $syncedLib"
 Write-Host ""
 Write-Host "Comandos prontos!"
 if ($TargetAI -ne "gemini") { Write-Host "   Claude: Use /start-card, /work-on-card, etc." }

@@ -11,8 +11,10 @@ set -euo pipefail
 # Valida e cria o arquivo .agent_obsidian se necessário
 #
 # Comportamento:
-# - Se .agent_obsidian não existe, cria com estrutura padrão
+# - Se .agent_obsidian não existe, cria com estrutura padrão (version 2.0)
 # - Se existe mas JSON inválido, recria
+# - Se existe e é válido mas version < 2.0, migra condensed_memory_path para o
+#   novo layout de dois eixos (projects/{projeto}.md) em vez de manter o antigo
 # - Se vault_path no JSON difere de $OBSIDIAN_VAULT_PATH, atualiza
 # - Retorna 0 se sucesso, 1 se erro
 #
@@ -33,13 +35,13 @@ validate_agent_state() {
   project_name=$(pwd | xargs basename | tr '[:upper:]' '[:lower:]' | tr '-' '_' | tr ' ' '_')
 
   local code_guidelines_path="${vault_path}/code guidelines.md"
-  local condensed_memory_path="${vault_path}/condensed memory/${project_name}/condensed memory.md"
+  local condensed_memory_path="${vault_path}/condensed memory/projects/${project_name}.md"
 
   # Se arquivo não existe ou não é JSON válido, criar
   if [[ ! -f "$agent_file" ]] || ! jq empty "$agent_file" 2>/dev/null; then
     cat > "$agent_file" <<EOF
 {
-  "version": "1.0",
+  "version": "2.0",
   "vault_path": "${vault_path}",
   "code_guidelines_path": "${code_guidelines_path}",
   "condensed_memory_path": "${condensed_memory_path}",
@@ -47,6 +49,20 @@ validate_agent_state() {
 }
 EOF
     echo "✅ .agent_obsidian criado" >&2
+  else
+    # Arquivo existe e é JSON válido. Verifica versão para migração.
+    local current_version
+    current_version=$(jq -r '.version // "1.0"' "$agent_file")
+
+    if [[ "$current_version" != "2.0" ]]; then
+      # Migra para o novo layout de dois eixos: reescreve condensed_memory_path
+      # e bumpar version. Mantém os demais campos (vault_path, current_card).
+      jq --arg path "$condensed_memory_path" \
+         --arg version "2.0" \
+         '.version = $version | .condensed_memory_path = $path' \
+         "$agent_file" > "${agent_file}.tmp" && mv "${agent_file}.tmp" "$agent_file"
+      echo "✅ .agent_obsidian migrado para version 2.0 (novo layout de memória)" >&2
+    fi
   fi
 
   # Adicionar .agent_obsidian ao .gitignore se não estiver lá
@@ -55,6 +71,41 @@ EOF
     echo "✅ .agent_obsidian adicionado ao .gitignore" >&2
   fi
 
+  return 0
+}
+
+# ============================================================================
+# get_feature_memory_path()
+# ============================================================================
+# Deriva o path do arquivo de memória de feature a partir do campo `feature:`
+# do frontmatter de um card.
+#
+# Args:
+#   $1: Path do arquivo markdown do card
+#   $2: Vault path (opcional; usa $OBSIDIAN_VAULT_PATH se omitido)
+#
+# Output: Path completo para condensed memory/features/{feature}.md
+# Return: 0 se o card tem feature:, 1 se não tem (sem output)
+#
+# Exemplo:
+#   feature_path=$(get_feature_memory_path "card.md" "$vault_path")
+# ============================================================================
+get_feature_memory_path() {
+  local card_file="$1"
+  local vault_path="${2:-${OBSIDIAN_VAULT_PATH:-}}"
+
+  if [[ -z "$vault_path" ]]; then
+    return 1
+  fi
+
+  local feature
+  feature=$(parse_frontmatter "$card_file" "feature")
+
+  if [[ -z "$feature" ]]; then
+    return 1
+  fi
+
+  echo "${vault_path}/condensed memory/features/${feature}.md"
   return 0
 }
 
@@ -217,3 +268,4 @@ export -f validate_agent_state
 export -f parse_frontmatter
 export -f update_frontmatter
 export -f get_git_info
+export -f get_feature_memory_path

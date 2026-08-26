@@ -32,10 +32,11 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code g
       - Senão, usar `$OBSIDIAN_VAULT_PATH/code guidelines.md`
       - Usar essas diretrizes ao escrever código
 
-   b) **Condensed Memory:** **Carregar somente o necessário para tarefa**
-      - Se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente
-      - Senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
-      - E construir: `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
+   b) **Condensed Memory (dois eixos):** **Carregar somente o necessário para tarefa**
+      - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
+      - **Memória de feature:** derivar do campo `feature:` do card via `get_feature_memory_path()` → `$OBSIDIAN_VAULT_PATH/condensed memory/features/{feature}.md`
+      - **Comportamento quando o card não tem `feature:` ou o arquivo da feature não existe:** carregar só a memória de projeto, sem erro
+      - **Reportar no output** quais arquivos foram carregados (projeto e/ou feature)
       - Usar conhecimento acumulado de tarefas anteriores
 
    c) **Cards dependentes:**
