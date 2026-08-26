@@ -1,3 +1,14 @@
+---
+repo: {url-do-repo ou "Local (sem remote configurado)"}
+branch: {nome-da-branch}
+status: {Not Started|In Progress|In Review|Done}
+feature: {slug-da-feature ou vazio}
+created: {YYYY-MM-DD}
+started: {YYYY-MM-DD se in_progress}
+reviewed: {YYYY-MM-DD se in_review}
+completed: {YYYY-MM-DD se done}
+---
+
 ### Descrição
 
 > Explique de forma simples e objetiva o que é a tarefa, problema ou funcionalidade. Este campo deve fornecer contexto suficiente para qualquer pessoa entender rapidamente o propósito do card.
@@ -24,11 +35,11 @@
 > Coloque todos os TODOs aqui. Serve como um lembrete do que precisa ser desenvolvido, validado ou revisado.
 
 - [ ] Tarefa 1
-    
+
 - [ ] Tarefa 2
-    
+
 - [ ] Tarefa 3
-    
+
 
 ---
 

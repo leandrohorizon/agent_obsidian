@@ -44,12 +44,13 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, code
    - Senão, usar `$OBSIDIAN_VAULT_PATH/code guidelines.md`
    - Estas diretrizes devem guiar qualquer código escrito
 
-5. **Carregar Condensed Memory do projeto:**
-   - Se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente
-   - Senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
-   - E construir: `$OBSIDIAN_VAULT_PATH/condensed memory/{nome-do-projeto}/condensed memory.md`
+5. **Carregar Condensed Memory (dois eixos):**
+   - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
+   - **Memória de feature:** derivar do campo `feature:` do card via `get_feature_memory_path()` → `$OBSIDIAN_VAULT_PATH/condensed memory/features/{feature}.md`
+   - **Comportamento quando o card não tem `feature:` ou o arquivo da feature não existe:** carregar só a memória de projeto, sem erro
+   - **Reportar no output** quais arquivos foram carregados (projeto e/ou feature)
    - Se não existir, informar que não há conhecimento consolidado ainda
-   - Este arquivo contém aprendizados de tarefas anteriores
+   - Estes arquivos contêm aprendizados de tarefas anteriores
 
 6. **Carregar cards dependentes:**
    - Na seção "### Dependências", procurar por links `[[nome-do-card]]`
@@ -135,8 +136,12 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, code
    ✅ {número de princípios}
 
    ## Conhecimento Consolidado
-   ✅ {número de categorias no condensed memory}
-   {ou: "⚠️ Nenhum conhecimento consolidado ainda"}
+   ✅ Memória de projeto carregada: condensed memory/projects/{projeto}.md ({n} categorias)
+   ✅ Memória de feature carregada: condensed memory/features/{feature}.md ({n} categorias)
+   {Se o card não tem feature: ou o arquivo não existe}
+   ⚠️ Memória de feature não carregada (card sem feature: ou arquivo inexistente)
+   {Se não há memória de projeto}
+   ⚠️ Nenhum conhecimento consolidado ainda
 
    ---
 

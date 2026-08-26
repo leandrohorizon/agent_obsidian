@@ -84,7 +84,7 @@ Inicia trabalho em um card, movendo de "not_started" para "in_progress" e criand
 **Uso:**
 ```
 cd ~/meu-projeto
-/start-card "pix in - consult dict 1"
+/start-card "card-exemplo"
 ```
 
 **O que faz:**
@@ -98,7 +98,7 @@ Trabalha nas tarefas do card, com contexto completo (code guidelines + condensed
 
 **Uso:**
 ```
-/work-on-card "pix in - consult dict 1"
+/work-on-card "card-exemplo"
 ```
 
 **O que faz:**
@@ -116,7 +116,7 @@ Prepara card para revisão, move para "in_review" e auxilia na criação de PR.
 
 **Uso:**
 ```
-/review-card "pix in - consult dict 1"
+/review-card "card-exemplo"
 ```
 
 **O que faz:**
@@ -133,7 +133,7 @@ Finaliza um card, movendo para "done" e garantindo documentação completa.
 
 **Uso:**
 ```
-/complete-card "pix in - consult dict 1"
+/complete-card "card-exemplo"
 ```
 
 **O que faz:**
@@ -173,17 +173,17 @@ Processa todos os cards em "4.done" e consolida conhecimento em `condensed memor
 /board-status
 
 # 2. Ir para o projeto e iniciar card
-cd ~/projetos/iugu-platform
-/start-card "pix in - consult dict 1"
+cd ~/projetos/projeto-a
+/start-card "card-exemplo"
 
 # 3. Trabalhar nas tarefas (pode executar múltiplas vezes)
-/work-on-card "pix in - consult dict 1"
+/work-on-card "card-exemplo"
 
 # 4. Quando terminar, preparar para revisão
-/review-card "pix in - consult dict 1"
+/review-card "card-exemplo"
 
 # 5. Após PR aprovado e merged, finalizar
-/complete-card "pix in - consult dict 1"
+/complete-card "card-exemplo"
 
 # 6. Periodicamente, consolidar conhecimento
 /condense-memory
@@ -201,10 +201,12 @@ $OBSIDIAN_VAULT_PATH/
 ├── templates/
 │   └── card template.md  # Template para novos cards
 ├── code guidelines.md    # Diretrizes de código (sempre carregadas)
-└── condensed memory/     # Conhecimento consolidado por projeto
-    ├── fraud-payout/
-    ├── platform/
-    └── calculator/
+└── condensed memory/     # Conhecimento consolidado em dois eixos
+    ├── projects/         # Memória por repositório (arquivo plano)
+    │   ├── projeto-a.md
+    │   └── projeto-b.md
+    └── features/         # Memória por feature (atravessa repos)
+        └── feature-x.md
 ```
 
 ## Arquivo de Estado `.agent_obsidian`
@@ -216,7 +218,7 @@ O sistema cria automaticamente um arquivo `.agent_obsidian` na **raiz de cada pr
 O arquivo fica na raiz do seu projeto (não no vault):
 
 ```
-/workspace/fraud-payout/          (seu projeto)
+/workspace/projeto-a/             (seu projeto)
 ├── .git/
 ├── .agent_obsidian               ← arquivo de estado
 ├── .gitignore                    ← deve incluir .agent_obsidian
@@ -230,8 +232,8 @@ O arquivo fica na raiz do seu projeto (não no vault):
   "version": "1.0",
   "vault_path": "/Users/you/workspace/obsidian/vault",
   "current_card": {
-    "name": "pix in - consult dict 2",
-    "path": "/Users/you/workspace/obsidian/vault/board/2.in_progress/pix in - consult dict 2.md"
+    "name": "card-exemplo",
+    "path": "/Users/you/workspace/obsidian/vault/board/2.in_progress/card-exemplo.md"
   }
 }
 ```

@@ -48,20 +48,23 @@ Suas tarefas são arquivos markdown fluindo através de estados:
 1.not_started → 2.in_progress → 3.in_review → 4.done
 ```
 
-### 🧠 Consolidação de Conhecimento
-Cada tarefa completada contribui para uma **condensed memory** que o Claude carrega automaticamente em trabalhos futuros:
-- Decisões arquiteturais com justificativas
-- Padrões e convenções
-- Lições aprendidas
-- Edge cases e gotchas
+### 🧠 Consolidação de Conhecimento (dois eixos)
+Cada tarefa completada contribui para uma **condensed memory** que o Claude carrega automaticamente em trabalhos futuros. O conhecimento é particionado em **dois eixos** com responsabilidades disjuntas:
+
+- **Memória de projeto** (`condensed memory/projects/{projeto}.md`) — o que é estável e transversal ao repositório: arquitetura, convenções de código, ferramentas, setup, gotchas do stack. **Sem conhecimento de feature.**
+- **Memória de feature** (`condensed memory/features/{feature}.md`) — regra de negócio, fluxo ponta a ponta, contratos entre serviços, decisões e edge cases daquela feature, **atravessando repositórios**.
+
+O card declara sua feature no frontmatter (`feature: feature-x`) e o `/condense-memory` **roteia** cada pedaço de conhecimento para o eixo correto, em vez de despejar tudo num arquivo só. Isso resolve o caso em que uma feature (ex: feature-x) atravessa três repositórios — o conhecimento do fluxo completo fica num único arquivo de feature, acessível de qualquer projeto.
 
 ### 🔄 Suporte Multi-Projetos
 Um vault centralizado, estado independente por projeto:
 ```
 ~/workspace/
-├── obsidian/leanddro/          # Vault centralizado (este repo)
+├── obsidian/user/              # Vault centralizado (este repo)
 │   ├── board/                   # Todos os cards
-│   └── condensed memory/        # Conhecimento por projeto
+│   └── condensed memory/        # Conhecimento em dois eixos
+│       ├── projects/            # Memória por repositório
+│       └── features/            # Memória por feature (atravessa repos)
 │
 ├── projeto-A/
 │   └── .agent_obsidian         # Estado do projeto A
@@ -149,7 +152,8 @@ cd ~/projeto-calculadora
 # Claude trabalha nas tarefas
 /work-on-card
 # Carrega: code guidelines.md
-# Carrega: condensed memory/calculadora/condensed memory.md (vazio na primeira vez)
+# Carrega: condensed memory/projects/calculadora.md (memória de projeto)
+# Carrega: condensed memory/features/{feature}.md (memória da feature do card)
 # Executa tarefas, escreve código seguindo guidelines
 # Documenta decisões e aprendizados no card
 
@@ -162,7 +166,7 @@ cd ~/projeto-calculadora
 # Depois do merge do PR
 /complete-card
 # Move para: board/4.done/
-# Extrai conhecimento para: condensed memory/calculadora/condensed memory.md
+# Roteia conhecimento para: condensed memory/projects/calculadora.md e condensed memory/features/{feature}.md
 # Limpa current card no .agent_obsidian
 
 # Iniciar próxima feature
@@ -186,6 +190,7 @@ Cada card segue um template:
 repo: git@github.com:user/project.git
 branch: feature/card-name
 status: In Progress
+feature: feature-x
 started: 2026-01-15
 ---
 
@@ -215,7 +220,11 @@ Regras de negócio, padrões, gotchas
 
 ## Formato da Condensed Memory
 
-O conhecimento é estruturado para fácil consumo pela IA:
+O conhecimento é estruturado em **dois eixos** para fácil consumo pela IA.
+
+### Memória de Projeto (`condensed memory/projects/{projeto}.md`)
+
+O que é estável e transversal ao repositório — arquitetura, convenções, ferramentas, setup. **Sem conhecimento de feature.**
 
 ```markdown
 # Condensed Memory - calculator
@@ -248,6 +257,40 @@ Operations flow through: validate → calculate → format
 - User testing revealed need for operation history
 ```
 
+### Memória de Feature (`condensed memory/features/{feature}.md`)
+
+Regra de negócio, fluxo ponta a ponta, contratos entre serviços e edge cases daquela feature, **atravessando repositórios**. Categorias próprias (não reaproveita as de projeto).
+
+```markdown
+# Feature - feature-x
+
+> Última atualização: 2026-01-15
+> Repositórios envolvidos: [service-a, service-b, service-c]
+> Cards de origem: [card-feature-x-a, card-feature-x-b, card-feature-x-c]
+
+## 🔀 Fluxo Ponta a Ponta
+
+### Enriquecimento de feature-x
+- service-a envia dados de enriquecimento
+- service-b repassa ao service-c
+- service-c consome payload e para de consultar
+
+## 🤝 Contratos entre Serviços
+
+### campo_status
+- service-a envia: {campos}
+- service-c consome: {campos}
+
+## 📐 Regras de Negócio
+
+### Consulta de status
+- Regra específica da feature
+
+## ⚠️ Edge Cases
+
+- Intermitência na consulta e como foi resolvida
+```
+
 ## Por Que Agent Obsidian?
 
 ### Abordagem Tradicional ❌
@@ -270,8 +313,9 @@ Operations flow through: validate → calculate → format
 O arquivo `.agent_obsidian` rastreia seu card atual:
 ```json
 {
-  "version": "1.0",
+  "version": "2.0",
   "vault_path": "/caminho/para/vault",
+  "condensed_memory_path": "/caminho/para/vault/condensed memory/projects/meu-projeto.md",
   "current_card": {
     "name": "nome-da-feature",
     "path": "/caminho/absoluto/para/card.md"
@@ -284,6 +328,7 @@ Benefícios:
 - Acesso direto por path (sem buscas de arquivo)
 - Auto-criado e mantido
 - Adicionado automaticamente ao .gitignore
+- `version: 2.0` indica o modelo de dois eixos; o path da memória de feature é derivado do campo `feature:` do card em tempo de carga (não fica no estado)
 
 ### Descrições Inteligentes de PR
 `/review-card` cria descrições de PR ao:
@@ -320,7 +365,9 @@ Use `/refine-card` em cards vagos para:
 │   ├── 4.done/
 │   └── 5.archived/
 ├── commands/                   # Definições dos slash commands
-├── condensed memory/           # Bases de conhecimento por projeto
+├── condensed memory/           # Bases de conhecimento em dois eixos
+│   ├── projects/               # Memória por repositório
+│   └── features/               # Memória por feature (atravessa repos)
 ├── templates/                  # Template de card
 ├── code guidelines.md          # Padrões de desenvolvimento
 ├── sync-commands.sh            # Instala comandos no Claude

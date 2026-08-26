@@ -46,19 +46,26 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
 
 6. **Criar conteúdo do card usando template:**
    - Ler template de: `$OBSIDIAN_VAULT_PATH/templates/card template.md`
-   - Adicionar frontmatter YAML no início do template:
+   - O template já contém o bloco de frontmatter YAML com placeholders. Preencher
+     os placeholders com os valores coletados:
      ```yaml
      ---
      repo: {url-do-repo ou "Local (sem remote configurado)"}
      branch: {nome-da-branch}
      status: {Not Started|In Progress|In Review|Done}
+     feature: {slug-da-feature ou vazio}
      created: {YYYY-MM-DD}
      started: {YYYY-MM-DD se in_progress}
      reviewed: {YYYY-MM-DD se in_review}
      completed: {YYYY-MM-DD se done}
      ---
      ```
-   - Concatenar frontmatter + conteúdo do template
+   - **Sugerir a feature:** listar os arquivos existentes em
+     `$OBSIDIAN_VAULT_PATH/condensed memory/features/` (sem extensão .md) e
+     sugerir ao usuário a feature mais próxima do card. Se não houver
+     correspondência, aceitar uma nova feature (slug lowercase com hífens).
+   - Preencher o placeholder `feature:` com o slug escolhido (ou deixar vazio
+     se o usuário não definir).
 
 7. **Criar o arquivo:**
    - Salvar em: `$OBSIDIAN_VAULT_PATH/board/{estado-detectado}/{nome-do-card}.md`
