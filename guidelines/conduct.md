@@ -53,6 +53,26 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
   tratado como decisão tomada — e o custo de corrigir depois é maior que o de
   esperar o merge.
 
+## Leitura de arquivos
+
+- Se o conteúdo de um arquivo já foi lido nesta sessão e está na memória, **não
+  ler de novo**. Vale para `.md` em geral: guidelines, condensed memory, comandos,
+  documentação.
+- Muitos comandos pedem a leitura de um arquivo que já foi carregado antes
+  (`/work-on-card` depois de `/load-context`, `/refine-card` depois de
+  `/work-on-card`, guidelines relidas a cada passo). Repetir a leitura não
+  acrescenta informação e queima contexto.
+- **Exceção — cards em andamento:** cards em `1.not_started/`, `2.in_progress/`
+  ou `3.in_review/` mudam durante a sessão (tarefas marcadas, discussões
+  adicionadas, frontmatter atualizado). Reler o card ativo antes de editá-lo é
+  correto e necessário.
+- Cards em `4.done/` e `5.archived/` são estáveis: se já foram lidos, não reler.
+- Se houver motivo para acreditar que o arquivo mudou (o usuário editou, outro
+  processo escreveu, a leitura anterior foi truncada ou resumida), reler é
+  legítimo — mas dizer o motivo.
+- Antes de reler, considerar `grep_search` para confirmar um trecho específico em
+  vez de carregar o arquivo inteiro de novo.
+
 ## Honestidade técnica
 
 - Marcar explicitamente como não verificado o que não foi executado ou lido.

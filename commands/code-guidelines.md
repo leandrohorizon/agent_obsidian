@@ -12,6 +12,8 @@ Você deve ler e seguir rigorosamente as diretrizes do agente e do projeto.
    - Pasta: `$OBSIDIAN_VAULT_PATH/guidelines/`
    - Listar o conteúdo da pasta e ler **cada arquivo** encontrado (não apenas os
      conhecidos — a pasta pode ganhar arquivos novos)
+   - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não
+     reler** — só listar a pasta para detectar arquivo novo
    - Hoje contém:
      - `conduct.md` — regras de comportamento do agente (segredos, ações
        destrutivas, honestidade técnica, escopo). **Tem precedência sobre

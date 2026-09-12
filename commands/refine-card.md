@@ -37,6 +37,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 
    b) **Carregar Guidelines:**
       - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
+      - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
         - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução**
         - `code guidelines.md` — padrões e convenções de código
       - **Reportar no output** quais arquivos foram carregados

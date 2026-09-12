@@ -41,6 +41,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
 
 4. **Carregar Guidelines:**
    - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
+   - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
      - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução**
      - `code guidelines.md` — padrões e convenções de código
    - **Reportar no output** quais arquivos foram carregados
@@ -49,6 +50,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
    - **Memória de feature:** derivar do campo `feature:` do card via `get_feature_memory_path()` → `$OBSIDIAN_VAULT_PATH/condensed memory/features/{feature}.md`
    - **Comportamento quando o card não tem `feature:` ou o arquivo da feature não existe:** carregar só a memória de projeto, sem erro
+   - Se a memória já foi lida nesta sessão e continua na memória, **não reler**
    - **Reportar no output** quais arquivos foram carregados (projeto e/ou feature)
    - Se não existir, informar que não há conhecimento consolidado ainda
    - Estes arquivos contêm aprendizados de tarefas anteriores
@@ -58,6 +60,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - Para cada card referenciado:
      - Ler o card dependente
      - Resumir informações relevantes (Descrição, Conhecimento Adquirido)
+     - Se o card dependente já foi lido nesta sessão e está em `4.done/` ou `5.archived/`, **não reler** (são estáveis)
    - Se não houver dependências, pular este passo
 
 7. **Verificar contexto do repositório:**
