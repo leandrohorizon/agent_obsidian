@@ -119,7 +119,6 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
         status: In Review
         started: {YYYY-MM-DD se existir, senão data de hoje}
         reviewed: {YYYY-MM-DD de hoje}
-        pr_number: {número do PR}
         pr_url: {URL do PR}
         ---
         ```
@@ -127,7 +126,6 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
       - Se frontmatter JÁ EXISTE, atualizar apenas campos necessários:
         - `status: In Review`
         - `reviewed: {YYYY-MM-DD de hoje}`
-        - `pr_number: {número do PR}`
         - `pr_url: {URL do PR}`
         - Adicionar `repo:` e `branch:` se não existirem
         - Preservar todos os outros campos existentes
@@ -155,7 +153,6 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    Frontmatter atualizado:
    - status: In Review
    - reviewed: YYYY-MM-DD
-   - pr_number: 123
    - pr_url: https://github.com/org/repo/pull/123
 
    Próximos passos:
