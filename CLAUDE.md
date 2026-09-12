@@ -94,7 +94,6 @@ created: 2026-01-15
 started: 2026-01-16
 reviewed: 2026-01-17  # Added when moved to review
 completed: 2026-01-18  # Added when moved to done
-pr_number: 123
 pr_url: https://github.com/org/project/pull/123
 pr_status: Merged
 ---
@@ -497,7 +496,7 @@ Prepares card for code review and creates PR.
    - Output in Portuguese (pt-BR)
    - Focuses on technical and business impact
 7. Captures PR number and URL
-8. Updates card frontmatter (pr_number, pr_url, reviewed date)
+8. Updates card frontmatter (pr_url, reviewed date)
 9. Moves card: `2.in_progress/` → `3.in_review/`
 10. **Does NOT clear `.agent_obsidian`** - card still active during review
 
