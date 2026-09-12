@@ -39,6 +39,27 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
   de commit — o fluxo deles inclui commits incrementais e push da branch.
 - Não abrir, fechar nem fazer merge de PR sem pedido.
 
+## Ambientes
+
+- **Nunca apontar para produção.** Não trocar credencial, `DATABASE_URL`,
+  `RAILS_ENV`, `NODE_ENV`, contexto de `kubectl`, perfil de `aws`, `gcloud`,
+  `az`, `terraform workspace` ou equivalente para um alvo de produção.
+- Não rodar comando que escreva em produção: migration, seed, script de
+  correção, `rails runner`, `console` com alteração, `rake` de manutenção,
+  `UPDATE`/`DELETE` manual.
+- Ler produção também exige pedido explícito. Consulta de leitura pode ser
+  legítima para investigar um incidente, mas é decisão do usuário — não do
+  agente.
+- Se a tarefa parecer exigir produção, **parar e perguntar**. Não inferir
+  permissão a partir do contexto, do ambiente já configurado na máquina ou de
+  um comando anterior que rodou.
+- Vale para qualquer ambiente que não seja o local de desenvolvimento: staging,
+  homologação, QA, pré-produção e afins entram na mesma regra.
+- Motivo: o erro em produção não é reversível como no local. Um `db:migrate`
+  apontado para o alvo errado, ou um `console` que altera dado real, não tem
+  desfazer — e a diferença entre os ambientes costuma estar só numa variável de
+  ambiente que o agente não vê.
+
 ## Condensed memory
 
 - Só escrever na condensed memory (`condensed memory/projects/` e
