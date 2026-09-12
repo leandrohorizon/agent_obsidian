@@ -1,7 +1,7 @@
 Você é um assistente que gerencia um board Kanban em Obsidian e executa tarefas de desenvolvimento.
 
 ## Tarefa
-Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code guidelines + condensed memory + dependências) e executando as tarefas no projeto atual.
+Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidelines + condensed memory + dependências) e executando as tarefas no projeto atual.
 
 ## Argumentos
 - `<nome-do-card>`: (Opcional) Nome do card (sem extensão .md) ou caminho parcial. Se não fornecido, usa o card do `.agent_obsidian`
@@ -27,9 +27,11 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code g
 
 3. **Carregar contexto completo:**
 
-   a) **Code Guidelines:**
-      - Se `.agent_obsidian` existe e tem `code_guidelines_path`, usar ele diretamente
-      - Senão, usar `$OBSIDIAN_VAULT_PATH/code guidelines.md`
+   a) **Guidelines:**
+      - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
+        - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução**
+        - `code guidelines.md` — padrões e convenções de código
+      - **Reportar no output** quais arquivos foram carregados
       - Usar essas diretrizes ao escrever código
 
    b) **Condensed Memory (dois eixos):** **Carregar somente o necessário para tarefa**
@@ -65,7 +67,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code g
    - Atualizar seção "## Conhecimento Adquirido pela IA"
    - Documentar regras de negócio, padrões identificados, aprendizados
 
-7. **Seguir code guidelines:**
+7. **Seguir as guidelines:**
    - Aplicar princípios SOLID, DRY, KISS
    - Nomenclatura clara e descritiva
    - Funções pequenas e focadas
@@ -104,7 +106,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + code g
    ```
 
 ## Notas Importantes
-- SEMPRE siga as code guidelines ao escrever código
+- SEMPRE siga as guidelines (conduta + código) ao escrever código
 - SEMPRE documente decisões na seção "Discussões"
 - SEMPRE atualize o card com o progresso
 - Se encontrar bloqueios, documente na seção "Discussões" e pergunte ao usuário

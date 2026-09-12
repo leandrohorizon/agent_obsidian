@@ -1,7 +1,7 @@
 Você é um assistente que carrega o contexto completo de um card para iniciar ou continuar uma sessão de trabalho.
 
 ## Tarefa
-Carregar todo o contexto necessário de um card, incluindo o próprio card, code guidelines, condensed memory e cards dependentes, preparando o ambiente para trabalhar na tarefa.
+Carregar todo o contexto necessário de um card, incluindo o próprio card, guidelines (conduta + código), condensed memory e cards dependentes, preparando o ambiente para trabalhar na tarefa.
 
 ## Argumentos
 - `<nome-do-card>`: (Opcional) Nome do card (sem extensão .md) ou caminho parcial. Se não fornecido, usa o card do `.agent_obsidian`
@@ -39,10 +39,11 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, code
      - Descrição Técnica
      - Conhecimento Adquirido
 
-4. **Carregar Code Guidelines:**
-   - Se `.agent_obsidian` existe e tem `code_guidelines_path`, usar ele diretamente
-   - Senão, usar `$OBSIDIAN_VAULT_PATH/code guidelines.md`
-   - Estas diretrizes devem guiar qualquer código escrito
+4. **Carregar Guidelines:**
+   - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
+     - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução**
+     - `code guidelines.md` — padrões e convenções de código
+   - **Reportar no output** quais arquivos foram carregados
 
 5. **Carregar Condensed Memory (dois eixos):**
    - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
@@ -132,8 +133,8 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, code
    {Se houver arquivos excluídos da análise}
    ⚠️ Arquivos não relacionados excluídos: {lista resumida}
 
-   ## Code Guidelines Carregadas
-   ✅ {número de princípios}
+   ## Guidelines Carregadas
+   ✅ guidelines/ — {n} arquivos lidos: {lista}
 
    ## Conhecimento Consolidado
    ✅ Memória de projeto carregada: condensed memory/projects/{projeto}.md ({n} categorias)
@@ -147,8 +148,8 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, code
 
    ✅ Contexto completo carregado!
 
-   Estou pronto para trabalhar neste card. As code guidelines e conhecimento
-   acumulado de tarefas anteriores estão disponíveis para consulta.
+   Estou pronto para trabalhar neste card. As guidelines (conduta + código) e o
+   conhecimento acumulado de tarefas anteriores estão disponíveis para consulta.
 
    Próximos passos sugeridos:
    - Use /work-on-card "{nome}" para começar/continuar trabalhando
@@ -182,7 +183,7 @@ Carrega contexto completo para preparar PR ou revisão.
 - Especialmente útil após pausas longas ou trocas de contexto
 - O condensed memory fornece conhecimento acumulado de tarefas anteriores
 - Cards dependentes ajudam a entender integrações e requisitos
-- Code guidelines garantem consistência no código produzido
+- Guidelines (conduta + código) garantem consistência e comportamento correto
 
 ### Análise de Modificações da Branch
 - O comando analisa TODAS as modificações na branch (commitadas e não commitadas)

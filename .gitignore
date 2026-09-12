@@ -8,9 +8,12 @@
 !README.md
 !CLAUDE.md
 !SETUP.md
-!code guidelines.md
 !sync-commands.sh
 !sync-commands.ps1
+
+# Diretrizes do agente (carregadas a cada /work-on-card, /load-context, /refine-card)
+!guidelines/
+!guidelines/**
 
 # Definições dos slash commands (incluindo commands/lib/)
 !commands/

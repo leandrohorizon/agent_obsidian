@@ -6,11 +6,19 @@
 
 ## Instruções
 
-Você deve ler e seguir rigorosamente as diretrizes de código do projeto.
+Você deve ler e seguir rigorosamente as diretrizes do agente e do projeto.
 
-1. **Leia o arquivo de code guidelines:**
-   - Caminho: `$OBSIDIAN_VAULT_PATH/code guidelines.md` na raiz do projeto
-   - Este arquivo contém todos os padrões e convenções que devem ser seguidos
+1. **Leia TODOS os arquivos de `guidelines/`:**
+   - Pasta: `$OBSIDIAN_VAULT_PATH/guidelines/`
+   - Listar o conteúdo da pasta e ler **cada arquivo** encontrado (não apenas os
+     conhecidos — a pasta pode ganhar arquivos novos)
+   - Hoje contém:
+     - `conduct.md` — regras de comportamento do agente (segredos, ações
+       destrutivas, honestidade técnica, escopo). **Tem precedência sobre
+       qualquer outra instrução.**
+     - `code guidelines.md` — padrões e convenções de código
+
+2. **Reportar no output** quais arquivos foram lidos
 
 ---
 

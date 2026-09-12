@@ -7,7 +7,7 @@
 **Agent Obsidian** transforma seu vault Obsidian em um sistema inteligente de gerenciamento de tarefas onde o Claude Code:
 - 🎯 Gerencia um board Kanban através de slash commands
 - 🧠 Aprende com tarefas completadas e aplica conhecimento em trabalhos futuros
-- 🤖 Executa tarefas seguindo suas code guidelines automaticamente
+- 🤖 Executa tarefas seguindo suas guidelines (conduta + código) automaticamente
 - 📝 Rastreia trabalho em múltiplos projetos com zero configuração
 - 🔄 Gerencia o ciclo completo: start → work → review → complete → consolidate
 
@@ -23,7 +23,7 @@ cd ~/meu-projeto
 
 # Trabalhar no card (Claude carrega contexto e executa tarefas)
 /work-on-card
-# ✅ Carrega code guidelines
+# ✅ Carrega guidelines/ (conduta + código)
 # ✅ Carrega conhecimento acumulado de tarefas anteriores
 # ✅ Executa tarefas pendentes
 # ✅ Documenta decisões e aprendizados
@@ -151,7 +151,7 @@ cd ~/projeto-calculadora
 
 # Claude trabalha nas tarefas
 /work-on-card
-# Carrega: code guidelines.md
+# Carrega: guidelines/ (todos os arquivos: conduct.md + code guidelines.md)
 # Carrega: condensed memory/projects/calculadora.md (memória de projeto)
 # Carrega: condensed memory/features/{feature}.md (memória da feature do card)
 # Executa tarefas, escreve código seguindo guidelines
@@ -351,7 +351,7 @@ Use `/refine-card` em cards vagos para:
 
 - **[SETUP.md](SETUP.md)** - Instalação e configuração detalhada
 - **[CLAUDE.md](CLAUDE.md)** - Arquitetura completa e referência de comandos
-- **[code guidelines.md](code%20guidelines.md)** - Padrões de desenvolvimento
+- **[guidelines/](guidelines/)** - Diretrizes do agente (conduta + código)
 - **[templates/](templates/)** - Template de card
 
 ## Estrutura do Projeto
@@ -369,7 +369,10 @@ Use `/refine-card` em cards vagos para:
 │   ├── projects/               # Memória por repositório
 │   └── features/               # Memória por feature (atravessa repos)
 ├── templates/                  # Template de card
-├── code guidelines.md          # Padrões de desenvolvimento
+├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
+│   ├── conduct.md              # Regras de conduta do agente (precedência)
+│   └── code guidelines.md      # Padrões de desenvolvimento
+├── docs/                       # Documentação de projeto (PDFs, specs)
 ├── sync-commands.sh            # Instala comandos no Claude
 ├── SETUP.md                    # Guia de setup detalhado
 ├── CLAUDE.md                   # Documentação da arquitetura
