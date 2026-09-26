@@ -94,7 +94,7 @@ cd ~/meu-projeto
 - Atualiza card com informações do repositório
 
 ### `/work-on-card <nome>`
-Trabalha nas tarefas do card, com contexto completo (code guidelines + condensed memory + dependências).
+Trabalha nas tarefas do card, com contexto completo (guidelines + condensed memory + dependências).
 
 **Uso:**
 ```
@@ -103,7 +103,7 @@ Trabalha nas tarefas do card, com contexto completo (code guidelines + condensed
 
 **O que faz:**
 - Lê o card completo
-- Carrega `code guidelines.md` para seguir padrões
+- Carrega **todos** os arquivos de `guidelines/` (conduta + código) para seguir padrões e regras de comportamento
 - Carrega `condensed memory.md` com conhecimento acumulado
 - Lê cards dependentes mencionados em `[[links]]`
 - Executa tarefas pendentes `- [ ]`
@@ -200,7 +200,10 @@ $OBSIDIAN_VAULT_PATH/
 │   └── 4.done/           # Cards finalizados
 ├── templates/
 │   └── card template.md  # Template para novos cards
-├── code guidelines.md    # Diretrizes de código (sempre carregadas)
+├── guidelines/           # Diretrizes do agente (todos os arquivos são carregados)
+│   ├── conduct.md        # Regras de conduta do agente (precedência)
+│   └── code guidelines.md # Padrões de desenvolvimento
+├── docs/                 # Documentação de projeto (PDFs, specs)
 └── condensed memory/     # Conhecimento consolidado em dois eixos
     ├── projects/         # Memória por repositório (arquivo plano)
     │   ├── projeto-a.md
@@ -288,7 +291,7 @@ Os comandos `/start-card`, `/work-on-card` e `/review-card` precisam ser executa
 
 1. **Use tab completion**: Os nomes dos cards podem ter espaços, use aspas
 2. **Commits incrementais**: `/work-on-card` pode fazer commits automáticos
-3. **Contexto automático**: Todos os comandos carregam code guidelines e condensed memory
+3. **Contexto automático**: Todos os comandos carregam as guidelines (conduta + código) e o condensed memory
 4. **Dependências**: Use `[[nome-do-card]]` para referenciar cards relacionados
 5. **Documentação**: Sempre preencha "Conhecimento Adquirido pela IA" para melhorar o condensed memory
 

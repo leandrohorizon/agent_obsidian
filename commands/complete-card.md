@@ -52,7 +52,7 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
 
 7. **Limpar .agent_obsidian:**
    - Ler `.agent_obsidian` do diretório atual (se existir)
-   - Manter todos os campos existentes (version, vault_path, code_guidelines_path, condensed_memory_path)
+   - Manter todos os campos existentes (version, vault_path, code_guidelines_path, conduct_path, condensed_memory_path)
    - Atualizar campo `current_card` para `null`
    - Escrever de volta usando Write tool preservando estrutura completa
 

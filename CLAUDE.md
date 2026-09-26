@@ -16,7 +16,10 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   │   ├── projects/             # Per-repository memory
 │   │   └── features/             # Per-feature memory (crosses repos)
 │   ├── commands/                 # Slash command definitions
-│   └── code guidelines.md        # Development standards
+│   ├── guidelines/               # Agent directives (all files loaded)
+│   │   ├── conduct.md            # Agent behavior rules (precedence)
+│   │   └── code guidelines.md    # Development standards
+│   └── docs/                     # Project documentation (PDFs, specs)
 │
 ├── project-calculator/           # Project 1
 │   └── .agent_obsidian          # State: current card for this project
@@ -91,7 +94,6 @@ created: 2026-01-15
 started: 2026-01-16
 reviewed: 2026-01-17  # Added when moved to review
 completed: 2026-01-18  # Added when moved to done
-pr_number: 123
 pr_url: https://github.com/org/project/pull/123
 pr_status: Merged
 ---
@@ -278,7 +280,7 @@ cd ~/workspace/project-calculator
 # 3. Work on the card (no argument needed - reads from .agent_obsidian)
 /work-on-card
 # → Loads card from current_card.path directly
-# → Loads code guidelines.md
+# → Loads all files in guidelines/ (conduct.md + code guidelines.md)
 # → Loads condensed memory/projects/calculator.md (project memory)
 # → Loads condensed memory/features/{feature}.md (feature memory, if card has feature:)
 # → Loads dependent cards
@@ -364,14 +366,14 @@ Executes tasks in a card with full context.
 
 **Context Loaded:**
 1. Card content (via direct path if from state)
-2. `code guidelines.md` - development standards
+2. All files in `guidelines/` - `conduct.md` (behavior rules, has precedence) + `code guidelines.md` (development standards)
 3. `condensed memory/projects/{project}.md` - project memory (architecture, conventions, tools)
 4. `condensed memory/features/{feature}.md` - feature memory (if card has `feature:` frontmatter)
 5. Dependent cards referenced as `[[card-name]]`
 
 **Actions:**
 - Identifies pending tasks (`- [ ]`)
-- Executes tasks following code guidelines
+- Executes tasks following the guidelines
 - Marks tasks complete (`- [x]`)
 - Documents decisions in "Discussões" section
 - Updates "Descrição Técnica" and "Conhecimento Adquirido"
@@ -395,7 +397,7 @@ Analyzes and refines vague or incomplete cards BEFORE starting work.
 
 **Context Loaded:**
 1. Card
-2. Code guidelines
+2. All files in `guidelines/` (conduct + code)
 3. Condensed memory
 4. Dependent cards
 5. **Related code in project** - reads actual implementation
@@ -494,7 +496,7 @@ Prepares card for code review and creates PR.
    - Output in Portuguese (pt-BR)
    - Focuses on technical and business impact
 7. Captures PR number and URL
-8. Updates card frontmatter (pr_number, pr_url, reviewed date)
+8. Updates card frontmatter (pr_url, reviewed date)
 9. Moves card: `2.in_progress/` → `3.in_review/`
 10. **Does NOT clear `.agent_obsidian`** - card still active during review
 
@@ -533,7 +535,7 @@ Loads complete context for a card (read-only, for understanding).
 
 **Actions:**
 1. Reads card (via direct path if from state)
-2. Loads code guidelines
+2. Loads all files in `guidelines/` (conduct + code)
 3. Loads condensed memory (both axes: project + feature)
 4. Loads dependent cards
 5. Checks git status, branch, last commit
@@ -553,7 +555,7 @@ Loads complete context for a card (read-only, for understanding).
    - Recent discussions
    - Git context
    - Branch modifications (commits, staged, unstaged)
-   - Code guidelines loaded
+   - Guidelines loaded (conduct + code)
    - Condensed memory categories (project + feature)
 
 **Use Cases:**
@@ -701,9 +703,16 @@ brew install gh
 gh auth login
 ```
 
-## Code Guidelines
+## Guidelines
 
-All code written by `/work-on-card` follows principles in `code guidelines.md`:
+All work done by `/work-on-card` follows the files in `guidelines/`:
+
+- **`conduct.md`** — agent behavior rules (secrets, destructive actions,
+  technical honesty, scope). **Has precedence over any other instruction.**
+- **`code guidelines.md`** — development standards
+
+Commands load **all** files in `guidelines/`, so new files added to the folder
+are picked up automatically without changing any command or state file.
 
 **Core Principles:**
 - SOLID principles
@@ -801,7 +810,7 @@ The system builds knowledge over time:
 1. **Per Card:** "Conhecimento Adquirido" section
 2. **Per Project:** `condensed memory/projects/{projeto}.md` (project memory)
 3. **Per Feature:** `condensed memory/features/{feature}.md` (feature memory, crosses repos)
-4. **Code Guidelines:** Shared standards across all projects
+4. **Guidelines:** Shared standards across all projects (`guidelines/`)
 
 This creates a feedback loop:
 - New task → Load condensed memory (both axes)
@@ -892,7 +901,10 @@ If you're unsure which card you were working on:
 ├── scripts/
 │   ├── list_prs.rb          # List PRs
 │   └── list_merged_prs.rb   # List merged PRs
-├── code guidelines.md        # Development standards
+├── guidelines/               # Agent directives (all files loaded)
+│   ├── conduct.md            # Agent behavior rules (precedence)
+│   └── code guidelines.md    # Development standards
+├── docs/                     # Project documentation (PDFs, specs)
 ├── sync-commands.sh          # Sync commands to ~/.claude/commands/
 ├── SETUP.md                  # Setup instructions
 └── CLAUDE.md                 # This file
