@@ -46,6 +46,7 @@ This system uses a **distributed state architecture** with centralized knowledge
 {
   "version": "2.0",
   "vault_path": "/Users/user/workspace/obsidian/user",
+  "guidelines_path": "/Users/user/workspace/obsidian/user/guidelines",
   "condensed_memory_path": "/Users/user/workspace/obsidian/user/condensed memory/projects/agent_obsidian.md",
   "current_card": {
     "name": "card-name",
@@ -55,9 +56,11 @@ This system uses a **distributed state architecture** with centralized knowledge
 ```
 
 **Version 2.0 (two-axis model):**
+- `guidelines_path` points to the **folder** `guidelines/`, not to individual files — commands list the folder and read every file in it, so a new directive file is picked up without touching state
 - `condensed_memory_path` points to `condensed memory/projects/{projeto}.md`
 - The feature memory path is NOT stored in state — it's derived from the card's `feature:` field at load time via `get_feature_memory_path()`
 - Migration: if an existing valid state has `version` < 2.0, `validate_agent_state()` rewrites `condensed_memory_path` to the new layout (instead of keeping the old path)
+- Migration: `validate_agent_state()` also rewrites `guidelines_path` to the canonical folder and drops the obsolete per-file keys (`code_guidelines_path`, `conduct_path`)
 
 **Lifecycle:**
 - Created automatically by any command if missing
@@ -68,8 +71,8 @@ This system uses a **distributed state architecture** with centralized knowledge
 **Benefits:**
 - Commands work without arguments when card is active
 - Direct path access eliminates file searches (performance optimization)
-- Automatic gitignore management
 - No manual configuration needed
+- Never committed: keeping it out of version control is a conduct rule, not a `.gitignore` entry
 
 ### Kanban Board Structure
 
@@ -77,12 +80,15 @@ Cards flow through states represented as folders:
 
 ```
 board/
-├── 1.not_started/    # Backlog - cards waiting to start
+├── 0.backlog/        # Raw ideas - not refined or prioritized yet
+├── 1.not_started/    # Refined cards waiting to start
 ├── 2.in_progress/    # Active work - one card per project typically
 ├── 3.in_review/      # Code review - PR created, awaiting approval
 ├── 4.done/           # Completed - source for condensed memory
 └── 5.archived/       # Old or cancelled cards
 ```
+
+**Card flow:** `0.backlog` (raw idea) → `/refine-card` → `1.not_started` (refined) → `/start-card` → `2.in_progress` → `/review-card` → `3.in_review` → `/complete-card` → `4.done`
 
 **Card Metadata (YAML Frontmatter):**
 ```yaml
@@ -347,12 +353,14 @@ Initiates work on a card.
 **Actions:**
 1. Verifies `$OBSIDIAN_VAULT_PATH` is set
 2. Creates/validates `.agent_obsidian` in project root
-3. Adds `.agent_obsidian` to `.gitignore`
-4. Finds card in `1.not_started/`
-5. Creates git branch: `feature/card-name`
-6. Updates card frontmatter (repo, branch, status, started date)
-7. Moves card: `1.not_started/` → `2.in_progress/`
-8. Updates `.agent_obsidian` with current_card
+3. Finds card in `1.not_started/`
+4. Detects base branch (`main`/`master`)
+5. **Asks the user** whether to switch to the base branch before creating the card branch (skipped when already on the base)
+6. **Always runs `git pull`** on the base branch — aborts if it fails
+7. Creates git branch: `feature/card-name`
+8. Updates card frontmatter (repo, branch, status, started date)
+9. Moves card: `1.not_started/` → `2.in_progress/`
+10. Updates `.agent_obsidian` with current_card
 
 **Important:** This is the entry point that initializes state for a project.
 
@@ -441,25 +449,6 @@ AFTER:
 
 ---
 
-### `/update-card <nome> [conteúdo]`
-Adds entries to the "Discussões" section.
-
-**Arguments:**
-- `<nome>`: Card name
-- `[conteúdo]`: Optional - content to add. If omitted, prompts user.
-
-**Actions:**
-- Locates card across all board folders
-- Adds timestamped entry to Discussões section
-- Preserves all previous discussions
-
-**Usage:**
-```
-/update-card "my-card" "Decided to use JWT because it scales better"
-```
-
----
-
 ### `/review-card [nome]`
 Prepares card for code review and creates PR.
 
@@ -523,12 +512,18 @@ Finalizes card after PR is merged.
    ```
 4. Moves card: `3.in_review/` → `4.done/`
 5. **Clears `.agent_obsidian`:** Sets `current_card: null`
-6. **Automatically calls `/condense-memory`** to consolidate knowledge immediately
+6. **Returns to the default branch and deletes the card branch:**
+   - Detects the default branch (`main`/`master`), preferring `main`
+   - Guards against uncommitted changes before the checkout (stops and warns)
+   - Runs `git checkout {default}` then `git pull` (aborts on failure)
+   - Deletes the card branch with `git branch -d` — never `-D`; if git refuses because of unmerged commits, stops and reports
+   - Does **not** delete the remote branch — only prints the cleanup command, since deleting a remote branch is destructive and requires an explicit request
+7. **Automatically calls `/condense-memory`** to consolidate knowledge immediately
 
 ---
 
 ### `/load-context [nome]`
-Loads complete context for a card (read-only, for understanding).
+Loads complete context for a card (read-only for card content, for understanding).
 
 **Arguments:**
 - `[nome]`: Optional - uses `.agent_obsidian` if omitted
@@ -548,8 +543,15 @@ Loads complete context for a card (read-only, for understanding).
      - Relevant extensions/directories
    - Excludes: `.obsidian/`, other cards, unrelated configs
    - Shows diff stats for related files
-7. Presents comprehensive summary:
+7. **Syncs branch and state:**
+   - Compares current branch with the card's `branch:` frontmatter
+   - If they diverge, **asks the user** before switching (numbered prompt)
+   - Guards against uncommitted changes (stops and warns)
+   - Runs `git checkout {branch-do-card}` then **always `git pull`** (aborts on failure)
+   - Updates `.agent_obsidian` (`current_card` name/path, corrects moved cards)
+8. Presents comprehensive summary:
    - Card state and location
+   - Branch sync status and pull result
    - Pending tasks
    - Dependencies
    - Recent discussions
@@ -562,6 +564,29 @@ Loads complete context for a card (read-only, for understanding).
 - Start new work session
 - Resume after interruption
 - Review before PR
+- Resume a card that lives on another branch
+
+---
+
+### `/orchestrate-cards [filtro]`
+Works on **all** cards in `1.not_started/` at once, one subagent per card, opening each PR as a **draft**.
+
+**Arguments:**
+- `[filtro]`: Optional - partial name or list of cards. If omitted, processes all cards in `1.not_started/`.
+
+**Actions:**
+1. Validates config and warns if a card is already active in `.agent_obsidian`
+2. Lists target cards and **asks for confirmation** before starting
+3. Detects dependencies between target cards and warns about parallel conflicts
+4. Runs **one subagent per card (in parallel)**, each executing the full sequence:
+   - `/start-card` → `/work-on-card` → `/review-card`
+   - The PR is created **as draft** (`gh pr create --draft`)
+5. Consolidates results (completed / blocked / failed) into a report
+6. Does **not** merge or consolidate memory — that is `/complete-card`'s job after human review
+
+**Use Cases:**
+- Batch-process a backlog of ready cards
+- Parallelize independent work across cards
 
 ---
 
@@ -661,7 +686,7 @@ Verify installation:
 ls ~/.claude/commands/
 ```
 
-Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `complete-card.md`, `load-context.md`, `update-card.md`, `refine-card.md`, `condense-memory.md`
+Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `complete-card.md`, `load-context.md`, `refine-card.md`, `orchestrate-cards.md`, `condense-memory.md`
 
 ### VS Code Skills Installation
 
@@ -730,10 +755,11 @@ Commands automatically load and apply these guidelines when writing code.
 
 ### Branch Management
 
+- `/start-card` asks whether to switch to the base branch (`main`/`master`), then **always pulls** before creating the branch
 - `/start-card` creates branch: `feature/card-name`
 - Branch name stored in card frontmatter
 - `/review-card` validates branch, creates commit, pushes
-- `/complete-card` assumes PR merged (doesn't delete branch)
+- `/complete-card` assumes PR merged, returns to the default branch and deletes the card branch locally (`git branch -d`)
 
 ### Commit Strategy
 
@@ -758,8 +784,7 @@ Commands automatically load and apply these guidelines when writing code.
 1. Create card in Obsidian vault `board/1.not_started/`
 2. If vague, run `/refine-card` to clarify before starting
 3. Run `/start-card` in your project directory
-4. Use `/work-on-card` to execute tasks
-5. Update discussions with `/update-card` as you make decisions
+4. Use `/work-on-card` to execute tasks (it documents decisions in "Discussões")
 
 ### During Development
 
@@ -860,7 +885,7 @@ If you're unsure which card you were working on:
 
 ### .agent_obsidian issues
 - Commands will auto-recreate if missing
-- Check `.gitignore` includes `.agent_obsidian`
+- Never commit it — it holds machine-local state (see `guidelines/conduct.md`)
 - If corrupted, delete and let it regenerate
 
 ### PR creation fails
@@ -873,7 +898,8 @@ If you're unsure which card you were working on:
 ```
 /Users/user/workspace/obsidian/user/
 ├── board/
-│   ├── 1.not_started/        # New cards
+│   ├── 0.backlog/            # Raw ideas (not refined/prioritized)
+│   ├── 1.not_started/        # Refined cards waiting to start
 │   ├── 2.in_progress/        # Active cards
 │   ├── 3.in_review/          # Cards in PR review
 │   ├── 4.done/               # Completed cards (source for memory)
@@ -883,10 +909,10 @@ If you're unsure which card you were working on:
 │   ├── start-card.md
 │   ├── work-on-card.md
 │   ├── refine-card.md
-│   ├── update-card.md
 │   ├── review-card.md
 │   ├── complete-card.md
 │   ├── load-context.md
+│   ├── orchestrate-cards.md
 │   └── condense-memory.md
 ├── condensed memory/         # Knowledge bases in two axes
 │   ├── projects/             # Per-repository memory (stable, transversal)

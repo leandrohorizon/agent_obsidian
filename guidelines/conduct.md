@@ -37,6 +37,20 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
   até haver pedido explícito.
   **Exceção:** os comandos `/work-on-card` e `/review-card` são o pedido explícito
   de commit — o fluxo deles inclui commits incrementais e push da branch.
+- **Nunca commitar o `.agent_obsidian`.** É arquivo de estado local da máquina:
+  guarda `vault_path` absoluto, `current_card` e paths que só fazem sentido no
+  ambiente de quem está trabalhando. Commitá-lo versiona configuração de máquina
+  e faz o estado de um projeto vazar para outro clone.
+  - A exceção de commit de `/work-on-card` e `/review-card` **não** cobre este
+    arquivo — a exceção é sobre *quando* commitar, não sobre *o que* commitar.
+  - Antes de commitar, conferir que ele não entrou no stage. Se entrou, remover
+    do stage (`git restore --staged .agent_obsidian`) — não basta deixar de
+    adicioná-lo.
+  - Se ele já foi commitado antes, avisar o usuário em vez de reescrever
+    histórico por conta própria.
+  - Não é preciso mexer no `.gitignore` para isso: a regra é de comportamento do
+    agente, não de configuração do repositório. O `.gitignore` de cada projeto
+    fica como está.
 - Não abrir, fechar nem fazer merge de PR sem pedido.
 
 ## Ambientes
