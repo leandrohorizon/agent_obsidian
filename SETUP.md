@@ -143,6 +143,8 @@ Finaliza um card, movendo para "done" e garantindo documentação completa.
 - Verifica se PR foi merged
 - Adiciona timestamps de conclusão
 - Move card de `3.in_review/` → `4.done/`
+- Volta para a branch default (`main`/`master`) e faz `git pull`
+- Apaga a branch do card localmente (`git branch -d`)
 - Marca como pronto para consolidação de memória
 
 ### `/condense-memory`
@@ -189,6 +191,7 @@ cd ~/projetos/projeto-a
 
 # 5. Após PR aprovado e merged, finalizar
 /complete-card "card-exemplo"
+# → Volta para a branch default e apaga a branch do card
 
 # 6. Periodicamente, consolidar conhecimento
 /condense-memory

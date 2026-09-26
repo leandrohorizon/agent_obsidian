@@ -39,6 +39,7 @@ cd ~/meu-projeto
 # Completar após merge
 /complete-card
 # ✅ Move para done
+# ✅ Volta para a branch default e apaga a branch do card
 # ✅ Consolida conhecimento para tarefas futuras
 ```
 
@@ -172,6 +173,7 @@ cd ~/projeto-calculadora
 # Depois do merge do PR
 /complete-card
 # Move para: board/4.done/
+# Volta para a branch default e apaga a branch do card
 # Roteia conhecimento para: condensed memory/projects/calculadora.md e condensed memory/features/{feature}.md
 # Limpa current card no .agent_obsidian
 

@@ -512,7 +512,13 @@ Finalizes card after PR is merged.
    ```
 4. Moves card: `3.in_review/` → `4.done/`
 5. **Clears `.agent_obsidian`:** Sets `current_card: null`
-6. **Automatically calls `/condense-memory`** to consolidate knowledge immediately
+6. **Returns to the default branch and deletes the card branch:**
+   - Detects the default branch (`main`/`master`), preferring `main`
+   - Guards against uncommitted changes before the checkout (stops and warns)
+   - Runs `git checkout {default}` then `git pull` (aborts on failure)
+   - Deletes the card branch with `git branch -d` — never `-D`; if git refuses because of unmerged commits, stops and reports
+   - Does **not** delete the remote branch — only prints the cleanup command, since deleting a remote branch is destructive and requires an explicit request
+7. **Automatically calls `/condense-memory`** to consolidate knowledge immediately
 
 ---
 
@@ -753,7 +759,7 @@ Commands automatically load and apply these guidelines when writing code.
 - `/start-card` creates branch: `feature/card-name`
 - Branch name stored in card frontmatter
 - `/review-card` validates branch, creates commit, pushes
-- `/complete-card` assumes PR merged (doesn't delete branch)
+- `/complete-card` assumes PR merged, returns to the default branch and deletes the card branch locally (`git branch -d`)
 
 ### Commit Strategy
 
