@@ -33,11 +33,15 @@ Nenhum.
      {
        "version": "2.0",
        "vault_path": "{valor de $OBSIDIAN_VAULT_PATH}",
-       "code_guidelines_path": "{$OBSIDIAN_VAULT_PATH}/code guidelines.md",
+       "code_guidelines_path": "{$OBSIDIAN_VAULT_PATH}/guidelines/code guidelines.md",
+       "conduct_path": "{$OBSIDIAN_VAULT_PATH}/guidelines/conduct.md",
        "condensed_memory_path": "{$OBSIDIAN_VAULT_PATH}/condensed memory/projects/{project_name}.md",
        "current_card": null
      }
      ```
+   - Os paths de `guidelines/` são apenas atalhos de leitura: os comandos leem
+     **todos** os arquivos da pasta `guidelines/`, então arquivos novos na pasta
+     são carregados sem alterar o estado
    - O path da memória de feature NÃO fica no estado: ele é derivado do campo
      `feature:` do card atual em tempo de carga (ver `get_feature_memory_path()`)
 
@@ -57,7 +61,7 @@ Nenhum.
 
    📁 Vault: {vault_path}
    📦 Projeto: {project_name}
-   📝 Code guidelines: {code_guidelines_path}
+   📝 Guidelines: {vault_path}/guidelines/ (todos os arquivos)
    💾 Condensed memory (projeto): {condensed_memory_path}
 
    O arquivo .agent_obsidian foi criado e adicionado ao .gitignore.

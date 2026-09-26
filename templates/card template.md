@@ -1,12 +1,18 @@
 ---
-repo: {url-do-repo ou "Local (sem remote configurado)"}
-branch: {nome-da-branch}
-status: {Not Started|In Progress|In Review|Done}
-feature: {slug-da-feature ou vazio}
-created: {YYYY-MM-DD}
-started: {YYYY-MM-DD se in_progress}
-reviewed: {YYYY-MM-DD se in_review}
-completed: {YYYY-MM-DD se done}
+repo:
+branch:
+status:
+  - Done
+  - Not Started
+feature:
+created:
+  YYYY-MM-DD:
+started:
+  YYYY-MM-DD se in_progress:
+reviewed:
+  YYYY-MM-DD se in_review:
+completed:
+  YYYY-MM-DD se done:
 ---
 
 ### Descrição

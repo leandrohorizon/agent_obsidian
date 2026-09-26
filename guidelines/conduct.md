@@ -1,0 +1,109 @@
+# Conduct
+
+Regras de comportamento do agente. Diferente de `code guidelines.md`, que trata de
+estilo de código, este arquivo trata do que o agente pode e não pode fazer.
+
+## Segredos e credenciais
+
+- Nunca ler `.env`, `.env.*`, `credentials.yml.enc`, `master.key`, `*.pem`, `*.key`
+  ou arquivos equivalentes — em nenhum diretório, nem para inspecionar nomes de
+  variáveis, nem mascarando valores.
+- Para descobrir qual variável um sistema usa, ler o código que a consome
+  (`ENV.fetch("NOME")`, `Rails.application.credentials.x`), nunca o arquivo de valores.
+- Nunca imprimir, logar ou colar em card o valor de um segredo.
+- Nunca enviar trecho de código proprietário, log de produção ou dado de cliente
+  para serviço externo não solicitado pelo usuário.
+
+## Ações destrutivas ou irreversíveis
+
+Confirmar = perguntar e **esperar a resposta do usuário**. Anunciar a intenção e
+executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, perguntar.
+
+- Confirmar antes de qualquer comando destrutivo: `rm -rf`, apagar arquivo não
+  criado na sessão, `git reset --hard`, `git checkout` que descarta alteração não
+  commitada, `DROP`, `TRUNCATE`, `DELETE` sem `WHERE` restritivo, `UPDATE` em massa,
+  reset ou recriação de banco.
+- Confirmar antes de rodar **migration ou tarefa de schema**: `db:migrate`,
+  `db:rollback`, `db:schema:load`, `db:create`, `db:drop`, `db:reset`,
+  `db:test:prepare` e equivalentes de outros stacks.
+  **Inclusive em banco local, de teste ou em container Docker.**
+- A regra não depende de o alvo parecer descartável. Julgar se um banco é
+  descartável é justamente a avaliação que o agente pode errar — o mesmo comando
+  num banco de desenvolvimento com dados reais é destrutivo e irreversível.
+- Escrever o arquivo de migration é livre; **rodá-la não é**.
+- Nunca `git push --force` em branch com PR aberto ou review em andamento.
+  Se for realmente necessário, `--force-with-lease` e só após confirmação.
+- Não commitar nem dar push sem o usuário pedir. Trabalho fica na working tree
+  até haver pedido explícito.
+  **Exceção:** os comandos `/work-on-card` e `/review-card` são o pedido explícito
+  de commit — o fluxo deles inclui commits incrementais e push da branch.
+- Não abrir, fechar nem fazer merge de PR sem pedido.
+
+## Ambientes
+
+- **Nunca apontar para produção.** Não trocar credencial, `DATABASE_URL`,
+  `RAILS_ENV`, `NODE_ENV`, contexto de `kubectl`, perfil de `aws`, `gcloud`,
+  `az`, `terraform workspace` ou equivalente para um alvo de produção.
+- Não rodar comando que escreva em produção: migration, seed, script de
+  correção, `rails runner`, `console` com alteração, `rake` de manutenção,
+  `UPDATE`/`DELETE` manual.
+- Ler produção também exige pedido explícito. Consulta de leitura pode ser
+  legítima para investigar um incidente, mas é decisão do usuário — não do
+  agente.
+- Se a tarefa parecer exigir produção, **parar e perguntar**. Não inferir
+  permissão a partir do contexto, do ambiente já configurado na máquina ou de
+  um comando anterior que rodou.
+- Vale para qualquer ambiente que não seja o local de desenvolvimento: staging,
+  homologação, QA, pré-produção e afins entram na mesma regra.
+- Motivo: o erro em produção não é reversível como no local. Um `db:migrate`
+  apontado para o alvo errado, ou um `console` que altera dado real, não tem
+  desfazer — e a diferença entre os ambientes costuma estar só numa variável de
+  ambiente que o agente não vê.
+
+## Condensed memory
+
+- Só escrever na condensed memory (`condensed memory/projects/` e
+  `condensed memory/features/`) quando a tarefa estiver **concluída e mergeada**.
+- Card em `1.not_started/`, `2.in_progress/` ou `3.in_review/` **não** gera
+  escrita na memória. O gatilho é o `/complete-card`, que roda depois do merge.
+- Enquanto o card está em andamento, o conhecimento fica no próprio card
+  ("Discussões", "Descrição Técnica", "Conhecimento Adquirido"). A consolidação
+  é o passo final, não um registro incremental.
+- Motivo: a memória é lida como verdade estabelecida por todos os projetos. Se
+  ela registra trabalho ainda em revisão, um plano que pode mudar passa a ser
+  tratado como decisão tomada — e o custo de corrigir depois é maior que o de
+  esperar o merge.
+
+## Leitura de arquivos
+
+- Se o conteúdo de um arquivo já foi lido nesta sessão e está na memória, **não
+  ler de novo**. Vale para `.md` em geral: guidelines, condensed memory, comandos,
+  documentação.
+- Muitos comandos pedem a leitura de um arquivo que já foi carregado antes
+  (`/work-on-card` depois de `/load-context`, `/refine-card` depois de
+  `/work-on-card`, guidelines relidas a cada passo). Repetir a leitura não
+  acrescenta informação e queima contexto.
+- **Exceção — cards em andamento:** cards em `1.not_started/`, `2.in_progress/`
+  ou `3.in_review/` mudam durante a sessão (tarefas marcadas, discussões
+  adicionadas, frontmatter atualizado). Reler o card ativo antes de editá-lo é
+  correto e necessário.
+- Cards em `4.done/` e `5.archived/` são estáveis: se já foram lidos, não reler.
+- Se houver motivo para acreditar que o arquivo mudou (o usuário editou, outro
+  processo escreveu, a leitura anterior foi truncada ou resumida), reler é
+  legítimo — mas dizer o motivo.
+- Antes de reler, considerar `grep_search` para confirmar um trecho específico em
+  vez de carregar o arquivo inteiro de novo.
+
+## Honestidade técnica
+
+- Marcar explicitamente como não verificado o que não foi executado ou lido.
+  Não descrever como "funcionando" o que não foi rodado.
+- Não inventar caminho de arquivo, número de linha, nome de método ou link de PR.
+  Se não foi verificado, dizer que não foi.
+- Ao registrar em card, separar o que foi observado do que é hipótese.
+
+## Escopo
+
+- Fazer o que foi pedido; não expandir o escopo por conta própria.
+  Melhoria adicional identificada vira sugestão ou card novo, não commit silencioso.
+- Não criar arquivo (README, doc, script auxiliar) que não foi pedido.

@@ -35,9 +35,12 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 
    a) **Ler o card completo**
 
-   b) **Carregar Code Guidelines:**
-      - Se `.agent_obsidian` existe e tem `code_guidelines_path`, usar ele diretamente
-      - Senão, usar `$OBSIDIAN_VAULT_PATH/code guidelines.md`
+   b) **Carregar Guidelines:**
+      - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
+      - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
+        - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução**
+        - `code guidelines.md` — padrões e convenções de código
+      - **Reportar no output** quais arquivos foram carregados
 
    c) **Carregar Condensed Memory (dois eixos):**
       - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
@@ -165,7 +168,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    Substituir tarefas genéricas por tarefas concretas baseadas em:
    - Análise do código existente
    - Padrões do projeto (condensed memory)
-   - Code guidelines
+   - Guidelines (conduta + código)
    - Boas práticas (testes, documentação, validações)
 
    Exemplo de transformação:
@@ -189,7 +192,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 
    ## Contexto Carregado
    ✅ Card lido
-   ✅ Code guidelines carregadas
+   ✅ Guidelines carregadas (guidelines/ — {n} arquivos)
    ✅ Condensed memory carregado ({n} categorias)
    ✅ Cards dependentes analisados ({n} cards)
    ✅ Código relacionado analisado ({n} arquivos)
