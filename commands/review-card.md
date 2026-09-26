@@ -100,7 +100,11 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
       - Sugerir passos de teste baseado nas mudanças
 
       **Passo 6: Criar PR**
-      - Executar: `gh pr create --title "Título" --body-file /tmp/pr-description-<timestamp>.md`
+      - Executar: `gh pr create --title "Título" --body "$(cat <<'EOF' ... EOF)"`
+        passando a descrição diretamente via `--body` (heredoc), **sem criar
+        arquivo temporário**
+      - **Nunca** usar `--body-file` com arquivo temporário (`/tmp/...`) — a
+        descrição vai inline no comando
       - Capturar número e URL do PR
 
 5. **Atualizar o card:**

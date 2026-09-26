@@ -23,6 +23,10 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
 3. **Encontrar o card:**
    - Procurar em `{vault_path}/board/1.not_started/{nome}.md`
    - Se não encontrar em 1.not_started, verificar outras pastas
+     (`0.backlog/`, `2.in_progress/`, `3.in_review/`)
+   - Se o card estiver em `0.backlog/`, avisar que ele ainda não foi refinado e
+     sugerir rodar `/refine-card` antes de iniciar (não bloquear se o usuário
+     insistir)
    - Se não encontrar, listar cards disponíveis
 
 4. **Ler o card:**
@@ -76,8 +80,9 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
      - `started: {YYYY-MM-DD de hoje}`
 
 10. **Mover o card:**
-   - Mover de `{vault_path}/board/1.not_started/card.md`
+   - Mover de `{vault_path}/board/{pasta-origem}/card.md`
    - Para `{vault_path}/board/2.in_progress/card.md`
+   - `{pasta-origem}` normalmente é `1.not_started`, mas pode ser `0.backlog`
 
 11. **Atualizar .agent_obsidian:**
    - Ler arquivo atual
@@ -96,7 +101,7 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
    ✅ Card iniciado!
 
    📝 Card: nome-do-card.md
-   🔀 Movido: 1.not_started → 2.in_progress
+   🔀 Movido: {pasta-origem} → 2.in_progress
    🌿 Branch base: {base} (atualizada com pull)
    🌿 Branch criada: feature/nome-do-card
 

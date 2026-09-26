@@ -26,6 +26,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 2. **Encontrar o card:**
    - Procurar em todas as pastas do board na seguinte ordem:
      - `$OBSIDIAN_VAULT_PATH/board/1.not_started/` (prioridade - cards novos costumam ser nebulosos)
+     - `$OBSIDIAN_VAULT_PATH/board/0.backlog/` (ideias cruas, ainda não priorizadas)
      - `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
      - `$OBSIDIAN_VAULT_PATH/board/3.in_review/`
      - `$OBSIDIAN_VAULT_PATH/board/4.done/`
@@ -225,6 +226,20 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    - Ou use /work-on-card se o card já foi iniciado
    ```
 
+12. **Promover card do backlog (se aplicável):**
+   - Se o card estava em `0.backlog/` e o refinamento o deixou claro e
+     acionável, **perguntar ao usuário** se deseja promovê-lo para
+     `1.not_started/`:
+     ```
+     O card estava no backlog e agora está refinado.
+     Deseja movê-lo para `1.not_started/` (pronto para iniciar)?
+
+     1. Sim — mover para 1.not_started
+     2. Não — manter no backlog
+     ```
+   - **Aguardar a resposta.** Só mover com confirmação
+   - Se mover: `0.backlog/` → `1.not_started/`
+
 ## Casos de Uso
 
 ### Exemplo 1: Card novo e vago
@@ -254,5 +269,7 @@ Adiciona dúvidas sobre integração com código existente, identifica dependên
 - Se encontrar inconsistências entre card e código, documentar claramente
 - Priorizar análise de código sobre suposições
 - Use este comando ANTES de /start-card para garantir clareza
+- Cards em `0.backlog` são ideias cruas; após refinados, podem ser promovidos
+  para `1.not_started` (o comando pergunta antes de mover)
 - Pode ser usado em cards já iniciados se surgirem dúvidas durante implementação
 - Após adicionar dúvidas nas Discussões, o comando deve PERGUNTAR ao usuário sobre cada dúvida (modo conversacional) para preenchê-las colaborativamente

@@ -80,12 +80,15 @@ Cards flow through states represented as folders:
 
 ```
 board/
-├── 1.not_started/    # Backlog - cards waiting to start
+├── 0.backlog/        # Raw ideas - not refined or prioritized yet
+├── 1.not_started/    # Refined cards waiting to start
 ├── 2.in_progress/    # Active work - one card per project typically
 ├── 3.in_review/      # Code review - PR created, awaiting approval
 ├── 4.done/           # Completed - source for condensed memory
 └── 5.archived/       # Old or cancelled cards
 ```
+
+**Card flow:** `0.backlog` (raw idea) → `/refine-card` → `1.not_started` (refined) → `/start-card` → `2.in_progress` → `/review-card` → `3.in_review` → `/complete-card` → `4.done`
 
 **Card Metadata (YAML Frontmatter):**
 ```yaml
@@ -446,25 +449,6 @@ AFTER:
 
 ---
 
-### `/update-card <nome> [conteúdo]`
-Adds entries to the "Discussões" section.
-
-**Arguments:**
-- `<nome>`: Card name
-- `[conteúdo]`: Optional - content to add. If omitted, prompts user.
-
-**Actions:**
-- Locates card across all board folders
-- Adds timestamped entry to Discussões section
-- Preserves all previous discussions
-
-**Usage:**
-```
-/update-card "my-card" "Decided to use JWT because it scales better"
-```
-
----
-
 ### `/review-card [nome]`
 Prepares card for code review and creates PR.
 
@@ -533,7 +517,7 @@ Finalizes card after PR is merged.
 ---
 
 ### `/load-context [nome]`
-Loads complete context for a card (read-only, for understanding).
+Loads complete context for a card (read-only for card content, for understanding).
 
 **Arguments:**
 - `[nome]`: Optional - uses `.agent_obsidian` if omitted
@@ -553,8 +537,15 @@ Loads complete context for a card (read-only, for understanding).
      - Relevant extensions/directories
    - Excludes: `.obsidian/`, other cards, unrelated configs
    - Shows diff stats for related files
-7. Presents comprehensive summary:
+7. **Syncs branch and state:**
+   - Compares current branch with the card's `branch:` frontmatter
+   - If they diverge, **asks the user** before switching (numbered prompt)
+   - Guards against uncommitted changes (stops and warns)
+   - Runs `git checkout {branch-do-card}` then **always `git pull`** (aborts on failure)
+   - Updates `.agent_obsidian` (`current_card` name/path, corrects moved cards)
+8. Presents comprehensive summary:
    - Card state and location
+   - Branch sync status and pull result
    - Pending tasks
    - Dependencies
    - Recent discussions
@@ -567,6 +558,29 @@ Loads complete context for a card (read-only, for understanding).
 - Start new work session
 - Resume after interruption
 - Review before PR
+- Resume a card that lives on another branch
+
+---
+
+### `/orchestrate-cards [filtro]`
+Works on **all** cards in `1.not_started/` at once, one subagent per card, opening each PR as a **draft**.
+
+**Arguments:**
+- `[filtro]`: Optional - partial name or list of cards. If omitted, processes all cards in `1.not_started/`.
+
+**Actions:**
+1. Validates config and warns if a card is already active in `.agent_obsidian`
+2. Lists target cards and **asks for confirmation** before starting
+3. Detects dependencies between target cards and warns about parallel conflicts
+4. Runs **one subagent per card (in parallel)**, each executing the full sequence:
+   - `/start-card` → `/work-on-card` → `/review-card`
+   - The PR is created **as draft** (`gh pr create --draft`)
+5. Consolidates results (completed / blocked / failed) into a report
+6. Does **not** merge or consolidate memory — that is `/complete-card`'s job after human review
+
+**Use Cases:**
+- Batch-process a backlog of ready cards
+- Parallelize independent work across cards
 
 ---
 
@@ -666,7 +680,7 @@ Verify installation:
 ls ~/.claude/commands/
 ```
 
-Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `complete-card.md`, `load-context.md`, `update-card.md`, `refine-card.md`, `condense-memory.md`
+Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `complete-card.md`, `load-context.md`, `refine-card.md`, `orchestrate-cards.md`, `condense-memory.md`
 
 ### VS Code Skills Installation
 
@@ -764,8 +778,7 @@ Commands automatically load and apply these guidelines when writing code.
 1. Create card in Obsidian vault `board/1.not_started/`
 2. If vague, run `/refine-card` to clarify before starting
 3. Run `/start-card` in your project directory
-4. Use `/work-on-card` to execute tasks
-5. Update discussions with `/update-card` as you make decisions
+4. Use `/work-on-card` to execute tasks (it documents decisions in "Discussões")
 
 ### During Development
 
@@ -879,7 +892,8 @@ If you're unsure which card you were working on:
 ```
 /Users/user/workspace/obsidian/user/
 ├── board/
-│   ├── 1.not_started/        # New cards
+│   ├── 0.backlog/            # Raw ideas (not refined/prioritized)
+│   ├── 1.not_started/        # Refined cards waiting to start
 │   ├── 2.in_progress/        # Active cards
 │   ├── 3.in_review/          # Cards in PR review
 │   ├── 4.done/               # Completed cards (source for memory)
@@ -889,10 +903,10 @@ If you're unsure which card you were working on:
 │   ├── start-card.md
 │   ├── work-on-card.md
 │   ├── refine-card.md
-│   ├── update-card.md
 │   ├── review-card.md
 │   ├── complete-card.md
 │   ├── load-context.md
+│   ├── orchestrate-cards.md
 │   └── condense-memory.md
 ├── condensed memory/         # Knowledge bases in two axes
 │   ├── projects/             # Per-repository memory (stable, transversal)

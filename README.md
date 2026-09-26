@@ -47,8 +47,11 @@ cd ~/meu-projeto
 ### 🎯 Kanban Board as Code
 Suas tarefas são arquivos markdown fluindo através de estados:
 ```
-1.not_started → 2.in_progress → 3.in_review → 4.done
+0.backlog → 1.not_started → 2.in_progress → 3.in_review → 4.done
 ```
+
+- **`0.backlog`** — ideias cruas, ainda não refinadas nem priorizadas
+- **`1.not_started`** — cards refinados, prontos para iniciar
 
 ### 🧠 Consolidação de Conhecimento (dois eixos)
 Cada tarefa completada contribui para uma **condensed memory** que o Claude carrega automaticamente em trabalhos futuros. O conhecimento é particionado em **dois eixos** com responsabilidades disjuntas:
@@ -129,10 +132,10 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 | `/start-card <nome>`      | Inicia trabalho, cria branch           | `/start-card "adicionar feature"`                       |
 | `/refine-card <nome>`     | Clarifica cards vagos antes de iniciar | `/refine-card "adicionar feature"`                      |
 | `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
-| `/update-card <nome>`     | Adiciona notas de discussão/decisão    | `/update-card "adicionar feature" "Decidimos usar JWT"` |
 | `/review-card [nome]`     | Cria PR, move para review              | `/review-card`                                          |
 | `/complete-card [nome]`   | Finaliza, consolida conhecimento       | `/complete-card`                                        |
-| `/load-context [nome]`    | Carrega contexto completo (read-only)  | `/load-context`                                         |
+| `/load-context [nome]`    | Carrega contexto, sincroniza branch    | `/load-context`                                         |
+| `/orchestrate-cards [filtro]` | Trabalha em todos os cards de `1.not_started` (PR em draft) | `/orchestrate-cards` |
 | `/condense-memory [nome]` | Consolida conhecimento do card         | `/condense-memory`                                      |
 
 **Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido.
@@ -362,6 +365,7 @@ Use `/refine-card` em cards vagos para:
 ```
 .
 ├── board/                      # Estados do Kanban
+│   ├── 0.backlog/
 │   ├── 1.not_started/
 │   ├── 2.in_progress/
 │   ├── 3.in_review/

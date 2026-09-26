@@ -10,6 +10,7 @@ Mostrar o status atual do board Obsidian, incluindo quantos cards existem em cad
    - Se não estiver, informar o usuário que precisa configurar: `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
 
 2. **Ler estrutura do board:**
+   - Listar todos os arquivos .md em `$OBSIDIAN_VAULT_PATH/board/0.backlog/`
    - Listar todos os arquivos .md em `$OBSIDIAN_VAULT_PATH/board/1.not_started/`
    - Listar todos os arquivos .md em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
    - Listar todos os arquivos .md em `$OBSIDIAN_VAULT_PATH/board/3.in_review/`
@@ -19,6 +20,9 @@ Mostrar o status atual do board Obsidian, incluindo quantos cards existem em cad
    Mostrar um resumo formatado:
    ```
    📊 Board Status - Obsidian Vault
+
+   💡 Backlog (X cards):
+   - card0.md
 
    📋 Not Started (X cards):
    - card1.md

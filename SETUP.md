@@ -199,10 +199,12 @@ cd ~/projetos/projeto-a
 ```
 $OBSIDIAN_VAULT_PATH/
 ├── board/
-│   ├── 1.not_started/    # Cards aguardando início
+│   ├── 0.backlog/        # Ideias cruas (não refinadas/priorizadas)
+│   ├── 1.not_started/    # Cards refinados aguardando início
 │   ├── 2.in_progress/    # Cards em desenvolvimento
 │   ├── 3.in_review/      # Cards aguardando review/merge
-│   └── 4.done/           # Cards finalizados
+│   ├── 4.done/           # Cards finalizados
+│   └── 5.archived/       # Cards antigos/cancelados
 ├── templates/
 │   └── card template.md  # Template para novos cards
 ├── guidelines/           # Diretrizes do agente (todos os arquivos são carregados)
@@ -306,11 +308,14 @@ Os comandos `/start-card`, `/work-on-card` e `/review-card` precisam ser executa
 ## Próximos Passos
 
 1. Execute `/board-status` para ver seus cards
-2. Escolha um card de `1.not_started/`
+2. Escolha um card de `1.not_started/` (ou refine um de `0.backlog/` com `/refine-card`)
 3. Use `/start-card` para começar
 4. Use `/work-on-card` quantas vezes precisar
 5. Finalize com `/review-card` e `/complete-card`
 6. Periodicamente execute `/condense-memory`
+
+> Para trabalhar em **todos** os cards de `1.not_started/` de uma vez, use
+> `/orchestrate-cards` — ele roda um subagente por card e abre cada PR em draft.
 
 ---
 
