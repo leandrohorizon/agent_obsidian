@@ -16,8 +16,10 @@ set -euo pipefail
 # - Se existe e é válido mas version < 2.0, migra condensed_memory_path para o
 #   novo layout de dois eixos (projects/{projeto}.md) em vez de manter o antigo
 # - Se vault_path no JSON difere de $OBSIDIAN_VAULT_PATH, atualiza
-# - Se code_guidelines_path ou conduct_path não batem com o path canônico atual
-#   (ex: arquivo movido para guidelines/), reescreve — auto-reparo
+# - Se guidelines_path não bate com o path canônico atual (ex: pasta movida),
+#   reescreve — auto-reparo
+# - Remove chaves obsoletas de guidelines (code_guidelines_path, conduct_path),
+#   substituídas por guidelines_path
 # - Retorna 0 se sucesso, 1 se erro
 #
 # Requer: $OBSIDIAN_VAULT_PATH definido
@@ -36,8 +38,7 @@ validate_agent_state() {
   local project_name
   project_name=$(pwd | xargs basename | tr '[:upper:]' '[:lower:]' | tr '-' '_' | tr ' ' '_')
 
-  local code_guidelines_path="${vault_path}/guidelines/code guidelines.md"
-  local conduct_path="${vault_path}/guidelines/conduct.md"
+  local guidelines_path="${vault_path}/guidelines"
   local condensed_memory_path="${vault_path}/condensed memory/projects/${project_name}.md"
 
   # Se arquivo não existe ou não é JSON válido, criar
@@ -46,8 +47,7 @@ validate_agent_state() {
 {
   "version": "2.0",
   "vault_path": "${vault_path}",
-  "code_guidelines_path": "${code_guidelines_path}",
-  "conduct_path": "${conduct_path}",
+  "guidelines_path": "${guidelines_path}",
   "condensed_memory_path": "${condensed_memory_path}",
   "current_card": null
 }
@@ -68,27 +68,27 @@ EOF
       echo "✅ .agent_obsidian migrado para version 2.0 (novo layout de memória)" >&2
     fi
 
-    # Auto-reparo de paths: se o path gravado não existe mais (ex: arquivo
-    # movido para guidelines/), reescreve para o path canônico atual. Evita
-    # exigir edição manual do .agent_obsidian em cada projeto.
+    # Auto-reparo do path de guidelines: se o path gravado não bate com o
+    # canônico atual (ex: pasta movida), reescreve. Evita exigir edição manual
+    # do .agent_obsidian em cada projeto.
     local stored_guidelines
-    stored_guidelines=$(jq -r '.code_guidelines_path // ""' "$agent_file")
-    local stored_conduct
-    stored_conduct=$(jq -r '.conduct_path // ""' "$agent_file")
+    stored_guidelines=$(jq -r '.guidelines_path // ""' "$agent_file")
 
-    if [[ "$stored_guidelines" != "$code_guidelines_path" ]] || [[ "$stored_conduct" != "$conduct_path" ]]; then
-      jq --arg guidelines "$code_guidelines_path" \
-         --arg conduct "$conduct_path" \
-         '.code_guidelines_path = $guidelines | .conduct_path = $conduct' \
+    if [[ "$stored_guidelines" != "$guidelines_path" ]]; then
+      jq --arg guidelines "$guidelines_path" \
+         '.guidelines_path = $guidelines' \
          "$agent_file" > "${agent_file}.tmp" && mv "${agent_file}.tmp" "$agent_file"
-      echo "✅ .agent_obsidian atualizado com os paths atuais de guidelines" >&2
+      echo "✅ .agent_obsidian atualizado com o path atual de guidelines" >&2
     fi
-  fi
 
-  # Adicionar .agent_obsidian ao .gitignore se não estiver lá
-  if [[ -f ".gitignore" ]] && ! grep -q "^\.agent_obsidian$" ".gitignore"; then
-    echo -e "\n# Agent state file (local to each project)\n.agent_obsidian" >> ".gitignore"
-    echo "✅ .agent_obsidian adicionado ao .gitignore" >&2
+    # Remove chaves obsoletas: os paths por arquivo (code_guidelines_path,
+    # conduct_path) foram substituídos por guidelines_path — os comandos leem a
+    # pasta inteira, então apontar arquivo por arquivo não faz sentido.
+    if jq -e 'has("code_guidelines_path") or has("conduct_path")' "$agent_file" >/dev/null 2>&1; then
+      jq 'del(.code_guidelines_path, .conduct_path)' \
+         "$agent_file" > "${agent_file}.tmp" && mv "${agent_file}.tmp" "$agent_file"
+      echo "✅ .agent_obsidian limpo: paths por arquivo substituídos por guidelines_path" >&2
+    fi
   fi
 
   return 0

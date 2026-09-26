@@ -21,8 +21,9 @@ Receber nome de um card e retornar o caminho absoluto do arquivo, buscando em to
      1. `{vault_path}/board/2.in_progress/`
      2. `{vault_path}/board/3.in_review/`
      3. `{vault_path}/board/1.not_started/`
-     4. `{vault_path}/board/4.done/`
-     5. `{vault_path}/board/5.archived/`
+     4. `{vault_path}/board/0.backlog/`
+     5. `{vault_path}/board/4.done/`
+     6. `{vault_path}/board/5.archived/`
 
    - Para cada pasta:
      - Usar Glob para listar: `{pasta}/*.md`
@@ -48,6 +49,9 @@ Receber nome de um card e retornar o caminho absoluto do arquivo, buscando em to
 
    📂 Not Started (1.not_started):
    - card3.md
+
+   📂 Backlog (0.backlog):
+   - card4.md
    ```
 
 6. **Formato de saída (sucesso):**

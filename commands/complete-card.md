@@ -52,21 +52,36 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
 
 7. **Limpar .agent_obsidian:**
    - Ler `.agent_obsidian` do diretório atual (se existir)
-   - Manter todos os campos existentes (version, vault_path, code_guidelines_path, conduct_path, condensed_memory_path)
+   - Manter todos os campos existentes (version, vault_path, guidelines_path, condensed_memory_path)
    - Atualizar campo `current_card` para `null`
    - Escrever de volta usando Write tool preservando estrutura completa
 
-8. **Consolidar conhecimento automaticamente:**
+8. **Voltar para a branch default e apagar a branch do card:**
+   - Detectar a branch default do repositório (`main`/`master`), preferindo `main` quando ambas existirem
+   - Ler a branch do card no frontmatter (`branch:`)
+   - Verificar alterações não commitadas: `git status --short`
+     - Se houver, **parar e avisar** — trocar de branch pode perder trabalho ou arrastar alterações para a branch errada. Perguntar o que fazer (commit, stash ou cancelar)
+   - Executar: `git checkout {branch-default}`
+   - Executar: `git pull` na branch default
+     - Se o pull falhar (conflito, sem upstream, sem remote), **parar e reportar**. Não apagar a branch sobre estado desatualizado
+     - Se não houver remote configurado, avisar e seguir
+   - Apagar a branch do card: `git branch -d {branch-do-card}`
+     - Usar `-d` (não `-D`): se o git recusar por commits não mergeados, **parar e reportar** em vez de forçar. Branch não mergeada apagada com `-D` perde trabalho
+     - Se a branch do card for a própria branch default, não apagar nada
+   - Se o remoto ainda tiver a branch, informar o comando de limpeza (`git push origin --delete {branch-do-card}`) sem executá-lo — apagar branch remota é ação destrutiva que exige pedido explícito
+
+9. **Consolidar conhecimento automaticamente:**
    - Executar `/condense-memory "{nome-do-card}"` automaticamente
    - Isso irá extrair e consolidar o conhecimento do card recém-finalizado
    - O conhecimento será imediatamente disponível para futuras tarefas
 
-8. **Confirmar:**
+10. **Confirmar:**
    ```
    ✅ Card concluído!
 
    📝 Card: nome-do-card.md
    🔀 Movido: 3.in_review → 4.done
+   � Branch: {branch-do-card} → {branch-default} (branch do card apagada)
    🎉 Tarefa finalizada com sucesso!
 
    📊 Resumo:
@@ -85,3 +100,5 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
 - A seção "Conhecimento Adquirido pela IA" é crucial para /condense-memory
 - Não delete informações ao mover o card, preserve todo o histórico
 - **O comando automaticamente chama `/condense-memory` após finalizar** para consolidar o conhecimento imediatamente
+- **O comando volta para a branch default e apaga a branch do card** (passo 8). Usa `git branch -d` e para se o git recusar por commits não mergeados — nunca força com `-D`
+- A branch remota **não** é apagada automaticamente: o comando apenas informa o comando de limpeza, porque apagar branch remota é ação destrutiva que exige pedido explícito

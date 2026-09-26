@@ -25,6 +25,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      - `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (prioridade)
      - `$OBSIDIAN_VAULT_PATH/board/3.in_review/`
      - `$OBSIDIAN_VAULT_PATH/board/1.not_started/`
+     - `$OBSIDIAN_VAULT_PATH/board/0.backlog/`
      - `$OBSIDIAN_VAULT_PATH/board/4.done/`
    - Se não encontrar, listar cards disponíveis
 
@@ -67,7 +68,40 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - Executar `git branch --show-current` para verificar branch
    - Executar `git status --short` para ver alterações pendentes
    - Executar `git log -1 --oneline` para ver último commit
+8. **Sincronizar branch e estado (`.agent_obsidian`):**
+   - Comparar a branch atual (`git branch --show-current`) com a branch do card
+     (campo `branch:` do frontmatter)
+   - **Se divergirem**, o card está ativo mas o repositório está em outra branch.
+     Perguntar ao usuário antes de trocar:
+     ```
+     O card está na branch `{branch-do-card}`, mas o repositório está em `{branch-atual}`.
+     Deseja mudar para `{branch-do-card}`?
 
+     1. Sim — trocar de branch (recomendado)
+     2. Não — continuar em `{branch-atual}`
+     ```
+   - **Aguardar a resposta.** Não trocar de branch sem confirmação
+   - Se o usuário escolher trocar:
+     - Verificar alterações não commitadas: `git status --short`
+     - Se houver, **parar e avisar** — trocar de branch pode perder trabalho ou
+       arrastar alterações para a branch errada. Perguntar o que fazer (commit,
+       stash ou cancelar)
+     - Executar: `git checkout {branch-do-card}`
+   - **Atualizar a branch com o remoto (SEMPRE, após estar na branch do card):**
+     - Executar: `git pull` na branch do card
+     - Se o pull falhar (conflito, sem upstream, sem remote), **parar e reportar**.
+       Não seguir com contexto de uma branch desatualizada ou em conflito
+     - Se não houver remote configurado, avisar e seguir (não há o que puxar)
+   - **Atualizar o `.agent_obsidian`** para refletir o card carregado:
+     - Se o card veio de argumento (não do estado), gravar `current_card` com
+       `name` e `path` do card carregado
+     - Se o `current_card.path` gravado aponta para uma pasta diferente da atual
+       (ex: card foi movido de `2.in_progress/` para `3.in_review/`), corrigir o
+       path para a localização real
+     - Preservar todos os outros campos (`version`, `vault_path`,
+       `guidelines_path`, `condensed_memory_path`)
+   - Se a branch atual já é a do card e o `current_card` já está correto, não
+     alterar nada — apenas reportar que está sincronizado
 8. **Analisar modificações da branch:**
    - Identificar branch base (main, master, ou similar)
    - Listar commits da branch: `git log origin/{base}..HEAD --oneline`
@@ -91,6 +125,9 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
 
    **Estado:** {Not Started|In Progress|In Review|Done}
    **Localização:** board/{pasta}/
+   **Branch:** {branch-atual} {✅ sincronizada com o card | ⚠️ divergente (card: {branch-do-card})}
+   **Pull:** {✅ atualizada com o remoto | ⚠️ falhou: {motivo} | — sem remote}
+   **Estado (.agent_obsidian):** {✅ atualizado | ✅ já estava correto}
 
    ## Resumo da Tarefa
    {Descrição do card em 2-3 linhas}
@@ -156,7 +193,6 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
 
    Próximos passos sugeridos:
    - Use /work-on-card "{nome}" para começar/continuar trabalhando
-   - Use /update-card "{nome}" para documentar decisões
    - Consulte as discussões anteriores para contexto de decisões
    ```
 
@@ -180,8 +216,17 @@ Recarrega contexto incluindo discussões e progresso anterior.
 ```
 Carrega contexto completo para preparar PR ou revisão.
 
+### Retomar card em outra branch
+```
+/load-context
+```
+Se o repositório estiver em uma branch diferente da do card, o comando pergunta se
+deve trocar para a branch correta e atualiza o `.agent_obsidian`.
+
 ## Notas Importantes
-- Este comando é read-only, não modifica nenhum arquivo
+- Este comando **não altera o conteúdo do card** — é de leitura para contexto
+- Ele **pode** trocar de branch (com confirmação), rodar `git pull` e atualizar o
+  `.agent_obsidian` para refletir o card carregado (ver passo 8)
 - Use-o no início de cada sessão para ter contexto completo
 - Especialmente útil após pausas longas ou trocas de contexto
 - O condensed memory fornece conhecimento acumulado de tarefas anteriores

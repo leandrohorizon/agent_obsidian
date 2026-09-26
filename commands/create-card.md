@@ -28,15 +28,18 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
 
    c) **Estado padrão:**
       - Se não há PR e não há commits específicos da branch → `1.not_started`
+      - **Exceção:** se o usuário pedir explicitamente para criar no backlog
+        (card ainda não refinado ou não priorizado), usar `0.backlog`
 
 3. **Determinar diretório de destino:**
+   - `0.backlog` → `$OBSIDIAN_VAULT_PATH/board/0.backlog/`
    - `1.not_started` → `$OBSIDIAN_VAULT_PATH/board/1.not_started/`
    - `2.in_progress` → `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
    - `3.in_review` → `$OBSIDIAN_VAULT_PATH/board/3.in_review/`
    - `4.done` → `$OBSIDIAN_VAULT_PATH/board/4.done/`
 
 4. **Verificar se card já existe:**
-   - Procurar em todas as pastas do board: `1.not_started/`, `2.in_progress/`, `3.in_review/`, `4.done/`
+   - Procurar em todas as pastas do board: `0.backlog/`, `1.not_started/`, `2.in_progress/`, `3.in_review/`, `4.done/`
    - Se encontrar, avisar usuário e perguntar se quer sobrescrever ou mover para o estado correto
 
 5. **Coletar informações do projeto (se aplicável):**
@@ -95,5 +98,7 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
 - A detecção automática evita cards desatualizados ou no estado errado
 - O frontmatter YAML substitui a antiga seção "## Repositório"
 - Cards criados em `1.not_started` podem ser movidos com `/start-card`
+- Cards em `0.backlog` são ideias ainda não refinadas/priorizadas; use
+  `/refine-card` para amadurecer e mover para `1.not_started`
 - Se o card for detectado como `done`, ele já conterá os metadados de conclusão
 - Use gh CLI para detecção de PRs (requer `gh` instalado)
