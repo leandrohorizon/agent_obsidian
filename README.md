@@ -17,6 +17,8 @@
 # Começar a trabalhar em um card
 cd ~/meu-projeto
 /start-card "implementar autenticação de usuário"
+# ✅ Pergunta se deve mudar para main/master antes de criar a branch
+# ✅ Faz pull da branch base
 # ✅ Card movido para in_progress
 # ✅ Branch git criada: feature/implementar-autenticacao-de-usuario
 # ✅ Estado rastreado em .agent_obsidian
@@ -121,17 +123,17 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 
 ## Comandos Disponíveis
 
-| Comando | Propósito | Exemplo |
-|---------|-----------|---------|
-| `/board-status` | Mostra estado do board Kanban | `/board-status` |
-| `/start-card <nome>` | Inicia trabalho, cria branch | `/start-card "adicionar feature"` |
-| `/work-on-card [nome]` | Executa tarefas com contexto completo | `/work-on-card` |
-| `/refine-card <nome>` | Clarifica cards vagos antes de iniciar | `/refine-card "adicionar feature"` |
-| `/update-card <nome>` | Adiciona notas de discussão/decisão | `/update-card "adicionar feature" "Decidimos usar JWT"` |
-| `/review-card [nome]` | Cria PR, move para review | `/review-card` |
-| `/complete-card [nome]` | Finaliza, consolida conhecimento | `/complete-card` |
-| `/load-context [nome]` | Carrega contexto completo (read-only) | `/load-context` |
-| `/condense-memory [nome]` | Consolida conhecimento do card | `/condense-memory` |
+| Comando                   | Propósito                              | Exemplo                                                 |
+| ------------------------- | -------------------------------------- | ------------------------------------------------------- |
+| `/board-status`           | Mostra estado do board Kanban          | `/board-status`                                         |
+| `/start-card <nome>`      | Inicia trabalho, cria branch           | `/start-card "adicionar feature"`                       |
+| `/refine-card <nome>`     | Clarifica cards vagos antes de iniciar | `/refine-card "adicionar feature"`                      |
+| `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
+| `/update-card <nome>`     | Adiciona notas de discussão/decisão    | `/update-card "adicionar feature" "Decidimos usar JWT"` |
+| `/review-card [nome]`     | Cria PR, move para review              | `/review-card`                                          |
+| `/complete-card [nome]`   | Finaliza, consolida conhecimento       | `/complete-card`                                        |
+| `/load-context [nome]`    | Carrega contexto completo (read-only)  | `/load-context`                                         |
+| `/condense-memory [nome]` | Consolida conhecimento do card         | `/condense-memory`                                      |
 
 **Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido.
 
@@ -145,6 +147,7 @@ cd ~/projeto-calculadora
 
 # Iniciar primeira feature
 /start-card "operações básicas"
+# Pergunta se deve mudar para main/master e faz pull da base
 # Cria: board/2.in_progress/operações básicas.md
 # Cria: .agent_obsidian (rastreia card atual)
 # Cria: branch feature/operacoes-basicas
@@ -327,7 +330,7 @@ Benefícios:
 - Comandos funcionam sem argumentos
 - Acesso direto por path (sem buscas de arquivo)
 - Auto-criado e mantido
-- Adicionado automaticamente ao .gitignore
+- Nunca commitado — manter fora do versionamento é regra de conduta, não entrada no `.gitignore`
 - `version: 2.0` indica o modelo de dois eixos; o path da memória de feature é derivado do campo `feature:` do card em tempo de carga (não fica no estado)
 
 ### Descrições Inteligentes de PR

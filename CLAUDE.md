@@ -46,6 +46,7 @@ This system uses a **distributed state architecture** with centralized knowledge
 {
   "version": "2.0",
   "vault_path": "/Users/user/workspace/obsidian/user",
+  "guidelines_path": "/Users/user/workspace/obsidian/user/guidelines",
   "condensed_memory_path": "/Users/user/workspace/obsidian/user/condensed memory/projects/agent_obsidian.md",
   "current_card": {
     "name": "card-name",
@@ -55,9 +56,11 @@ This system uses a **distributed state architecture** with centralized knowledge
 ```
 
 **Version 2.0 (two-axis model):**
+- `guidelines_path` points to the **folder** `guidelines/`, not to individual files — commands list the folder and read every file in it, so a new directive file is picked up without touching state
 - `condensed_memory_path` points to `condensed memory/projects/{projeto}.md`
 - The feature memory path is NOT stored in state — it's derived from the card's `feature:` field at load time via `get_feature_memory_path()`
 - Migration: if an existing valid state has `version` < 2.0, `validate_agent_state()` rewrites `condensed_memory_path` to the new layout (instead of keeping the old path)
+- Migration: `validate_agent_state()` also rewrites `guidelines_path` to the canonical folder and drops the obsolete per-file keys (`code_guidelines_path`, `conduct_path`)
 
 **Lifecycle:**
 - Created automatically by any command if missing
@@ -68,8 +71,8 @@ This system uses a **distributed state architecture** with centralized knowledge
 **Benefits:**
 - Commands work without arguments when card is active
 - Direct path access eliminates file searches (performance optimization)
-- Automatic gitignore management
 - No manual configuration needed
+- Never committed: keeping it out of version control is a conduct rule, not a `.gitignore` entry
 
 ### Kanban Board Structure
 
@@ -347,12 +350,14 @@ Initiates work on a card.
 **Actions:**
 1. Verifies `$OBSIDIAN_VAULT_PATH` is set
 2. Creates/validates `.agent_obsidian` in project root
-3. Adds `.agent_obsidian` to `.gitignore`
-4. Finds card in `1.not_started/`
-5. Creates git branch: `feature/card-name`
-6. Updates card frontmatter (repo, branch, status, started date)
-7. Moves card: `1.not_started/` → `2.in_progress/`
-8. Updates `.agent_obsidian` with current_card
+3. Finds card in `1.not_started/`
+4. Detects base branch (`main`/`master`)
+5. **Asks the user** whether to switch to the base branch before creating the card branch (skipped when already on the base)
+6. **Always runs `git pull`** on the base branch — aborts if it fails
+7. Creates git branch: `feature/card-name`
+8. Updates card frontmatter (repo, branch, status, started date)
+9. Moves card: `1.not_started/` → `2.in_progress/`
+10. Updates `.agent_obsidian` with current_card
 
 **Important:** This is the entry point that initializes state for a project.
 
@@ -730,6 +735,7 @@ Commands automatically load and apply these guidelines when writing code.
 
 ### Branch Management
 
+- `/start-card` asks whether to switch to the base branch (`main`/`master`), then **always pulls** before creating the branch
 - `/start-card` creates branch: `feature/card-name`
 - Branch name stored in card frontmatter
 - `/review-card` validates branch, creates commit, pushes
@@ -860,7 +866,7 @@ If you're unsure which card you were working on:
 
 ### .agent_obsidian issues
 - Commands will auto-recreate if missing
-- Check `.gitignore` includes `.agent_obsidian`
+- Never commit it — it holds machine-local state (see `guidelines/conduct.md`)
 - If corrupted, delete and let it regenerate
 
 ### PR creation fails

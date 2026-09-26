@@ -89,8 +89,10 @@ cd ~/meu-projeto
 
 **O que faz:**
 - Move card de `1.not_started/` → `2.in_progress/`
-- Detecta repositório git atual
-- Sugere criar branch no formato `feature/nome-do-card`
+- Detecta repositório git atual e a branch base (`main`/`master`)
+- Pergunta se deve mudar para a branch base antes de criar a branch do card
+- Faz `git pull` da branch base (sempre)
+- Cria branch no formato `feature/nome-do-card`
 - Atualiza card com informações do repositório
 
 ### `/work-on-card <nome>`
@@ -175,6 +177,9 @@ Processa todos os cards em "4.done" e consolida conhecimento em `condensed memor
 # 2. Ir para o projeto e iniciar card
 cd ~/projetos/projeto-a
 /start-card "card-exemplo"
+# → Pergunta se deve mudar para main/master antes de criar a branch
+# → Faz pull da branch base (sempre)
+# → Cria a branch feature/card-exemplo
 
 # 3. Trabalhar nas tarefas (pode executar múltiplas vezes)
 /work-on-card "card-exemplo"
@@ -223,8 +228,7 @@ O arquivo fica na raiz do seu projeto (não no vault):
 ```
 /workspace/projeto-a/             (seu projeto)
 ├── .git/
-├── .agent_obsidian               ← arquivo de estado
-├── .gitignore                    ← deve incluir .agent_obsidian
+├── .agent_obsidian               ← arquivo de estado (nunca commitado)
 └── app/
 ```
 
@@ -232,8 +236,10 @@ O arquivo fica na raiz do seu projeto (não no vault):
 
 ```json
 {
-  "version": "1.0",
+  "version": "2.0",
   "vault_path": "/Users/you/workspace/obsidian/vault",
+  "guidelines_path": "/Users/you/workspace/obsidian/vault/guidelines",
+  "condensed_memory_path": "/Users/you/workspace/obsidian/vault/condensed memory/projects/projeto-a.md",
   "current_card": {
     "name": "card-exemplo",
     "path": "/Users/you/workspace/obsidian/vault/board/2.in_progress/card-exemplo.md"
@@ -245,8 +251,10 @@ Quando não há card ativo:
 
 ```json
 {
-  "version": "1.0",
+  "version": "2.0",
   "vault_path": "/Users/you/workspace/obsidian/vault",
+  "guidelines_path": "/Users/you/workspace/obsidian/vault/guidelines",
+  "condensed_memory_path": "/Users/you/workspace/obsidian/vault/condensed memory/projects/projeto-a.md",
   "current_card": null
 }
 ```
@@ -266,7 +274,7 @@ O arquivo é criado automaticamente quando você usa qualquer comando:
 
 ### Importante
 
-- Adicione `.agent_obsidian` ao `.gitignore` do projeto (feito automaticamente pelo `/start-card`)
+- Nunca commite o `.agent_obsidian` — é estado local da máquina (regra em `guidelines/conduct.md`)
 - Não edite manualmente o arquivo (deixe a IA gerenciar)
 - Se corrompido, será recriado automaticamente
 
