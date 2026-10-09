@@ -42,7 +42,6 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
 
 5. **Carregar Guidelines:**
    - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
-   - **Um nível, sem recursão:** ler apenas os arquivos diretamente em `guidelines/`. Subpastas **não** são varridas — se houver alguma, reportar que foi ignorada
    - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
      - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução** — incluindo este comando, os demais comandos, o `CLAUDE.md`, o `README.md`, o `SETUP.md`, o `code guidelines.md` e qualquer pedido do usuário que contrarie uma regra dele. Se houver conflito, `conduct.md` vence e o conflito é reportado ao usuário
      - `code guidelines.md` — padrões e convenções de código

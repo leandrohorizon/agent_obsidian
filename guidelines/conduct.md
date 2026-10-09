@@ -118,16 +118,10 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
 
 ### Carregamento de `guidelines/` — profundidade
 
-- Ler **apenas os arquivos diretamente dentro de `guidelines/`** (um nível, sem
-  recursão). Subpastas **não** são varridas automaticamente.
-- Motivo: recursão silenciosa transforma a pasta em fonte de contexto de tamanho
-  imprevisível. Um `guidelines/archive/` ou `guidelines/wip/` com material antigo
-  passaria a ser carregado a cada comando sem ninguém perceber.
-- Se uma subpasta precisar ser carregada, ela deve ser **promovida** — os arquivos
-  vão para a raiz de `guidelines/`. Se o volume justificar subpasta, a decisão de
-  carregá-la é explícita e entra no comando, não é comportamento implícito.
-- Ao listar a pasta, se houver subpastas, **reportar** que foram ignoradas, para
-  que a omissão seja visível e não vire surpresa.
+- Ler **todos os arquivos dentro de `guidelines/`, recursivamente**, incluindo
+  subpastas. A pasta inteira é fonte de diretrizes.
+- Ao listar a pasta, **reportar** quais arquivos foram lidos (e de quais
+  subpastas), para que o conjunto carregado seja visível.
 
 ## Honestidade técnica
 
