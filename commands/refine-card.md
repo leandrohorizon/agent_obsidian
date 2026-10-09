@@ -14,6 +14,11 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 - Identificar edge cases não considerados
 - Validar se as resoluções anteriores ainda fazem sentido dado o contexto atual do código
 
+**Além de esclarecer dúvidas, o refinamento deve ativamente caçar problemas:**
+- **Gaps:** o que o card não cobre — requisitos ausentes, tarefas faltando (testes, migração, rollback, observabilidade), dependências não declaradas, caminhos de erro não tratados
+- **Possíveis bugs:** riscos concretos no código existente ou na abordagem proposta — condições de corrida, estados inconsistentes, validações faltando, casos de borda que quebram, regressões em fluxos já existentes
+- **Trade-offs:** alternativas de implementação com prós/contras explícitos (custo, complexidade, performance, manutenibilidade, acoplamento) e uma recomendação justificada
+
 ## Argumentos
 - `<nome-do-card>`: Nome do card (sem extensão .md) ou caminho parcial
 
@@ -125,6 +130,42 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
      - "Qual padrão está sendo usado em Y?"
      - "Esta alteração quebra implementação existente?"
 
+6.1. **Identificar gaps, possíveis bugs e trade-offs:**
+
+   Além das dúvidas, produzir uma análise crítica explícita. Não basta perguntar — é preciso apontar o que está faltando e o que pode quebrar.
+
+   a) **Gaps (o que o card não cobre):**
+      - Requisitos ou comportamentos ausentes na descrição
+      - Tarefas faltando: testes, migração de dados, rollback, observabilidade/logs, documentação, feature flag
+      - Dependências não declaradas (serviços, cards, variáveis de ambiente)
+      - Caminhos de erro e casos de falha não tratados
+      - Impacto em outros fluxos/sistemas não mencionado
+
+   b) **Possíveis bugs (riscos concretos):**
+      - Condições de corrida, concorrência ou estados inconsistentes
+      - Validações faltando ou insuficientes (entrada inválida, limites, nulos)
+      - Casos de borda que quebram a abordagem proposta
+      - Regressões em funcionalidades existentes que dependem do código tocado
+      - Suposições frágeis sobre o comportamento atual do código (verificar no código real!)
+      - Para cada risco: descrever o cenário que dispara o bug e a mitigação sugerida
+
+   c) **Trade-offs (alternativas e decisões):**
+      - Listar as abordagens viáveis para o problema
+      - Para cada uma: prós, contras e custo (complexidade, performance, manutenibilidade, acoplamento)
+      - Apontar a recomendação e o motivo
+      - Formato sugerido:
+        ```
+        **Opção A — {nome}**
+        - Prós: ...
+        - Contras: ...
+        **Opção B — {nome}**
+        - Prós: ...
+        - Contras: ...
+        **Recomendação:** {opção} porque {motivo}
+        ```
+
+   d) **Registrar na seção Discussões** junto com as dúvidas (ver passo 7)
+
 7. **Adicionar dúvidas na seção Discussões:**
 
    - Obter timestamp: `date +"%Y-%m-%d %H:%M"`
@@ -151,6 +192,19 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    **Análise do Código Existente:**
    - {arquivo}: {função/classe} - {como funciona atualmente}
    - {arquivo}: {observação sobre implementação atual}
+
+   **Gaps Identificados:**
+   - {requisito/tarefa/dependência ausente}
+   - {caminho de erro não tratado}
+
+   **Possíveis Bugs / Riscos:**
+   - {cenário que dispara o bug} → {mitigação sugerida}
+   - {suposição frágil sobre o código atual}
+
+   **Trade-offs:**
+   - **Opção A — {nome}:** prós {…}; contras {…}
+   - **Opção B — {nome}:** prós {…}; contras {…}
+   - **Recomendação:** {opção} porque {motivo}
    ```
    - Adicionar na seção "### Discussões" do card
 
@@ -202,6 +256,11 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    ## Pontos Nebulosos Identificados
    {lista resumida dos problemas encontrados}
 
+   ## Gaps, Bugs e Trade-offs
+   ✅ {n} gaps identificados
+   ✅ {n} possíveis bugs/riscos mapeados
+   ✅ {n} trade-offs analisados
+
    ## Dúvidas Adicionadas às Discussões
    ✅ {n} dúvidas sobre implementação
    ✅ {n} dúvidas sobre comportamento
@@ -221,6 +280,9 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    - ✅ Descrição atualizada (se aplicável)
    - ✅ {n} tarefas substituídas por tarefas específicas
    - ✅ {n} dependências adicionadas
+   - ✅ {n} gaps fechados (tarefas/requisitos adicionados)
+   - ✅ {n} riscos de bug endereçados
+   - ✅ {n} trade-offs decididos e documentados
 
    Próximos passos:
    - Use /start-card para iniciar o trabalho no card
@@ -269,6 +331,8 @@ Adiciona dúvidas sobre integração com código existente, identifica dependên
 - Documentar COMO o código atual funciona nas discussões
 - Se encontrar inconsistências entre card e código, documentar claramente
 - Priorizar análise de código sobre suposições
+- **Sempre** identificar gaps, possíveis bugs e trade-offs — não apenas dúvidas. Apontar o que falta, o que pode quebrar e quais alternativas existem, com recomendação justificada
+- Riscos de bug devem vir com cenário de disparo e mitigação, não apenas um alerta vago
 - Use este comando ANTES de /start-card para garantir clareza
 - Cards em `0.backlog` são ideias cruas; após refinados, podem ser promovidos
   para `1.not_started` (o comando pergunta antes de mover)
