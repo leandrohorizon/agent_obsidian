@@ -25,12 +25,12 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (e outros diretórios se necessário)
    - Ler conteúdo completo do card
 
-3. **Carregar contexto completo:**
+4. **Carregar contexto completo:**
 
    a) **Guidelines:**
       - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
       - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
-        - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução**
+        - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução** — incluindo este comando, os demais comandos, o `CLAUDE.md`, o `README.md`, o `SETUP.md`, o `code guidelines.md` e qualquer pedido do usuário que contrarie uma regra dele. Se houver conflito, `conduct.md` vence e o conflito é reportado ao usuário
         - `code guidelines.md` — padrões e convenções de código
       - **Reportar no output** quais arquivos foram carregados
       - Usar essas diretrizes ao escrever código
@@ -51,12 +51,12 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    d) **Template do card:**
       - Entender a estrutura esperada do card (Descrição, Dependências, Tarefas, Discussões, PRs, etc.)
 
-4. **Analisar tarefas:**
+5. **Analisar tarefas:**
    - Identificar todos os checkboxes `- [ ]` no card
    - Listar tarefas pendentes vs completas `- [x]`
    - Priorizar tarefas não completadas
 
-5. **Executar as tarefas:**
+6. **Executar as tarefas:**
    - Para cada tarefa pendente:
      - Explicar o que vai fazer
      - Executar a tarefa (ler código, fazer alterações, rodar testes, etc.)
@@ -64,20 +64,20 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
      - Atualizar seção "Discussões" com decisões tomadas
      - Fazer commits git incrementais se apropriado
 
-6. **Documentar o trabalho no card:**
+7. **Documentar o trabalho no card:**
    - Atualizar seção "## Descrição Técnica do que Foi Feito"
    - Adicionar detalhes de implementação
    - Atualizar seção "## Conhecimento Adquirido pela IA"
    - Documentar regras de negócio, padrões identificados, aprendizados
 
-7. **Seguir as guidelines:**
+8. **Seguir as guidelines:**
    - Aplicar princípios SOLID, DRY, KISS
    - Nomenclatura clara e descritiva
    - Funções pequenas e focadas
    - Tratamento adequado de erros
    - Escrever ou atualizar testes quando necessário
 
-8. **Testes e lint - escopo conforme o tamanho do projeto:**
+9. **Testes e lint - escopo conforme o tamanho do projeto:**
    - Obter a lista de arquivos alterados: `git status --porcelain` e `git diff --name-only`
    - **Avaliar o tamanho da suíte** antes de decidir o escopo (ex: `ls **/*_spec.rb | wc -l`, `find . -name "*.test.*" | wc -l`)
      - **Suíte pequena/rápida** (poucas dezenas de arquivos ou roda em segundos): rodar tudo, é mais seguro e pega quebras em consumidores do código alterado
@@ -92,7 +92,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    - **Rationale:** em projeto grande a suíte completa é lenta e traz falhas pré-existentes não relacionadas ao card; em projeto pequeno o custo é irrelevante e a cobertura extra compensa
    - Se surgirem falhas em arquivos que você não modificou, documentar na seção "Discussões" e não corrigir sem alinhar com o usuário
 
-9. **Status final:**
+10. **Status final:**
    ```
    ✅ Trabalho em progresso no card: nome-do-card
 

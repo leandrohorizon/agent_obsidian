@@ -24,17 +24,17 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
    - Ler conteúdo completo do card
    - Verificar se o PR foi merged (se houver PR mencionado)
 
-3. **Validar completude:**
+4. **Validar completude:**
    - ✅ Todas as tarefas `- [x]` completadas?
    - ✅ Seção "Descrição Técnica do que Foi Feito" preenchida?
    - ✅ Seção "Conhecimento Adquirido pela IA" preenchida?
    - ✅ Seção "PRs" com status atualizado?
    - ✅ Seção "Discussões" documentada?
 
-4. **Completar documentação:**
+5. **Completar documentação:**
    - Se algo estiver faltando, perguntar ao usuário ou completar automaticamente
 
-5. **Atualizar frontmatter do card:**
+6. **Atualizar frontmatter do card:**
    - Atualizar campos no frontmatter YAML:
      ```yaml
      status: Done
@@ -46,17 +46,17 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
      ```
    - Calcular tempo total baseado nas datas de `started` e `completed`
 
-6. **Mover o card:**
+7. **Mover o card:**
    - Mover arquivo de `$OBSIDIAN_VAULT_PATH/board/3.in_review/card.md`
    - Para: `$OBSIDIAN_VAULT_PATH/board/4.done/card.md`
 
-7. **Limpar .agent_obsidian:**
+8. **Limpar .agent_obsidian:**
    - Ler `.agent_obsidian` do diretório atual (se existir)
    - Manter todos os campos existentes (version, vault_path, guidelines_path, condensed_memory_path)
    - Atualizar campo `current_card` para `null`
    - Escrever de volta usando Write tool preservando estrutura completa
 
-8. **Voltar para a branch default e apagar a branch do card:**
+9. **Voltar para a branch default e apagar a branch do card:**
    - Detectar a branch default do repositório (`main`/`master`), preferindo `main` quando ambas existirem
    - Ler a branch do card no frontmatter (`branch:`)
    - Verificar alterações não commitadas: `git status --short`
@@ -67,15 +67,16 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
      - Se não houver remote configurado, avisar e seguir
    - Apagar a branch do card: `git branch -d {branch-do-card}`
      - Usar `-d` (não `-D`): se o git recusar por commits não mergeados, **parar e reportar** em vez de forçar. Branch não mergeada apagada com `-D` perde trabalho
+     - **Squash merge faz o `-d` recusar mesmo com o PR merged.** O squash cria um commit novo na base, então os commits da branch não são ancestrais dela e o git não os reconhece como mergeados. Antes de reportar como problema, confirmar que o conteúdo está na base: `git diff --stat {branch} {default}` deve vir vazio. Se vier vazio, o merge está completo e a recusa é esperada — informar o usuário e deixar a decisão de apagar com `-D` para ele, já que `-D` é destrutivo
      - Se a branch do card for a própria branch default, não apagar nada
    - Se o remoto ainda tiver a branch, informar o comando de limpeza (`git push origin --delete {branch-do-card}`) sem executá-lo — apagar branch remota é ação destrutiva que exige pedido explícito
 
-9. **Consolidar conhecimento automaticamente:**
+10. **Consolidar conhecimento automaticamente:**
    - Executar `/condense-memory "{nome-do-card}"` automaticamente
    - Isso irá extrair e consolidar o conhecimento do card recém-finalizado
    - O conhecimento será imediatamente disponível para futuras tarefas
 
-10. **Confirmar:**
+11. **Confirmar:**
    ```
    ✅ Card concluído!
 
@@ -100,5 +101,5 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
 - A seção "Conhecimento Adquirido pela IA" é crucial para /condense-memory
 - Não delete informações ao mover o card, preserve todo o histórico
 - **O comando automaticamente chama `/condense-memory` após finalizar** para consolidar o conhecimento imediatamente
-- **O comando volta para a branch default e apaga a branch do card** (passo 8). Usa `git branch -d` e para se o git recusar por commits não mergeados — nunca força com `-D`
+- **O comando volta para a branch default e apaga a branch do card** (passo 9). Usa `git branch -d` e para se o git recusar por commits não mergeados — nunca força com `-D`. Em squash merge a recusa é esperada: confirmar com `git diff --stat {branch} {default}` que o conteúdo está na base antes de reportar
 - A branch remota **não** é apagada automaticamente: o comando apenas informa o comando de limpeza, porque apagar branch remota é ação destrutiva que exige pedido explícito

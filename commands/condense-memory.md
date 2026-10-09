@@ -42,7 +42,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
      - Seção "## Discussões"
      - Seção "## Descrição Técnica do que Foi Feito"
 
-5. **Extrair e processar conhecimento:**
+6. **Extrair e processar conhecimento:**
 
    **IMPORTANTE: Aplicar deduplicação e condensação**
    - Identificar informações repetidas entre cards
@@ -116,7 +116,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
       - Casos limite, intermitências, comportamentos inesperados
       - Problemas conhecidos e como foram resolvidos
 
-6. **Atualizar os arquivos de memória (roteamento por eixo):**
+7. **Atualizar os arquivos de memória (roteamento por eixo):**
 
    **Roteamento:**
    - Itens classificados como **projeto** → escrever em `condensed memory/projects/{projeto}.md`
@@ -291,12 +291,12 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
    5. **Deduplicação por eixo:** ao consolidar múltiplos cards da mesma feature,
       deduplique dentro do arquivo de feature (mesma regra do eixo de projeto)
 
-7. **Evitar duplicação:**
+8. **Evitar duplicação:**
    - Antes de adicionar conhecimento, verificar se já existe em cada eixo
    - Consolidar informações similares dentro do mesmo arquivo (projeto OU feature)
    - Manter apenas o mais relevante e atual
 
-8. **Marcar cards processados:**
+9. **Marcar cards processados:**
    - Adicionar comentário no final de cada card processado, registrando os dois destinos:
      ```markdown
      ---
@@ -308,7 +308,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
      > ✅ Conhecimento consolidado em condensed memory/projects/{projeto}.md em YYYY-MM-DD (sem feature:)
      ```
 
-9. **Confirmar:**
+10. **Confirmar:**
 
    **Se processou card específico:**
    ```

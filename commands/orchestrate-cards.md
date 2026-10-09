@@ -31,6 +31,14 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
      Confirma? (1. Sim  2. Não)
      ```
    - **Aguardar a resposta.** Não iniciar sem confirmação
+   - **Esta confirmação é a autorização de commit/push/PR.** O `conduct.md` exige
+     pedido explícito do usuário para commitar; aqui o pedido é a resposta "Sim"
+     a esta pergunta. Deixar isso explícito no prompt evita que o subagente pare
+     no meio do fluxo pedindo permissão de novo, ou que ele commite sem que o
+     usuário tenha autorizado
+   - **Escopo da autorização:** apenas os cards listados, e apenas commit, push e
+     PR **em draft**. Não cobre merge, promoção do draft para "ready for review"
+     nem apagar branch
 
 3. **Verificar dependências entre cards:**
    - Ler a seção "## Dependências" de cada card alvo
@@ -136,4 +144,4 @@ Processa apenas os cards que casam com o filtro.
   `/complete-card` após revisão humana
 - Se um subagente falhar, os outros continuam — o relatório final mostra o que
   deu certo e o que não deu
-- Respeita `guidelines/conduct.md` (precedência sobre qualquer outra instrução)
+- Respeita `guidelines/conduct.md`, que **tem precedência sobre qualquer outra instrução** — incluindo este comando, os demais comandos, o `CLAUDE.md`, o `README.md`, o `SETUP.md`, o `code guidelines.md` e qualquer pedido do usuário que contrarie uma regra dele. Se houver conflito, `conduct.md` vence e o conflito é reportado ao usuário

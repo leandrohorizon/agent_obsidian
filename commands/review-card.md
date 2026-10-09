@@ -27,12 +27,12 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]`
    - Se houver tarefas pendentes, avisar o usuário
 
-3. **Revisar o trabalho:**
+4. **Revisar o trabalho:**
    - Verificar se a seção "## Descrição Técnica do que Foi Feito" está preenchida
    - Verificar se a seção "## Conhecimento Adquirido pela IA" está preenchida
    - Se faltar documentação, pedir ao usuário para completar ou completar automaticamente
 
-4. **Preparar commit/PR:**
+5. **Preparar commit/PR:**
 
    a) **Status do Git:**
       - Executar `git status` para ver alterações
@@ -51,28 +51,26 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    d) **Criar Pull Request com descrição inteligente:**
 
       **Passo 1: Detectar branch base**
-      - Tentar em ordem: `origin/main`, `origin/develop`
-      - Usar a primeira que existir
+      - Usar a base já registrada no card (`branch:` do frontmatter aponta para a
+        branch do card; a base é a default do repo)
+      - Se não estiver clara, tentar em ordem: `origin/main`, `origin/develop`
 
-      **Passo 2: Obter commits relevantes**
-      - Executar: `git log <base>..HEAD --oneline`
-      - Ignorar commits triviais: typo, lint, format, chore sem impacto
-      - Agrupar commits relacionados em um único ponto
-
-      **Passo 3: Detectar template de PR**
+      **Passo 2: Detectar template de PR**
       - Procurar em ordem:
         1. `.github/PULL_REQUEST_TEMPLATE.md`
         2. `.github/pull_request_template.md`
         3. `.github/PULL_REQUEST_TEMPLATE/*.md`
-      - Se múltiplos templates: escolher mais relevante baseado nos commits (feat, fix, etc.)
+      - Se múltiplos templates: escolher mais relevante baseado no trabalho (feat, fix, etc.)
 
-      **Passo 4: Gerar descrição**
-      - **Se template existe:**
-        - Manter estrutura do template
-        - Substituir TODOS os placeholders (TODO, <!-- comentários -->, seções vazias)
-        - Preencher com informações dos commits + card
-
-      - **Se NÃO existe template, usar estrutura padrão:**
+      **Passo 3: Gerar descrição**
+      - **Fontes, com peso igual:**
+        - **O card** — "Descrição Técnica do que Foi Feito", "Discussões" e
+          "Conhecimento Adquirido". É onde está o *porquê* das decisões
+        - **Os commits** — `git log <base>..HEAD --oneline` para conferir o que
+          entrou e não deixar nada de fora
+      - **Se template existe:** manter a estrutura do template e substituir TODOS
+        os placeholders (TODO, `<!-- comentários -->`, seções vazias)
+      - **Se NÃO existe template:** usar a estrutura padrão abaixo como fallback
         ```markdown
         ## 🧾 Resumo
         [Resumo geral das mudanças em 2-3 linhas]
@@ -87,19 +85,10 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
         ## ⚠️ Observações
         [Riscos, dependências, notas importantes se houver]
         ```
+      - **Regras:** output em pt-BR; não copiar mensagens de commit — interpretar
+        e agrupar; focar em impacto técnico e de negócio; destacar riscos
 
-      **Regras para geração:**
-      - Output em Português Brasileiro (pt-BR)
-      - NÃO copiar mensagens de commit — interpretar e agrupar
-      - Ser conciso e claro
-      - Focar em impacto técnico e de negócio
-      - Evitar repetição
-      - Usar formatação markdown (negrito para ênfase)
-      - Inferir tipo do PR (feat, fix, refactor)
-      - Destacar riscos se presentes
-      - Sugerir passos de teste baseado nas mudanças
-
-      **Passo 6: Criar PR**
+      **Passo 4: Criar PR**
       - Executar: `gh pr create --title "Título" --body "$(cat <<'EOF' ... EOF)"`
         passando a descrição diretamente via `--body` (heredoc), **sem criar
         arquivo temporário**
@@ -107,7 +96,7 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
         descrição vai inline no comando
       - Capturar número e URL do PR
 
-5. **Atualizar o card:**
+6. **Atualizar o card:**
 
    a) **Coletar informações do repositório:**
       - Executar `git remote get-url origin` para obter URL do repo
@@ -140,11 +129,11 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
       - [PR #123 - Título](url-do-pr) - Status: Open
       ```
 
-6. **Mover o card:**
+7. **Mover o card:**
    - Mover arquivo de `$OBSIDIAN_VAULT_PATH/board/2.in_progress/card.md`
    - Para: `$OBSIDIAN_VAULT_PATH/board/3.in_review/card.md`
 
-7. **Confirmar:**
+8. **Confirmar:**
    ```
    ✅ Card movido para revisão!
 

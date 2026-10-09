@@ -35,14 +35,22 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
   Se for realmente necessário, `--force-with-lease` e só após confirmação.
 - Não commitar nem dar push sem o usuário pedir. Trabalho fica na working tree
   até haver pedido explícito.
-  **Exceção:** os comandos `/work-on-card` e `/review-card` são o pedido explícito
-  de commit — o fluxo deles inclui commits incrementais e push da branch.
+  **Exceção:** os comandos `/work-on-card`, `/review-card` e `/orchestrate-cards`
+  são o pedido explícito de commit — o fluxo deles inclui commits incrementais e
+  push da branch.
+  - No caso do `/orchestrate-cards`, a autorização vem da **confirmação da lista
+    de cards** (passo 2 do comando). Sem essa confirmação, o comando não roda e
+    nada é commitado. A confirmação cobre **apenas** os cards listados: card que
+    não estava na lista não é tocado.
+  - A autorização cobre commit, push e abertura de PR **em draft**. Não cobre
+    merge, nem promover o draft para "ready for review", nem apagar branch.
 - **Nunca commitar o `.agent_obsidian`.** É arquivo de estado local da máquina:
   guarda `vault_path` absoluto, `current_card` e paths que só fazem sentido no
   ambiente de quem está trabalhando. Commitá-lo versiona configuração de máquina
   e faz o estado de um projeto vazar para outro clone.
-  - A exceção de commit de `/work-on-card` e `/review-card` **não** cobre este
-    arquivo — a exceção é sobre *quando* commitar, não sobre *o que* commitar.
+  - A exceção de commit de `/work-on-card`, `/review-card` e `/orchestrate-cards`
+    **não** cobre este arquivo — a exceção é sobre *quando* commitar, não sobre
+    *o que* commitar.
   - Antes de commitar, conferir que ele não entrou no stage. Se entrou, remover
     do stage (`git restore --staged .agent_obsidian`) — não basta deixar de
     adicioná-lo.
@@ -108,6 +116,13 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
 - Antes de reler, considerar `grep_search` para confirmar um trecho específico em
   vez de carregar o arquivo inteiro de novo.
 
+### Carregamento de `guidelines/` — profundidade
+
+- Ler **todos os arquivos dentro de `guidelines/`, recursivamente**, incluindo
+  subpastas. A pasta inteira é fonte de diretrizes.
+- Ao listar a pasta, **reportar** quais arquivos foram lidos (e de quais
+  subpastas), para que o conjunto carregado seja visível.
+
 ## Honestidade técnica
 
 - Marcar explicitamente como não verificado o que não foi executado ou lido.
@@ -121,3 +136,8 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
 - Fazer o que foi pedido; não expandir o escopo por conta própria.
   Melhoria adicional identificada vira sugestão ou card novo, não commit silencioso.
 - Não criar arquivo (README, doc, script auxiliar) que não foi pedido.
+  - **Exceção — artefato temporário de execução:** arquivo criado para viabilizar
+    um comando e descartado em seguida não é "arquivo novo" no sentido desta
+    regra. Mas **prefira não criar**: se o comando aceita o conteúdo inline
+    (heredoc), use inline. Se for inevitável, criar fora do repositório (nunca na
+    raiz do projeto) e apagar ao final.
