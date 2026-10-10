@@ -55,9 +55,13 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
       - **Reportar no output** quais arquivos foram carregados (projeto e/ou feature)
       - Se não existir, informar que não há conhecimento consolidado
 
-   d) **Carregar cards dependentes:**
+   d) **Carregar cards dependentes e dependentes deste:**
       - Na seção "### Dependências", procurar por links `[[nome-do-card]]`
       - Para cada card referenciado, ler e resumir
+      - Na seção "### Dependentes", procurar por links `[[nome-do-card]]` — são os
+        cards que dependem deste. Ler e resumir o que cada um consome deste card,
+        para que o refinamento considere o impacto sobre eles
+      - Se a seção "### Dependentes" não existir, pular sem erro
 
    e) **Analisar código relacionado no projeto atual:**
       - Se o card menciona arquivos, classes, funções ou componentes específicos, **LER O CÓDIGO REAL**

@@ -117,6 +117,9 @@ Brief description of what needs to be done and why
 - [[other-card-name]] - what it provides
 - External dependencies (APIs, services, libraries)
 
+## Dependentes
+- [[card-that-depends-on-this]] - what it consumes from this card
+
 ## Tarefas
 - [ ] Specific actionable task 1
 - [ ] Specific actionable task 2
@@ -820,14 +823,21 @@ Switch between projects by just `cd`-ing - commands adapt automatically.
 
 ### Handling Dependencies Between Cards
 
-Reference cards in "Dependências" section:
+Reference cards in the "Dependências" section, and declare who depends on this card in the "Dependentes" section:
 ```markdown
 ## Dependências
 - [[authentication-card]] - Provides user auth system
 - [[database-migration-card]] - Creates required tables
+
+## Dependentes
+- [[checkout-card]] - Consumes the auth token format defined here
 ```
 
-`/work-on-card` and `/load-context` automatically load these cards for context.
+Both sections use plain Obsidian wiki-links (`[[card-name]]`). Obsidian resolves the backlink automatically, so the "Dependentes" section exists to make the reverse direction explicit: whoever works on this card sees who will be affected before changing a contract or decision.
+
+`/work-on-card`, `/load-context` and `/refine-card` automatically load both the cards this card depends on and the cards that depend on it. `/orchestrate-cards` uses the same information to order parallel execution.
+
+There is no version or timestamp tracking between cards — the correlation is the link itself.
 
 ### Knowledge Retention
 
