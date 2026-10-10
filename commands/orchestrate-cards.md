@@ -46,6 +46,10 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
      trabalhar em paralelo pode causar conflitos de branch/arquivos
    - Sugerir processar dependências em ordem (sequencial) ou remover o card
      dependente da lista
+   - Ler também a seção "## Dependentes" de cada card alvo: se um card declara
+     outro card da lista como dependente, a relação é a mesma vista do outro lado.
+     Usar essa informação para montar a ordem de execução (quem é dependido roda
+     antes) e para avisar quem será afetado por uma mudança
 
 4. **Executar um subagente por card (em paralelo):**
    - Para cada card, disparar um subagente com contexto isolado

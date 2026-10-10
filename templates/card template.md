@@ -2,17 +2,12 @@
 repo:
 branch:
 status:
-  - Done
   - Not Started
 feature:
 created:
-  YYYY-MM-DD:
 started:
-  YYYY-MM-DD se in_progress:
 reviewed:
-  YYYY-MM-DD se in_review:
 completed:
-  YYYY-MM-DD se done:
 ---
 
 ### Descrição
@@ -31,7 +26,17 @@ completed:
 ---
 ### Dependências
 
-> Documente sistemas, serviços, bibliotecas, APIs, tarefas ou outros cards dos quais esta implementação depende para funcionar corretamente.
+> Documente sistemas, serviços, bibliotecas, APIs, tarefas ou outros cards dos quais esta implementação depende para funcionar corretamente. Use `[[nome-do-card]]` para linkar cards do board.
+
+- [[card-do-qual-depende]] — o que ele fornece
+
+
+
+---
+### Dependentes
+
+> Liste os cards que dependem deste. Use `[[nome-do-card]]`. O Obsidian resolve o backlink automaticamente; esta seção existe para que quem trabalha neste card veja o impacto de mudá-lo.
+- [[card-que-depende-deste]] — o que ele consome
 
 
 

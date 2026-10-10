@@ -43,13 +43,17 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
       - **Reportar no output** quais arquivos foram carregados (projeto e/ou feature)
       - Usar conhecimento acumulado de tarefas anteriores
 
-   c) **Cards dependentes:**
+   c) **Cards dependentes e dependentes deste:**
       - Procurar por links `[[card-name]]` na seção "Dependências" do card
       - Ler cada card referenciado para entender contexto
       - Se o card dependente já foi lido nesta sessão e está em `4.done/` ou `5.archived/`, **não reler** (são estáveis)
+      - Procurar por links `[[card-name]]` na seção "Dependentes" — são os cards que
+        dependem deste. Ler cada um para saber o que ele consome deste card, e
+        considerar esse impacto antes de alterar contratos, decisões ou tarefas
+      - Se a seção "Dependentes" não existir, pular sem erro
 
    d) **Template do card:**
-      - Entender a estrutura esperada do card (Descrição, Dependências, Tarefas, Discussões, PRs, etc.)
+      - Entender a estrutura esperada do card (Descrição, Dependências, Dependentes, Tarefas, Discussões, PRs, etc.)
 
 5. **Analisar tarefas:**
    - Identificar todos os checkboxes `- [ ]` no card

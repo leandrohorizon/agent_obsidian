@@ -35,6 +35,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - Extrair seções principais:
      - Descrição
      - Dependências
+     - Dependentes
      - Tarefas (identificar quais estão pendentes)
      - Discussões
      - Descrição Técnica
@@ -56,13 +57,17 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - Se não existir, informar que não há conhecimento consolidado ainda
    - Estes arquivos contêm aprendizados de tarefas anteriores
 
-7. **Carregar cards dependentes:**
+7. **Carregar cards dependentes e dependentes deste:**
    - Na seção "### Dependências", procurar por links `[[nome-do-card]]`
    - Para cada card referenciado:
      - Ler o card dependente
      - Resumir informações relevantes (Descrição, Conhecimento Adquirido)
      - Se o card dependente já foi lido nesta sessão e está em `4.done/` ou `5.archived/`, **não reler** (são estáveis)
    - Se não houver dependências, pular este passo
+   - **Na seção "### Dependentes"**, procurar por links `[[nome-do-card]]` — são os
+     cards que dependem deste. Para cada um, ler e resumir o que ele consome deste
+     card. Serve para mostrar o impacto de alterar este card.
+   - Se a seção "### Dependentes" não existir no card, pular sem erro
 
 8. **Verificar contexto do repositório:**
    - Executar `git branch --show-current` para verificar branch
@@ -138,8 +143,12 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    {listar apenas as não completadas}
 
    ## Dependências
-   {Se houver, listar cards dependentes com resumo}
+   {Se houver, listar cards dos quais este depende, com resumo}
    {Se não houver: "Nenhuma dependência identificada"}
+
+   ## Dependentes
+   {Se houver, listar cards que dependem deste, com o que consomem}
+   {Se não houver: "Nenhum card depende deste"}
 
    ## Discussões Recentes
    {Últimas 1-2 discussões registradas}
