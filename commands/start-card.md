@@ -30,7 +30,7 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
    - Se não encontrar, listar cards disponíveis
 
 4. **Ler o card:**
-   - Ler conteúdo completo
+   - Ler pela **leitura enxuta** (`guidelines/IA best practices.md` §6) — por seção, não o arquivo inteiro
    - Mostrar resumo breve ao usuário
 
 5. **Detectar informações git:**

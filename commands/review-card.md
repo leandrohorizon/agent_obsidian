@@ -23,7 +23,7 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
 3. **Ler e validar o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
-   - Ler conteúdo do card
+   - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6) — por seção, não o arquivo inteiro
    - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]`
    - Se houver tarefas pendentes, avisar o usuário
 

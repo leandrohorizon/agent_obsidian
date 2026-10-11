@@ -29,17 +29,17 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      - `$OBSIDIAN_VAULT_PATH/board/4.done/`
    - Se não encontrar, listar cards disponíveis
 
-4. **Ler o card completo:**
-   - Ler todo o conteúdo do card
+4. **Ler o card pela leitura enxuta** (`guidelines/IA best practices.md` §6):
+   - Mapear os headings e ler por seção, não o arquivo inteiro
    - Identificar estado atual (qual pasta está)
-   - Extrair seções principais:
+   - Seções da visão padrão:
      - Descrição
      - Dependências
      - Dependentes
-     - Tarefas (identificar quais estão pendentes)
-     - Discussões
+     - Tarefas (apenas as pendentes)
      - Descrição Técnica
      - Conhecimento Adquirido
+   - `Discussões` fica fora da visão padrão — ler só se o trabalho travar
 
 5. **Carregar Guidelines:**
    - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)

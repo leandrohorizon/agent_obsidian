@@ -48,6 +48,9 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
      dependente da lista
    - Ler também a seção "## Dependentes" de cada card alvo: se um card declara
      outro card da lista como dependente, a relação é a mesma vista do outro lado.
+     A seção é opcional — 8 dos 24 cards do board não a têm; ausência não é erro
+   - Aqui só as duas seções de correlação são necessárias — não ler o card inteiro
+     (leitura enxuta, `guidelines/IA best practices.md` §6)
      Usar essa informação para montar a ordem de execução (quem é dependido roda
      antes) e para avisar quem será afetado por uma mudança
 

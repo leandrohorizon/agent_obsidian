@@ -39,7 +39,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 
 3. **Carregar contexto completo (usando lógica do /load-context):**
 
-   a) **Ler o card completo**
+   a) **Ler o card pela leitura enxuta** (`guidelines/IA best practices.md` §6) — por seção, não o arquivo inteiro
 
    b) **Carregar Guidelines:**
       - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
