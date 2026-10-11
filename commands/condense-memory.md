@@ -36,7 +36,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
      - Processar todos os cards não processados
 
 5. **Processar cards selecionados:**
-   - Para cada card, ler **o card completo** — este comando é a **exceção** à leitura enxuta de `guidelines/IA best practices.md` §6:
+   - Para cada card, ler:
      - Seção "## Descrição"
      - Seção "## Conhecimento Adquirido pela IA"
      - Seção "## Discussões"
