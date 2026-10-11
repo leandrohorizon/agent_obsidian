@@ -31,7 +31,6 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
 
 4. **Ler o card:**
    - Ler apenas o necessário para o resumo: frontmatter, `### Descrição` e os títulos das tarefas
-   - Não carregar o card inteiro — `/work-on-card` é quem lê o card para trabalhar
    - Mostrar resumo breve ao usuário
 
 5. **Detectar informações git:**
