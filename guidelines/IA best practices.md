@@ -62,7 +62,8 @@ Card é artefato de execução e cresce durante a vida dele: `### Discussões` e
 | `### Discussões` | omitir por padrão; leitura opcional sob demanda |
 | `### Descrição Técnica do que Foi Feito` | incluir — fonte principal para a IA |
 | `### Conhecimento Adquirido pela IA` | incluir |
-| `### Pull Requests` | omitir |
+
+O `pr_url` do frontmatter é a fonte única do PR — cards antigos podem ter uma seção de PRs no corpo, mas ela é redundante e não é mais criada.
 
 **Procedimento:**
 

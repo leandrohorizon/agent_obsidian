@@ -123,11 +123,7 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
         - Adicionar `repo:` e `branch:` se não existirem
         - Preservar todos os outros campos existentes
 
-   c) **Adicionar ou atualizar seção "## PRs"** (se card não tiver frontmatter ou se preferir manter seção):
-      ```markdown
-      ## PRs
-      - [PR #123 - Título](url-do-pr) - Status: Open
-      ```
+   c) **Não criar seção de PR no corpo do card** — o `pr_url` do frontmatter é a fonte única. Se o card já tiver uma seção de PRs, preservá-la como está; não atualizar nem remover.
 
 7. **Mover o card:**
    - Mover arquivo de `$OBSIDIAN_VAULT_PATH/board/2.in_progress/card.md`

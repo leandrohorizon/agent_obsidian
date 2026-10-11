@@ -17,13 +17,6 @@ completed:
 
 
 ---
-### Pull Requests
-
-> Liste os Pull Requests relacionados a este card, incluindo links, status e observações importantes sobre revisões ou aprovações.
-
-
-
----
 ### Dependências
 
 > Documente sistemas, serviços, bibliotecas, APIs, tarefas ou outros cards dos quais esta implementação depende para funcionar corretamente. Use `[[nome-do-card]]` para linkar cards do board.
