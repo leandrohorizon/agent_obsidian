@@ -58,7 +58,7 @@ Card é artefato de execução e cresce durante a vida dele: `### Discussões` e
 | `### Descrição` | incluir |
 | `### Dependências` / `### Dependentes` | incluir |
 | `### Tarefas` — pendentes (`- [ ]`) | incluir |
-| `### Tarefas` — concluídas (`- [x]`) | omitir |
+| `### Tarefas` — concluídas (`- [x]`) | omitir por padrão; leitura opcional sob demanda |
 | `### Discussões` | omitir por padrão; leitura opcional sob demanda |
 | `### Descrição Técnica do que Foi Feito` | incluir — fonte principal para a IA |
 | `### Conhecimento Adquirido pela IA` | incluir |
@@ -73,6 +73,8 @@ Card é artefato de execução e cresce durante a vida dele: `### Discussões` e
 
 **Discussões é leitura opcional.** O humano lê `### Discussões`; a IA trabalha a partir de `### Descrição Técnica do que Foi Feito`. Se o trabalho travar, ler `### Discussões` é permitido — não é o padrão.
 
+**Tarefas concluídas também são leitura opcional.** Omitir `- [x]` é o padrão, mas ler é permitido quando o histórico de execução ajuda: entender por que uma abordagem foi abandonada, o que já foi tentado, ou se uma tarefa foi marcada como feita sem ter sido. Omitir é economia de contexto, não proibição.
+
 **Exceção — `/condense-memory`:** lê o card completo, incluindo `### Discussões`. Essa seção é a matéria-prima dele; sem a exceção, decisão que nunca foi promovida para `### Descrição Técnica` se perde em silêncio e de forma irreversível, porque o card é marcado como consolidado.
 
 **Robustez do recorte:**
@@ -80,6 +82,6 @@ Card é artefato de execução e cresce durante a vida dele: `### Discussões` e
 - Delimite a seção por **qualquer** heading, não só pelos canônicos — cards reais têm `## Objetivo`, `## Contexto`, `## Rascunho` no meio.
 - Ignore headings dentro de blocos cercados por ` ``` `. Um card do board contém `## Segredos e credenciais` dentro de um bloco ` ```markdown `; um `grep` ingênuo acha quatro seções que não existem.
 - `### Dependentes` é opcional — 8 dos 24 cards do board não têm a seção.
-- Ao omitir tarefas concluídas, respeite a indentação: `  - [x]` aninhado sob um `- [x]` pai não pode ser removido sozinho, senão o item pai fica órfão.
+- Ao omitir tarefas concluídas, respeite a indentação: `  - [x]` aninhado sob um `- [x]` pai não pode ser removido sozinho, senão o item pai fica órfão. Se o item pai for lido sob demanda, os filhos vêm junto.
 - Nunca escreva a visão filtrada no arquivo original. O filtro é decisão de leitura, não transformação.
 - Se nenhuma seção canônica for encontrada, leia o card completo e reporte — degradar para o arquivo inteiro é melhor que trabalhar com um recorte vazio.
