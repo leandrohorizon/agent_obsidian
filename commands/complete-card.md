@@ -21,7 +21,7 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
 3. **Ler e validar o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/3.in_review/`
-   - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6) — por seção, não o arquivo inteiro
+   - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
    - Verificar se o PR foi merged (se houver PR mencionado)
 
 4. **Validar completude:**

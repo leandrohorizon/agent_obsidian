@@ -41,7 +41,6 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
      - Seção "## Conhecimento Adquirido pela IA"
      - Seção "## Discussões"
      - Seção "## Descrição Técnica do que Foi Feito"
-   - **Rationale:** `### Discussões` é a matéria-prima deste comando. Sem ler o card inteiro, decisão que nunca foi promovida para `### Descrição Técnica` se perde em silêncio e de forma irreversível, porque o card é marcado como consolidado
 
 6. **Extrair e processar conhecimento:**
 

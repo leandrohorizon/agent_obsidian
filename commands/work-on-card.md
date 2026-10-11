@@ -23,7 +23,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
 3. **Ler o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (e outros diretórios se necessário)
-   - Ler o card pela **leitura enxuta** de `guidelines/IA best practices.md` §6 — por seção, não o arquivo inteiro
+   - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
 
 4. **Carregar contexto completo:**
 
