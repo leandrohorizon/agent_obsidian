@@ -24,6 +24,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (e outros diretórios se necessário)
    - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
+   - **Sempre ler o card aqui**, mesmo que `/start-card` tenha acabado de rodar — este é o comando que trabalha no card, e o card pode ter mudado desde o início
 
 4. **Carregar contexto completo:**
 
