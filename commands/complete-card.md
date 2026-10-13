@@ -28,7 +28,7 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
    - ✅ Todas as tarefas `- [x]` completadas?
    - ✅ Seção "Descrição Técnica do que Foi Feito" preenchida?
    - ✅ Seção "Conhecimento Adquirido pela IA" preenchida?
-   - ✅ Seção "PRs" com status atualizado?
+   - ✅ `pr_url` no frontmatter atualizado?
    - ✅ Seção "Discussões" documentada?
 
 5. **Completar documentação:**

@@ -76,8 +76,6 @@ O `pr_url` do frontmatter é a fonte única do PR — cards antigos podem ter um
 
 **Tarefas concluídas também são leitura opcional.** Omitir `- [x]` é o padrão, mas ler é permitido quando o histórico de execução ajuda: entender por que uma abordagem foi abandonada, o que já foi tentado, ou se uma tarefa foi marcada como feita sem ter sido. Omitir é economia de contexto, não proibição.
 
-**Exceção — `/condense-memory`:** lê o card completo, incluindo `### Discussões`. Essa seção é a matéria-prima dele; sem a exceção, decisão que nunca foi promovida para `### Descrição Técnica` se perde em silêncio e de forma irreversível, porque o card é marcado como consolidado.
-
 **Robustez do recorte:**
 
 - Delimite a seção por **qualquer** heading, não só pelos canônicos — cards reais têm `## Objetivo`, `## Contexto`, `## Rascunho` no meio.
