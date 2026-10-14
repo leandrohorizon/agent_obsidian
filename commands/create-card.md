@@ -49,8 +49,7 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
 
 6. **Criar conteúdo do card usando template:**
    - Ler template de: `$OBSIDIAN_VAULT_PATH/templates/card template.md`
-   - O template já contém o bloco de frontmatter YAML com placeholders. Preencher
-     os placeholders com os valores coletados:
+   - Preencher os placeholders do frontmatter com os valores coletados:
      ```yaml
      ---
      repo: {url-do-repo ou "Local (sem remote configurado)"}

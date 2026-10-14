@@ -38,11 +38,7 @@ Nenhum.
        "current_card": null
      }
      ```
-   - `guidelines_path` aponta para a **pasta**, não para arquivos: os comandos
-     leem **todos** os arquivos de `guidelines/`, então arquivo novo na pasta é
-     carregado sem alterar o estado. Declarar arquivo por arquivo exigiria
-     mexer no estado a cada diretriz nova — e é justamente o que a leitura da
-     pasta evita
+   - `guidelines_path` aponta para a **pasta**, não para arquivos
    - O path da memória de feature NÃO fica no estado: ele é derivado do campo
      `feature:` do card atual em tempo de carga (ver `get_feature_memory_path()`)
 
