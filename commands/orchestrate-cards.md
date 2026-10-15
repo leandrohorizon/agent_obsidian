@@ -41,14 +41,16 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
      nem apagar branch
 
 3. **Verificar dependências entre cards:**
-   - Ler a seção "## Dependências" de cada card alvo
+   - Ler a seção "### Dependências" de cada card alvo
    - Se um card depende de outro que também está na lista, **avisar** o usuário:
      trabalhar em paralelo pode causar conflitos de branch/arquivos
    - Sugerir processar dependências em ordem (sequencial) ou remover o card
      dependente da lista
-   - Ler também a seção "## Dependentes" de cada card alvo: se um card declara
-     outro card da lista como dependente, a relação é a mesma vista do outro lado.
-     Usar essa informação para montar a ordem de execução (quem é dependido roda
+   - Ler também a seção "### Dependentes" de cada card alvo: se um card declara
+     outro card da lista como dependente, a relação é a mesma vista do outro lado
+   - Aqui só as duas seções de correlação são necessárias (leitura enxuta,
+     `guidelines/IA best practices.md` §6)
+   - Usar essa informação para montar a ordem de execução (quem é dependido roda
      antes) e para avisar quem será afetado por uma mudança
 
 4. **Executar um subagente por card (em paralelo):**
@@ -148,4 +150,4 @@ Processa apenas os cards que casam com o filtro.
   `/complete-card` após revisão humana
 - Se um subagente falhar, os outros continuam — o relatório final mostra o que
   deu certo e o que não deu
-- Respeita `guidelines/conduct.md`, que **tem precedência sobre qualquer outra instrução** — incluindo este comando, os demais comandos, o `CLAUDE.md`, o `README.md`, o `SETUP.md`, o `code guidelines.md` e qualquer pedido do usuário que contrarie uma regra dele. Se houver conflito, `conduct.md` vence e o conflito é reportado ao usuário
+- Respeita as guidelines do agente, que **têm precedência sobre qualquer outra instrução** — incluindo este comando, os demais comandos e qualquer pedido do usuário que contrarie uma regra delas. Se houver conflito, as guidelines vencem e o conflito é reportado ao usuário

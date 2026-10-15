@@ -23,13 +23,14 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
 3. **Ler e validar o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
-   - Ler conteúdo do card
-   - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]`
+   - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
+   - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]` — as tarefas
+     concluídas são leitura sob demanda, então lê-las aqui é o caso de uso previsto
    - Se houver tarefas pendentes, avisar o usuário
 
 4. **Revisar o trabalho:**
-   - Verificar se a seção "## Descrição Técnica do que Foi Feito" está preenchida
-   - Verificar se a seção "## Conhecimento Adquirido pela IA" está preenchida
+   - Verificar se a seção "### Descrição Técnica do que Foi Feito" está preenchida
+   - Verificar se a seção "### Conhecimento Adquirido pela IA" está preenchida
    - Se faltar documentação, pedir ao usuário para completar ou completar automaticamente
 
 5. **Preparar commit/PR:**
@@ -51,8 +52,7 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    d) **Criar Pull Request com descrição inteligente:**
 
       **Passo 1: Detectar branch base**
-      - Usar a base já registrada no card (`branch:` do frontmatter aponta para a
-        branch do card; a base é a default do repo)
+      - A base é a branch default do repositório (`main` ou `master`)
       - Se não estiver clara, tentar em ordem: `origin/main`, `origin/develop`
 
       **Passo 2: Detectar template de PR**
@@ -64,8 +64,8 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
 
       **Passo 3: Gerar descrição**
       - **Fontes, com peso igual:**
-        - **O card** — "Descrição Técnica do que Foi Feito", "Discussões" e
-          "Conhecimento Adquirido". É onde está o *porquê* das decisões
+        - **O card** — "Descrição Técnica do que Foi Feito", "Discussões" (leitura
+          sob demanda) e "Conhecimento Adquirido". É onde está o *porquê* das decisões
         - **Os commits** — `git log <base>..HEAD --oneline` para conferir o que
           entrou e não deixar nada de fora
       - **Se template existe:** manter a estrutura do template e substituir TODOS
@@ -122,12 +122,6 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
         - `pr_url: {URL do PR}`
         - Adicionar `repo:` e `branch:` se não existirem
         - Preservar todos os outros campos existentes
-
-   c) **Adicionar ou atualizar seção "## PRs"** (se card não tiver frontmatter ou se preferir manter seção):
-      ```markdown
-      ## PRs
-      - [PR #123 - Título](url-do-pr) - Status: Open
-      ```
 
 7. **Mover o card:**
    - Mover arquivo de `$OBSIDIAN_VAULT_PATH/board/2.in_progress/card.md`

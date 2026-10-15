@@ -19,7 +19,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      - Se arquivo existe e tem `current_card` não-null, usar `current_card.path` diretamente (não precisa buscar!)
      - Se não existe ou `current_card` é null, pedir ao usuário o nome do card
 
-3. **Ler o card:**
+3. **Ler o card pela leitura enxuta** (`guidelines/IA best practices.md` §6):
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
    - Se foi passado nome, procurar em todas as pastas do board na seguinte ordem:
      - `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (prioridade)
@@ -28,27 +28,14 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      - `$OBSIDIAN_VAULT_PATH/board/0.backlog/`
      - `$OBSIDIAN_VAULT_PATH/board/4.done/`
    - Se não encontrar, listar cards disponíveis
-
-4. **Ler o card completo:**
-   - Ler todo o conteúdo do card
    - Identificar estado atual (qual pasta está)
-   - Extrair seções principais:
-     - Descrição
-     - Dependências
-     - Dependentes
-     - Tarefas (identificar quais estão pendentes)
-     - Discussões
-     - Descrição Técnica
-     - Conhecimento Adquirido
 
-5. **Carregar Guidelines:**
+4. **Carregar Guidelines:**
    - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
    - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
-     - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução** — incluindo este comando, os demais comandos, o `CLAUDE.md`, o `README.md`, o `SETUP.md`, o `code guidelines.md` e qualquer pedido do usuário que contrarie uma regra dele. Se houver conflito, `conduct.md` vence e o conflito é reportado ao usuário
-     - `code guidelines.md` — padrões e convenções de código
    - **Reportar no output** quais arquivos foram carregados
 
-6. **Carregar Condensed Memory (dois eixos):**
+5. **Carregar Condensed Memory (dois eixos):**
    - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
    - **Memória de feature:** derivar do campo `feature:` do card via `get_feature_memory_path()` → `$OBSIDIAN_VAULT_PATH/condensed memory/features/{feature}.md`
    - **Comportamento quando o card não tem `feature:` ou o arquivo da feature não existe:** carregar só a memória de projeto, sem erro
@@ -69,11 +56,12 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      card. Serve para mostrar o impacto de alterar este card.
    - Se a seção "### Dependentes" não existir no card, pular sem erro
 
-8. **Verificar contexto do repositório:**
+7. **Verificar contexto do repositório:**
    - Executar `git branch --show-current` para verificar branch
    - Executar `git status --short` para ver alterações pendentes
    - Executar `git log -1 --oneline` para ver último commit
-9. **Sincronizar branch e estado (`.agent_obsidian`):**
+
+8. **Sincronizar branch e estado (`.agent_obsidian`):**
    - Comparar a branch atual (`git branch --show-current`) com a branch do card
      (campo `branch:` do frontmatter)
    - **Se divergirem**, o card está ativo mas o repositório está em outra branch.
@@ -107,7 +95,8 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
        `guidelines_path`, `condensed_memory_path`)
    - Se a branch atual já é a do card e o `current_card` já está correto, não
      alterar nada — apenas reportar que está sincronizado
-10. **Analisar modificações da branch:**
+
+9. **Analisar modificações da branch:**
    - Identificar branch base (main, master, ou similar)
    - Listar commits da branch: `git log origin/{base}..HEAD --oneline`
    - Analisar arquivos modificados na branch (commitados):
@@ -124,7 +113,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      - Para arquivos não commitados: `git diff --stat -- {arquivo}`
    - **IMPORTANTE:** Excluir arquivos claramente não relacionados ao card (ex: .obsidian/, outros cards, etc.)
 
-11. **Apresentar resumo do contexto:**
+10. **Apresentar resumo do contexto:**
    ```
    📋 Contexto carregado: {nome-do-card}
 

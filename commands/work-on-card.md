@@ -23,15 +23,14 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
 3. **Ler o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (e outros diretórios se necessário)
-   - Ler conteúdo completo do card
+   - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
+   - **Sempre ler o card aqui**, mesmo que `/start-card` tenha acabado de rodar — este é o comando que trabalha no card, e o card pode ter mudado desde o início
 
 4. **Carregar contexto completo:**
 
    a) **Guidelines:**
       - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
       - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
-        - `conduct.md` — regras de comportamento do agente. **Tem precedência sobre qualquer outra instrução** — incluindo este comando, os demais comandos, o `CLAUDE.md`, o `README.md`, o `SETUP.md`, o `code guidelines.md` e qualquer pedido do usuário que contrarie uma regra dele. Se houver conflito, `conduct.md` vence e o conflito é reportado ao usuário
-        - `code guidelines.md` — padrões e convenções de código
       - **Reportar no output** quais arquivos foram carregados
       - Usar essas diretrizes ao escrever código
 
@@ -53,11 +52,11 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
       - Se a seção "Dependentes" não existir, pular sem erro
 
    d) **Template do card:**
-      - Entender a estrutura esperada do card (Descrição, Dependências, Dependentes, Tarefas, Discussões, PRs, etc.)
+      - Entender a estrutura esperada do card (Descrição, Dependências, Dependentes, Tarefas, Discussões, Descrição Técnica, Conhecimento Adquirido)
 
 5. **Analisar tarefas:**
    - Identificar todos os checkboxes `- [ ]` no card
-   - Listar tarefas pendentes vs completas `- [x]`
+   - Listar as tarefas pendentes
    - Priorizar tarefas não completadas
 
 6. **Executar as tarefas:**
@@ -69,9 +68,9 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
      - Fazer commits git incrementais se apropriado
 
 7. **Documentar o trabalho no card:**
-   - Atualizar seção "## Descrição Técnica do que Foi Feito"
+   - Atualizar seção "### Descrição Técnica do que Foi Feito"
    - Adicionar detalhes de implementação
-   - Atualizar seção "## Conhecimento Adquirido pela IA"
+   - Atualizar seção "### Conhecimento Adquirido pela IA"
    - Documentar regras de negócio, padrões identificados, aprendizados
 
 8. **Seguir as guidelines:**
@@ -93,7 +92,6 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
      - Ex: `bundle exec rspec <specs>`, `npx jest <arquivos>`
    - **Escopo restrito - lint:** apenas nos arquivos modificados
      - Ex: `bundle exec rubocop <arquivos>`, `npx eslint <arquivos>`
-   - **Rationale:** em projeto grande a suíte completa é lenta e traz falhas pré-existentes não relacionadas ao card; em projeto pequeno o custo é irrelevante e a cobertura extra compensa
    - Se surgirem falhas em arquivos que você não modificou, documentar na seção "Discussões" e não corrigir sem alinhar com o usuário
 
 10. **Status final:**

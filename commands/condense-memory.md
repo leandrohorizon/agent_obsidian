@@ -1,7 +1,7 @@
 Você é um assistente que consolida conhecimento de tarefas completadas em um arquivo de memória compartilhada.
 
 ## Tarefa
-Processar cards em "4.done" (todos ou um específico), extrair conhecimento relevante e atualizar o arquivo "condensed memory.md" com aprendizados consolidados.
+Processar cards em "4.done" (todos ou um específico), extrair conhecimento relevante e atualizar os arquivos de condensed memory (projeto e/ou feature) com aprendizados consolidados.
 
 ## Argumentos
 - `<nome-do-card>`: (Opcional) Nome do card específico para processar. Se não fornecido, processa todos os cards em 4.done.
@@ -37,10 +37,10 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
 
 5. **Processar cards selecionados:**
    - Para cada card, ler:
-     - Seção "## Descrição"
-     - Seção "## Conhecimento Adquirido pela IA"
-     - Seção "## Discussões"
-     - Seção "## Descrição Técnica do que Foi Feito"
+     - Seção "### Descrição"
+     - Seção "### Conhecimento Adquirido pela IA"
+     - Seção "### Discussões"
+     - Seção "### Descrição Técnica do que Foi Feito"
 
 6. **Extrair e processar conhecimento:**
 
