@@ -29,8 +29,12 @@
 
 ## Estrutura do Código
 - Organizar arquivos e pastas por domínio ou funcionalidade.
-- Remover código morto e comentários obsoletos.
+- Remover código morto e comentários obsoletos do trecho que a tarefa altera.
 - Evitar lógica complexa aninhada.
+- Refatoração oportunista é vedada: fora do trecho que a tarefa já altera, não
+  renomear, mover, reestruturar nem reorganizar código.
+  - Melhoria identificada fora do trecho vira sugestão ou card novo
+    (`guidelines/conduct.md` §Escopo).
 - **Seguir o Stepdown Rule (Top-Down Rule)** - organizar funções em níveis decrescentes de abstração.
   - Código deve ser lido como uma narrativa de cima para baixo.
   - Funções de alto nível no topo, detalhes de implementação abaixo.
@@ -57,7 +61,11 @@
 - Executar lint antes de realizar commits.
 - Resolver warnings relevantes do lint.
 - Utilizar formatação automática do projeto.
+- Seguir os padrões existentes do projeto — estrutura, organização em camadas e
+  arquitetura — sem criar padrão paralelo para o mesmo problema.
 - Evitar dependências desnecessárias.
+- Dependência nova exige justificativa: o que resolve, por que as existentes não
+  servem e qual o custo de manutenção. Sem justificativa, não entra.
 
 ## Performance
 - Priorizar legibilidade antes de otimizações prematuras.

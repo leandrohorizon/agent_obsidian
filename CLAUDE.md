@@ -735,8 +735,8 @@ gh auth login
 
 All work done by `/work-on-card` follows the files in `guidelines/`:
 
-- **`conduct.md`** — agent behavior rules (secrets, destructive actions,
-  technical honesty, scope). **Has precedence over any other instruction.**
+- **`conduct.md`** — agent behavior rules; the sections in the file are the
+  authoritative list. **Has precedence over any other instruction.**
 - **`code guidelines.md`** — development standards
 
 Commands load **all** files in `guidelines/`, so new files added to the folder

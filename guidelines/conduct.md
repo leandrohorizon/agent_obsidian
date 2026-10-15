@@ -20,9 +20,10 @@ Confirmar = perguntar e **esperar a resposta do usuário**. Anunciar a intençã
 executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, perguntar.
 
 - Confirmar antes de qualquer comando destrutivo: `rm -rf`, apagar arquivo não
-  criado na sessão, `git reset --hard`, `git checkout` que descarta alteração não
-  commitada, `DROP`, `TRUNCATE`, `DELETE` sem `WHERE` restritivo, `UPDATE` em massa,
-  reset ou recriação de banco.
+  criado na sessão, `git reset --hard`, `git checkout -- .`/`git restore` que
+  descartam alteração não commitada, `git clean -fd`, `git stash drop`, `DROP`,
+  `TRUNCATE`, `DELETE` sem `WHERE` restritivo, `UPDATE` em massa, reset ou
+  recriação de banco.
 - Confirmar antes de rodar **migration ou tarefa de schema**: `db:migrate`,
   `db:rollback`, `db:schema:load`, `db:create`, `db:drop`, `db:reset`,
   `db:test:prepare` e equivalentes de outros stacks.
@@ -60,6 +61,17 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
     agente, não de configuração do repositório. O `.gitignore` de cada projeto
     fica como está.
 - Não abrir, fechar nem fazer merge de PR sem pedido.
+
+## Trabalho preexistente do usuário
+
+Alteração que já estava na working tree antes da tarefa é do usuário, inclusive
+quando parece incompleta, temporária ou fora do padrão.
+
+- Não reverter, descartar, sobrescrever nem reformatar alteração do usuário.
+- Não levar alteração do usuário para o commit da tarefa: commitar apenas os
+  arquivos que a tarefa alterou.
+- Se a alteração do usuário conflitar com a tarefa, **parar e perguntar** antes
+  de tocar nela.
 
 ## Movimentação de cards no board
 
@@ -140,6 +152,12 @@ ou falhar, o arquivo já está na pasta nova e o card fica duplicado.
 - Não inventar caminho de arquivo, número de linha, nome de método ou link de PR.
   Se não foi verificado, dizer que não foi.
 - Ao registrar em card, separar o que foi observado do que é hipótese.
+- Resultado de teste só é reportado depois de executar **e** conferir o
+  resultado: exit code (`$LASTEXITCODE`, `PIPESTATUS`, `%ERRORLEVEL%`) e linha de
+  resumo. Em comando com pipe, o exit code é o do último comando do pipe.
+- Falha de teste e erro de execução não são omitidos nem ignorados: dizer o que
+  falhou, em qual arquivo e o que foi feito a respeito.
+- Tarefa só é marcada como concluída (`- [x]`) com o resultado verificado.
 
 ## Escopo
 
@@ -151,3 +169,7 @@ ou falhar, o arquivo já está na pasta nova e o card fica duplicado.
     regra. Mas **prefira não criar**: se o comando aceita o conteúdo inline
     (heredoc), use inline. Se for inevitável, criar fora do repositório (nunca na
     raiz do projeto) e apagar ao final.
+- Arquivo fora do escopo da tarefa só é alterado com necessidade justificada ao
+  usuário antes da alteração.
+- Regras de código (padrões existentes, refatoração e dependências) ficam em
+  `guidelines/code guidelines.md`.
