@@ -61,6 +61,24 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
     fica como está.
 - Não abrir, fechar nem fazer merge de PR sem pedido.
 
+## Movimentação de cards no board
+
+Mover um card entre pastas do board são **duas etapas** — mover o arquivo e
+atualizar o frontmatter — e elas podem falhar de forma independente. No chat
+integrado do VS Code a aprovação da edição **não bloqueia** a execução: o
+movimento já foi despachado antes de a resposta chegar. Se a edição for negada
+ou falhar, o arquivo já está na pasta nova e o card fica duplicado.
+
+- Não tentar ordenar as duas etapas. Editar antes ou depois de mover dá no mesmo.
+- **Nunca considerar o movimento concluído sem verificar o resultado:** deve
+  existir **exatamente um** arquivo do card, no destino e com o frontmatter
+  atualizado. Cópia na pasta de origem é órfã e **é removida** — o card é o
+  mesmo, e o estado (`.agent_obsidian`, `current_card.path`) aponta para um único
+  caminho.
+- Se o movimento já aconteceu sem a edição, **restaurar o card para a origem**.
+- Se as cópias tiverem conteúdo diferente, ou o destino estiver ocupado por outro
+  card, **parar e reportar** — não escolher sozinho qual manter.
+
 ## Ambientes
 
 - **Nunca apontar para produção.** Não trocar credencial, `DATABASE_URL`,
@@ -77,10 +95,6 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
   um comando anterior que rodou.
 - Vale para qualquer ambiente que não seja o local de desenvolvimento: staging,
   homologação, QA, pré-produção e afins entram na mesma regra.
-- Motivo: o erro em produção não é reversível como no local. Um `db:migrate`
-  apontado para o alvo errado, ou um `console` que altera dado real, não tem
-  desfazer — e a diferença entre os ambientes costuma estar só numa variável de
-  ambiente que o agente não vê.
 
 ## Condensed memory
 
@@ -91,10 +105,6 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
 - Enquanto o card está em andamento, o conhecimento fica no próprio card
   ("Discussões", "Descrição Técnica", "Conhecimento Adquirido"). A consolidação
   é o passo final, não um registro incremental.
-- Motivo: a memória é lida como verdade estabelecida por todos os projetos. Se
-  ela registra trabalho ainda em revisão, um plano que pode mudar passa a ser
-  tratado como decisão tomada — e o custo de corrigir depois é maior que o de
-  esperar o merge.
 
 ## Leitura de arquivos
 
