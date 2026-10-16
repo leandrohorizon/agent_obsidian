@@ -105,7 +105,7 @@ Trabalha nas tarefas do card, com contexto completo (guidelines + condensed memo
 
 **O que faz:**
 - Lê o card completo
-- Carrega **todos** os arquivos de `guidelines/` (conduta + código) para seguir padrões e regras de comportamento
+- Carrega **todos** os arquivos de `guidelines/` para seguir padrões e regras de comportamento
 - Carrega `condensed memory.md` com conhecimento acumulado
 - Lê cards dependentes mencionados em `[[links]]`
 - Executa tarefas pendentes `- [ ]`
@@ -211,8 +211,9 @@ $OBSIDIAN_VAULT_PATH/
 ├── templates/
 │   └── card template.md  # Template para novos cards
 ├── guidelines/           # Diretrizes do agente (todos os arquivos são carregados)
-│   ├── conduct.md        # Regras de conduta do agente (precedência)
-│   └── code guidelines.md # Padrões de desenvolvimento
+│   ├── conduct.md           # Regras de conduta do agente (precedência)
+│   ├── code guidelines.md   # Padrões de desenvolvimento
+│   └── IA best practices.md # Boas práticas de uso de IA por agentes
 ├── docs/                 # Documentação de projeto (PDFs, specs)
 └── condensed memory/     # Conhecimento consolidado em dois eixos
     ├── projects/         # Memória por repositório (arquivo plano)
@@ -304,7 +305,7 @@ Os comandos `/start-card`, `/work-on-card` e `/review-card` precisam ser executa
 
 1. **Use tab completion**: Os nomes dos cards podem ter espaços, use aspas
 2. **Commits incrementais**: `/work-on-card` pode fazer commits automáticos
-3. **Contexto automático**: Todos os comandos carregam as guidelines (conduta + código) e o condensed memory
+3. **Contexto automático**: Todos os comandos carregam todos os arquivos de `guidelines/` e o condensed memory
 4. **Dependências**: Use `[[nome-do-card]]` para referenciar cards relacionados
 5. **Documentação**: Sempre preencha "Conhecimento Adquirido pela IA" para melhorar o condensed memory
 
