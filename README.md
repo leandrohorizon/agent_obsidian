@@ -113,6 +113,7 @@ Cards começam vagos? Use `/refine-card` para:
    ```bash
    ./sync-commands.sh
    ```
+   No Windows, use `.\sync-commands.ps1`.
    Isso instala os slash commands globalmente no Claude Code.
 
 3. **Verificar:**
@@ -383,7 +384,8 @@ Use `/refine-card` em cards vagos para:
 │   ├── code guidelines.md      # Padrões de desenvolvimento
 │   └── IA best practices.md    # Boas práticas de uso de IA por agentes
 ├── docs/                       # Documentação de projeto (PDFs, specs)
-├── sync-commands.sh            # Instala comandos no Claude
+├── sync-commands.sh            # Instala comandos no Claude (Linux/macOS)
+├── sync-commands.ps1           # Instala comandos no Claude (Windows)
 ├── SETUP.md                    # Guia de setup detalhado
 ├── CLAUDE.md                   # Documentação da arquitetura
 └── README.md                   # Este arquivo

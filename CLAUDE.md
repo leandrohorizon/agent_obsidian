@@ -680,6 +680,8 @@ Commands are defined in `commands/*.md` and synced to `~/.claude/commands/` via:
 ./sync-commands.sh
 ```
 
+On Windows, use `.\sync-commands.ps1` instead.
+
 This script:
 - Copies all `commands/*.md` to `~/.claude/commands/`
 - Makes them available as slash commands globally in Claude Code
@@ -718,7 +720,8 @@ description: Skill do Agent Obsidian para gerenciar o board Kanban em Obsidian.
 
 If the `name` doesn't match the folder name, VS Code may silently ignore the skill.
 
-The `sync-commands.sh` script automatically generates these skills from `commands/*.md`.
+The `sync-commands.sh` (Linux/macOS) and `sync-commands.ps1` (Windows) scripts
+automatically generate these skills from `commands/*.md`.
 
 ### Git & GitHub CLI
 
@@ -884,7 +887,7 @@ If you're unsure which card you were working on:
 
 ### Commands not found
 - Check `~/.claude/commands/` exists and contains .md files
-- Run `./sync-commands.sh` from vault directory
+- Run `./sync-commands.sh` (Linux/macOS) or `.\sync-commands.ps1` (Windows) from vault directory
 
 ### $OBSIDIAN_VAULT_PATH not set
 - Add to shell config and `source` it
@@ -936,15 +939,13 @@ If you're unsure which card you were working on:
 │       └── feature-y.md
 ├── templates/
 │   └── card template.md      # Template for new cards
-├── scripts/
-│   ├── list_prs.rb          # List PRs
-│   └── list_merged_prs.rb   # List merged PRs
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
 │   ├── code guidelines.md    # Development standards
 │   └── IA best practices.md  # AI context and tooling practices
 ├── docs/                     # Project documentation (PDFs, specs)
-├── sync-commands.sh          # Sync commands to ~/.claude/commands/
+├── sync-commands.sh          # Sync commands to ~/.claude/commands/ (Linux/macOS)
+├── sync-commands.ps1         # Sync commands to ~/.claude/commands/ (Windows)
 ├── SETUP.md                  # Setup instructions
 └── CLAUDE.md                 # This file
 ```
