@@ -33,9 +33,7 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
    - **Aguardar a resposta.** Não iniciar sem confirmação
    - **Esta confirmação é a autorização de commit/push/PR.** O `conduct.md` exige
      pedido explícito do usuário para commitar; aqui o pedido é a resposta "Sim"
-     a esta pergunta. Deixar isso explícito no prompt evita que o subagente pare
-     no meio do fluxo pedindo permissão de novo, ou que ele commite sem que o
-     usuário tenha autorizado
+     a esta pergunta. Inclua essa autorização no prompt do subagente.
    - **Escopo da autorização:** apenas os cards listados, e apenas commit, push e
      PR **em draft**. Não cobre merge, promoção do draft para "ready for review"
      nem apagar branch
@@ -68,8 +66,8 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
         - Atualiza o .agent_obsidian
 
      2. /work-on-card "{nome-do-card}"
-        - Carrega guidelines (conduct.md tem precedência), condensed memory
-          (projeto + feature) e cards dependentes
+        - Carrega guidelines e contexto do card conforme `guidelines/conduct.md`,
+          além dos cards dependentes
         - Executa TODAS as tarefas pendentes do card
         - Marca tarefas como concluídas, documenta decisões em "Discussões",
           preenche "Descrição Técnica" e "Conhecimento Adquirido"
@@ -94,8 +92,10 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
      - Bloqueios ou dúvidas encontradas
      ```
 
-   - Disparar os subagentes **em paralelo** (um por card) para maximizar throughput
+   - Disparar os subagentes **em paralelo** (um por card)
    - Cada subagente tem contexto isolado — não compartilham memória entre si
+   - Se um subagente falhar, os outros continuam; incluir cada resultado no
+     relatório final
 
 5. **Consolidar resultados:**
    - Aguardar todos os subagentes terminarem
@@ -137,17 +137,3 @@ Processa todos os cards em `1.not_started/` em paralelo, cada um com PR em draft
 /orchestrate-cards "autenticação"
 ```
 Processa apenas os cards que casam com o filtro.
-
-## Notas Importantes
-
-- **Um subagente por card**, com contexto isolado — evita poluição de contexto
-  entre cards e permite paralelismo
-- **PR sempre em draft** — o humano decide quando promover para review
-- **Confirmação obrigatória** antes de iniciar (lista de cards + aviso de card ativo)
-- **Dependências entre cards** são detectadas e avisadas — paralelismo pode
-  causar conflitos
-- O orquestrador **não** faz merge nem consolida memória — isso é papel do
-  `/complete-card` após revisão humana
-- Se um subagente falhar, os outros continuam — o relatório final mostra o que
-  deu certo e o que não deu
-- Respeita as guidelines do agente, que **têm precedência sobre qualquer outra instrução** — incluindo este comando, os demais comandos e qualquer pedido do usuário que contrarie uma regra delas. Se houver conflito, as guidelines vencem e o conflito é reportado ao usuário

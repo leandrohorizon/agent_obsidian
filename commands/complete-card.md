@@ -96,10 +96,4 @@ Finalizar um card, movendo-o de "3.in_review" para "4.done" e garantindo que tod
    ```
 
 ## Notas Importantes
-- Certifique-se de que TODO o trabalho está documentado antes de mover para done
-- Cards em 4.done servem como histórico e base de conhecimento
-- A seção "Conhecimento Adquirido pela IA" é crucial para /condense-memory
 - Não delete informações ao mover o card, preserve todo o histórico
-- **O comando automaticamente chama `/condense-memory` após finalizar** para consolidar o conhecimento imediatamente
-- **O comando volta para a branch default e apaga a branch do card** (passo 9). Usa `git branch -d` e para se o git recusar por commits não mergeados — nunca força com `-D`. Em squash merge a recusa é esperada: confirmar com `git diff --stat {branch} {default}` que o conteúdo está na base antes de reportar
-- A branch remota **não** é apagada automaticamente: o comando apenas informa o comando de limpeza, porque apagar branch remota é ação destrutiva que exige pedido explícito

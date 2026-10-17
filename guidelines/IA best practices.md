@@ -84,3 +84,19 @@ O `pr_url` do frontmatter é a fonte única do PR — cards antigos podem ter um
 - Ao omitir tarefas concluídas, respeite a indentação: `  - [x]` aninhado sob um `- [x]` pai não pode ser removido sozinho, senão o item pai fica órfão. Se o item pai for lido sob demanda, os filhos vêm junto.
 - Nunca escreva a visão filtrada no arquivo original. O filtro é decisão de leitura, não transformação.
 - Se nenhuma seção canônica for encontrada, leia o card completo e reporte — degradar para o arquivo inteiro é melhor que trabalhar com um recorte vazio.
+
+## 7. Escrita de cards — o que não vira tarefa
+
+`### Tarefas` registra o trabalho da tarefa. Passo que um comando do fluxo já executa não entra como tarefa.
+
+| Passo | Comando que já executa |
+|---|---|
+| Rodar testes e lint da mudança | `/work-on-card` |
+| Commit, push e abertura do PR | `/work-on-card`, `/review-card` |
+| Mover o card entre pastas e atualizar o frontmatter | `/start-card`, `/review-card`, `/complete-card` |
+| Consolidar a condensed memory | `/complete-card` |
+
+- Registrar em vez disso o resultado: comportamento a implementar, teste que precisa
+  ser **escrito** e o que ele prova, migração, rollback, documentação cujo conteúdo muda.
+- Tarefa cujo efeito é verificar o que o fluxo já verifica é removida, não mantida.
+- Vale ao criar card, ao refinar card e ao ajustar as tarefas de um card em andamento.

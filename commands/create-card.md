@@ -68,6 +68,11 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
      correspondência, aceitar uma nova feature (slug lowercase com hífens).
    - Preencher o placeholder `feature:` com o slug escolhido (ou deixar vazio
      se o usuário não definir).
+   - **Tarefas:** registrar o trabalho da tarefa, não passo já garantido pelo
+     fluxo — testes, lint, commit, push, PR, mover card, consolidar memória
+     (`guidelines/IA best practices.md` §7). Registrar em vez disso o
+     comportamento a implementar, o teste a **escrever** e o que ele prova,
+     migração, rollback e documentação cujo conteúdo muda.
 
 7. **Criar o arquivo:**
    - Salvar em: `$OBSIDIAN_VAULT_PATH/board/{estado-detectado}/{nome-do-card}.md`
@@ -94,7 +99,6 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
    ```
 
 ## Notas Importantes
-- A detecção automática evita cards desatualizados ou no estado errado
 - O frontmatter YAML substitui a antiga seção "## Repositório"
 - Cards criados em `1.not_started` podem ser movidos com `/start-card`
 - Cards em `0.backlog` são ideias ainda não refinadas/priorizadas; use
