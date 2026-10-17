@@ -117,11 +117,11 @@ Um arquivo por área, carregados inteiros pelo `/work-on-card`.
 | `shell.md` | shell, PowerShell, encoding, caminhos, redirecionamento |
 | `vscode.md` | VS Code, sessão do Copilot, skills, extensões |
 
-**Nenhum arquivo de área é versionado.** Só o `README.md` (este contrato) e o
-`.gitkeep` entram no repositório — as entradas são conteúdo local, como os cards
-e as condensed memories, e cada máquina constrói a sua. A área que ainda não
-existe é criada na primeira entrada, com o cabeçalho `# Operacional — {area}` e
-a linha de teto.
+**Nenhum arquivo de área é versionado.** Só o `README.md` (este contrato) entra
+no repositório — as entradas são conteúdo local, como os cards e as condensed
+memories, e cada máquina constrói a sua. O README versionado já mantém a pasta
+no clone; `.gitkeep` seria redundante. A área que ainda não existe é criada na
+primeira entrada, com o cabeçalho `# Operacional — {area}` e a linha de teto.
 
 **Regra de nome:** o arquivo leva o nome da **ferramenta concreta**, em inglês e
 sem categoria intermediária. `ferramentas.md` (balde genérico) e `testes.md`

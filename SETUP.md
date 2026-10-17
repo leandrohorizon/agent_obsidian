@@ -250,18 +250,18 @@ vault — o `/work-on-card` lê essa pasta e não a cria em runtime:
 ```
 $OBSIDIAN_VAULT_PATH/operational memory/
 ├── README.md    # Especificação: fronteira, formato, confiança, poda (versionado)
-├── .gitkeep     # Mantém a pasta no clone
 ├── git.md       # Local — criado na primeira entrada
 ├── github.md    # Local
 ├── shell.md     # Local
 └── vscode.md    # Local
 ```
 
-Só `README.md` e `.gitkeep` são versionados; as entradas são conteúdo local,
-como os cards. Cada arquivo de área tem teto de ~40 linhas e nasce na primeira
-entrada que precisar dele. `README.md` não é carregado em tarefas — só os
-arquivos de área. O nome do arquivo é a ferramenta concreta (`git`, `github`,
-`shell`, `vscode`), não uma categoria.
+Só `README.md` é versionado; as entradas são conteúdo local, como os cards. Como
+o README existe no clone, a pasta também existe — `.gitkeep` é desnecessário.
+Cada arquivo de área tem teto de ~40 linhas e nasce na primeira entrada que
+precisar dele. `README.md` não é carregado em tarefas — só os arquivos de área.
+O nome do arquivo é a ferramenta concreta (`git`, `github`, `shell`, `vscode`),
+não uma categoria.
 
 ## Arquivo de Estado `.agent_obsidian`
 

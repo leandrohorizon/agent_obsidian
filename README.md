@@ -385,7 +385,6 @@ Use `/refine-card` em cards vagos para:
 │   └── features/               # Memória por feature (atravessa repos)
 ├── operational memory/         # Memória de execução (falhou → funcionou)
 │   ├── README.md               # Contrato: formato, fronteira, poda (versionado)
-│   ├── .gitkeep
 │   └── {area}.md               # Local, não versionado — git, github, shell, vscode
 ├── templates/                  # Template de card
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)

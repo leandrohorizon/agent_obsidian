@@ -18,7 +18,6 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   │   └── features/             # Per-feature memory (crosses repos)
 │   ├── operational memory/       # Execution memory (failed → worked)
 │   │   ├── README.md             # Contract: format, border, pruning (versioned)
-│   │   ├── .gitkeep
 │   │   └── {area}.md             # Local, not versioned (git, github, shell, vscode)
 │   ├── commands/                 # Slash command definitions
 │   ├── guidelines/               # Agent directives (all files loaded)
@@ -955,7 +954,6 @@ If you're unsure which card you were working on:
 │       └── feature-y.md
 ├── operational memory/       # Execution memory — loaded only by /work-on-card
 │   ├── README.md             # Spec: border, entry format, confidence, pruning
-│   ├── .gitkeep
 │   └── {area}.md             # Local, not versioned — git, github, shell, vscode
 ├── templates/
 │   └── card template.md      # Template for new cards
