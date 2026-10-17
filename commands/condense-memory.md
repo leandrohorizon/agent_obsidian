@@ -142,7 +142,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
 
    **Fronteira entre os eixos** (também em `condensed memory/README.md`):
    conhecimento que vale em qualquer repositório é operacional e vai para
-   `operational memory/`, não para o §💡 Aprendizados Chave.
+   `condensed memory/operational/`, não para o §💡 Aprendizados Chave.
 
 8. **Evitar duplicação:**
    - Antes de adicionar conhecimento, verificar se já existe em cada eixo

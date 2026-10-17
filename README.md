@@ -379,13 +379,11 @@ Use `/refine-card` em cards vagos para:
 │   ├── 4.done/
 │   └── 5.archived/
 ├── commands/                   # Definições dos slash commands
-├── condensed memory/           # Bases de conhecimento em dois eixos
+├── condensed memory/           # Bases de conhecimento em três eixos
 │   ├── README.md               # Especificação do formato (versionada)
 │   ├── projects/               # Memória por repositório
-│   └── features/               # Memória por feature (atravessa repos)
-├── operational memory/         # Memória de execução (falhou → funcionou)
-│   ├── README.md               # Contrato: formato, fronteira, poda (versionado)
-│   └── {area}.md               # Local, não versionado — git, github, shell, vscode
+│   ├── features/               # Memória por feature (atravessa repos)
+│   └── operational/            # Memória de execução (falhou → funcionou)
 ├── templates/                  # Template de card
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)

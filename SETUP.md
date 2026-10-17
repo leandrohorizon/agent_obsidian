@@ -235,33 +235,24 @@ $OBSIDIAN_VAULT_PATH/
 │   ├── code guidelines.md   # Padrões de desenvolvimento
 │   └── IA best practices.md # Boas práticas de uso de IA por agentes
 ├── docs/                 # Documentação de projeto (PDFs, specs)
-└── condensed memory/     # Conhecimento consolidado em dois eixos
+└── condensed memory/     # Conhecimento em três eixos
     ├── README.md         # Especificação do formato (versionada)
     ├── projects/         # Memória por repositório (arquivo plano)
     │   ├── projeto-a.md
     │   └── projeto-b.md
-    └── features/         # Memória por feature (atravessa repos)
-        └── feature-x.md
+    ├── features/         # Memória por feature (atravessa repos)
+    │   └── feature-x.md
+    └── operational/      # Memória de execução (falhou → funcionou)
+        └── {area}.md     # Local, não versionado — git, github, shell, vscode
 ```
 
-`operational memory/` faz parte da instalação e precisa existir no clone do
-vault — o `/work-on-card` lê essa pasta e não a cria em runtime:
+Só `condensed memory/README.md` é versionado. O conteúdo de `projects/`,
+`features/` e `operational/` é local, como os cards — cada máquina constrói o
+seu, e as pastas nascem na primeira escrita.
 
-```
-$OBSIDIAN_VAULT_PATH/operational memory/
-├── README.md    # Especificação: fronteira, formato, confiança, poda (versionado)
-├── git.md       # Local — criado na primeira entrada
-├── github.md    # Local
-├── shell.md     # Local
-└── vscode.md    # Local
-```
-
-Só `README.md` é versionado; as entradas são conteúdo local, como os cards. Como
-o README existe no clone, a pasta também existe — `.gitkeep` é desnecessário.
-Cada arquivo de área tem teto de ~40 linhas e nasce na primeira entrada que
-precisar dele. `README.md` não é carregado em tarefas — só os arquivos de área.
-O nome do arquivo é a ferramenta concreta (`git`, `github`, `shell`, `vscode`),
-não uma categoria.
+Na memória operacional, um arquivo por área, teto de ~40 linhas cada, criado na
+primeira entrada que precisar dele. O nome do arquivo é a ferramenta concreta
+(`git`, `github`, `shell`, `vscode`), não uma categoria.
 
 ## Arquivo de Estado `.agent_obsidian`
 

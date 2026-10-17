@@ -45,15 +45,16 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
       - Entender a estrutura esperada do card (Descrição, Dependências, Dependentes, Tarefas, Discussões, Descrição Técnica, Conhecimento Adquirido)
 
    e) **Memória operacional:** é o **único** comando que a carrega.
-      - Path: `{vault_path}/operational memory/`, derivado do `.agent_obsidian`
-        (não há chave própria no estado). Usar `vault_path`; se o estado não
-        existir, usar `$OBSIDIAN_VAULT_PATH`.
-      - Ler **todos** os arquivos de área (`git.md`, `github.md`, `shell.md`,
-        `vscode.md`) **exceto `README.md`** — o README é a especificação do
-        mecanismo e só se lê ao criar ou editar uma entrada.
-      - Se a pasta não existir, avisar uma vez e seguir (não criar em runtime).
-        Arquivo de área ausente é normal (não são versionados): criar com o
-        cabeçalho `# Operacional — {area}` só quando houver entrada para gravar.
+      - Path: `{vault_path}/condensed memory/operational/`, derivado do
+        `.agent_obsidian` (não há chave própria no estado). Usar `vault_path`; se
+        o estado não existir, usar `$OBSIDIAN_VAULT_PATH`.
+      - Ler **todos** os `.md` dessa pasta (`git.md`, `github.md`, `shell.md`,
+        `vscode.md`, ...). Não confundir com o `README.md` de
+        `condensed memory/`, que é a especificação e só se lê ao criar ou editar
+        uma entrada.
+      - Se a pasta não existir, seguir sem aviso: ela não é versionada e nasce na
+        primeira entrada gravada. Criar o arquivo de área com o cabeçalho
+        `# Operacional — {area}` quando houver entrada para gravar.
       - Aplicar apenas entradas com `Confiança: verificado` ou `fato`.
         `preferência` é consulta, não instrução.
       - Reler a área antes de aplicar ou substituir uma entrada, mesmo que já
@@ -64,9 +65,10 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
       2. Se ela **não atender aos requisitos** (erro, saída errada, requisito não
          cumprido), tentar a alternativa.
       3. Se a alternativa **passar**, gravar a entrada na área correspondente,
-         seguindo `operational memory/README.md`: título = situação (não o
-         comando), `Situação`, `Padrão`, `Falhou porque`, `Alternativa`,
-         `Evidência`, `Confiança`, `Escopo`, `Validado em`, `Origem`.
+         seguindo `condensed memory/README.md` §Memória operacional: título =
+         situação (não o comando), `Situação`, `Padrão`, `Falhou porque`,
+         `Alternativa`, `Evidência`, `Confiança`, `Escopo`, `Validado em`,
+         `Origem`.
       4. Sem o par `padrão falhou` → `alternativa passou`, **não** gravar
          `verificado`; no máximo `preferência`, e no máximo `fato` para a
          observação isolada.
