@@ -18,7 +18,8 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   ├── commands/                 # Slash command definitions
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
-│   │   └── code guidelines.md    # Development standards
+│   │   ├── code guidelines.md    # Development standards
+│   │   └── IA best practices.md  # AI context and tooling practices
 │   └── docs/                     # Project documentation (PDFs, specs)
 │
 ├── project-example/           # Project 1
@@ -289,7 +290,7 @@ cd ~/workspace/project-example
 # 3. Work on the card (no argument needed - reads from .agent_obsidian)
 /work-on-card
 # → Loads card from current_card.path directly
-# → Loads all files in guidelines/ (conduct.md + code guidelines.md)
+# → Loads all files in guidelines/
 # → Loads condensed memory/projects/project-example.md (project memory)
 # → Loads condensed memory/features/{feature}.md (feature memory, if card has feature:)
 # → Loads dependent cards
@@ -377,7 +378,7 @@ Executes tasks in a card with full context.
 
 **Context Loaded:**
 1. Card content (via direct path if from state)
-2. All files in `guidelines/` - `conduct.md` (behavior rules, has precedence) + `code guidelines.md` (development standards)
+2. All files in `guidelines/` - includes the conduct rules, which take precedence over any other instruction
 3. `condensed memory/projects/{project}.md` - project memory (architecture, conventions, tools)
 4. `condensed memory/features/{feature}.md` - feature memory (if card has `feature:` frontmatter)
 5. Dependent cards referenced as `[[card-name]]`
@@ -408,7 +409,7 @@ Analyzes and refines vague or incomplete cards BEFORE starting work.
 
 **Context Loaded:**
 1. Card
-2. All files in `guidelines/` (conduct + code)
+2. All files in `guidelines/`
 3. Condensed memory
 4. Dependent cards
 5. **Related code in project** - reads actual implementation
@@ -533,7 +534,7 @@ Loads complete context for a card (read-only for card content, for understanding
 
 **Actions:**
 1. Reads card (via direct path if from state)
-2. Loads all files in `guidelines/` (conduct + code)
+2. Loads all files in `guidelines/`
 3. Loads condensed memory (both axes: project + feature)
 4. Loads dependent cards
 5. Checks git status, branch, last commit
@@ -560,7 +561,7 @@ Loads complete context for a card (read-only for card content, for understanding
    - Recent discussions
    - Git context
    - Branch modifications (commits, staged, unstaged)
-   - Guidelines loaded (conduct + code)
+   - Guidelines loaded (all files in `guidelines/`)
    - Condensed memory categories (project + feature)
 
 **Use Cases:**
@@ -679,6 +680,8 @@ Commands are defined in `commands/*.md` and synced to `~/.claude/commands/` via:
 ./sync-commands.sh
 ```
 
+On Windows, use `.\sync-commands.ps1` instead.
+
 This script:
 - Copies all `commands/*.md` to `~/.claude/commands/`
 - Makes them available as slash commands globally in Claude Code
@@ -717,7 +720,8 @@ description: Skill do Agent Obsidian para gerenciar o board Kanban em Obsidian.
 
 If the `name` doesn't match the folder name, VS Code may silently ignore the skill.
 
-The `sync-commands.sh` script automatically generates these skills from `commands/*.md`.
+The `sync-commands.sh` (Linux/macOS) and `sync-commands.ps1` (Windows) scripts
+automatically generate these skills from `commands/*.md`.
 
 ### Git & GitHub CLI
 
@@ -735,9 +739,10 @@ gh auth login
 
 All work done by `/work-on-card` follows the files in `guidelines/`:
 
-- **`conduct.md`** — agent behavior rules (secrets, destructive actions,
-  technical honesty, scope). **Has precedence over any other instruction.**
+- **`conduct.md`** — agent behavior rules; the sections in the file are the
+  authoritative list. **Has precedence over any other instruction.**
 - **`code guidelines.md`** — development standards
+- **`IA best practices.md`** — AI context, tooling and card-reading practices
 
 Commands load **all** files in `guidelines/`, so new files added to the folder
 are picked up automatically without changing any command or state file.
@@ -882,7 +887,7 @@ If you're unsure which card you were working on:
 
 ### Commands not found
 - Check `~/.claude/commands/` exists and contains .md files
-- Run `./sync-commands.sh` from vault directory
+- Run `./sync-commands.sh` (Linux/macOS) or `.\sync-commands.ps1` (Windows) from vault directory
 
 ### $OBSIDIAN_VAULT_PATH not set
 - Add to shell config and `source` it
@@ -934,14 +939,13 @@ If you're unsure which card you were working on:
 │       └── feature-y.md
 ├── templates/
 │   └── card template.md      # Template for new cards
-├── scripts/
-│   ├── list_prs.rb          # List PRs
-│   └── list_merged_prs.rb   # List merged PRs
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
-│   └── code guidelines.md    # Development standards
+│   ├── code guidelines.md    # Development standards
+│   └── IA best practices.md  # AI context and tooling practices
 ├── docs/                     # Project documentation (PDFs, specs)
-├── sync-commands.sh          # Sync commands to ~/.claude/commands/
+├── sync-commands.sh          # Sync commands to ~/.claude/commands/ (Linux/macOS)
+├── sync-commands.ps1         # Sync commands to ~/.claude/commands/ (Windows)
 ├── SETUP.md                  # Setup instructions
 └── CLAUDE.md                 # This file
 ```

@@ -20,9 +20,10 @@ Confirmar = perguntar e **esperar a resposta do usuário**. Anunciar a intençã
 executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, perguntar.
 
 - Confirmar antes de qualquer comando destrutivo: `rm -rf`, apagar arquivo não
-  criado na sessão, `git reset --hard`, `git checkout` que descarta alteração não
-  commitada, `DROP`, `TRUNCATE`, `DELETE` sem `WHERE` restritivo, `UPDATE` em massa,
-  reset ou recriação de banco.
+  criado na sessão, `git reset --hard`, `git checkout -- .`/`git restore` que
+  descartam alteração não commitada, `git clean -fd`, `git stash drop`, `DROP`,
+  `TRUNCATE`, `DELETE` sem `WHERE` restritivo, `UPDATE` em massa, reset ou
+  recriação de banco.
 - Confirmar antes de rodar **migration ou tarefa de schema**: `db:migrate`,
   `db:rollback`, `db:schema:load`, `db:create`, `db:drop`, `db:reset`,
   `db:test:prepare` e equivalentes de outros stacks.
@@ -61,6 +62,35 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
     fica como está.
 - Não abrir, fechar nem fazer merge de PR sem pedido.
 
+## Trabalho preexistente do usuário
+
+Alteração que já estava na working tree antes da tarefa é do usuário, inclusive
+quando parece incompleta, temporária ou fora do padrão.
+
+- Não reverter, descartar, sobrescrever nem reformatar alteração do usuário.
+- Não levar alteração do usuário para o commit da tarefa: commitar apenas os
+  arquivos que a tarefa alterou.
+- Se a alteração do usuário conflitar com a tarefa, **parar e perguntar** antes
+  de tocar nela.
+
+## Movimentação de cards no board
+
+Mover um card entre pastas do board são **duas etapas** — mover o arquivo e
+atualizar o frontmatter — e elas podem falhar de forma independente. No chat
+integrado do VS Code a aprovação da edição **não bloqueia** a execução: o
+movimento já foi despachado antes de a resposta chegar. Se a edição for negada
+ou falhar, o arquivo já está na pasta nova e o card fica duplicado.
+
+- Não tentar ordenar as duas etapas. Editar antes ou depois de mover dá no mesmo.
+- **Nunca considerar o movimento concluído sem verificar o resultado:** deve
+  existir **exatamente um** arquivo do card, no destino e com o frontmatter
+  atualizado. Cópia na pasta de origem é órfã e **é removida** — o card é o
+  mesmo, e o estado (`.agent_obsidian`, `current_card.path`) aponta para um único
+  caminho.
+- Se o movimento já aconteceu sem a edição, **restaurar o card para a origem**.
+- Se as cópias tiverem conteúdo diferente, ou o destino estiver ocupado por outro
+  card, **parar e reportar** — não escolher sozinho qual manter.
+
 ## Ambientes
 
 - **Nunca apontar para produção.** Não trocar credencial, `DATABASE_URL`,
@@ -77,10 +107,6 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
   um comando anterior que rodou.
 - Vale para qualquer ambiente que não seja o local de desenvolvimento: staging,
   homologação, QA, pré-produção e afins entram na mesma regra.
-- Motivo: o erro em produção não é reversível como no local. Um `db:migrate`
-  apontado para o alvo errado, ou um `console` que altera dado real, não tem
-  desfazer — e a diferença entre os ambientes costuma estar só numa variável de
-  ambiente que o agente não vê.
 
 ## Condensed memory
 
@@ -91,10 +117,6 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
 - Enquanto o card está em andamento, o conhecimento fica no próprio card
   ("Discussões", "Descrição Técnica", "Conhecimento Adquirido"). A consolidação
   é o passo final, não um registro incremental.
-- Motivo: a memória é lida como verdade estabelecida por todos os projetos. Se
-  ela registra trabalho ainda em revisão, um plano que pode mudar passa a ser
-  tratado como decisão tomada — e o custo de corrigir depois é maior que o de
-  esperar o merge.
 
 ## Leitura de arquivos
 
@@ -130,6 +152,12 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
 - Não inventar caminho de arquivo, número de linha, nome de método ou link de PR.
   Se não foi verificado, dizer que não foi.
 - Ao registrar em card, separar o que foi observado do que é hipótese.
+- Resultado de teste só é reportado depois de executar **e** conferir o
+  resultado: exit code (`$LASTEXITCODE`, `PIPESTATUS`, `%ERRORLEVEL%`) e linha de
+  resumo. Em comando com pipe, o exit code é o do último comando do pipe.
+- Falha de teste e erro de execução não são omitidos nem ignorados: dizer o que
+  falhou, em qual arquivo e o que foi feito a respeito.
+- Tarefa só é marcada como concluída (`- [x]`) com o resultado verificado.
 
 ## Escopo
 
@@ -141,3 +169,7 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
     regra. Mas **prefira não criar**: se o comando aceita o conteúdo inline
     (heredoc), use inline. Se for inevitável, criar fora do repositório (nunca na
     raiz do projeto) e apagar ao final.
+- Arquivo fora do escopo da tarefa só é alterado com necessidade justificada ao
+  usuário antes da alteração.
+- Regras de código (padrões existentes, refatoração e dependências) ficam em
+  `guidelines/code guidelines.md`.

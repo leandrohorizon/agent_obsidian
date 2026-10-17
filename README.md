@@ -7,7 +7,7 @@
 **Agent Obsidian** transforma seu vault Obsidian em um sistema inteligente de gerenciamento de tarefas onde o Claude Code:
 - 🎯 Gerencia um board Kanban através de slash commands
 - 🧠 Aprende com tarefas completadas e aplica conhecimento em trabalhos futuros
-- 🤖 Executa tarefas seguindo suas guidelines (conduta + código) automaticamente
+- 🤖 Executa tarefas seguindo todos os arquivos de `guidelines/` automaticamente
 - 📝 Rastreia trabalho em múltiplos projetos com zero configuração
 - 🔄 Gerencia o ciclo completo: start → work → review → complete → consolidate
 
@@ -25,7 +25,7 @@ cd ~/meu-projeto
 
 # Trabalhar no card (Claude carrega contexto e executa tarefas)
 /work-on-card
-# ✅ Carrega guidelines/ (conduta + código)
+# ✅ Carrega todos os arquivos de guidelines/
 # ✅ Carrega conhecimento acumulado de tarefas anteriores
 # ✅ Executa tarefas pendentes
 # ✅ Documenta decisões e aprendizados
@@ -113,6 +113,7 @@ Cards começam vagos? Use `/refine-card` para:
    ```bash
    ./sync-commands.sh
    ```
+   No Windows, use `.\sync-commands.ps1`.
    Isso instala os slash commands globalmente no Claude Code.
 
 3. **Verificar:**
@@ -158,7 +159,7 @@ cd ~/projeto-calculadora
 
 # Claude trabalha nas tarefas
 /work-on-card
-# Carrega: guidelines/ (todos os arquivos: conduct.md + code guidelines.md)
+# Carrega: todos os arquivos de guidelines/
 # Carrega: condensed memory/projects/calculadora.md (memória de projeto)
 # Carrega: condensed memory/features/{feature}.md (memória da feature do card)
 # Executa tarefas, escreve código seguindo guidelines
@@ -359,7 +360,7 @@ Use `/refine-card` em cards vagos para:
 
 - **[SETUP.md](SETUP.md)** - Instalação e configuração detalhada
 - **[CLAUDE.md](CLAUDE.md)** - Arquitetura completa e referência de comandos
-- **[guidelines/](guidelines/)** - Diretrizes do agente (conduta + código)
+- **[guidelines/](guidelines/)** - Diretrizes do agente (todos os arquivos são carregados)
 - **[templates/](templates/)** - Template de card
 
 ## Estrutura do Projeto
@@ -380,9 +381,11 @@ Use `/refine-card` em cards vagos para:
 ├── templates/                  # Template de card
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)
-│   └── code guidelines.md      # Padrões de desenvolvimento
+│   ├── code guidelines.md      # Padrões de desenvolvimento
+│   └── IA best practices.md    # Boas práticas de uso de IA por agentes
 ├── docs/                       # Documentação de projeto (PDFs, specs)
-├── sync-commands.sh            # Instala comandos no Claude
+├── sync-commands.sh            # Instala comandos no Claude (Linux/macOS)
+├── sync-commands.ps1           # Instala comandos no Claude (Windows)
 ├── SETUP.md                    # Guia de setup detalhado
 ├── CLAUDE.md                   # Documentação da arquitetura
 └── README.md                   # Este arquivo
