@@ -34,7 +34,6 @@ Receber nome de um card e retornar o caminho absoluto do arquivo, buscando em to
 
 4. **Se múltiplos cards com mesmo nome:**
    - Retornar apenas o primeiro encontrado (ordem de prioridade)
-   - A ordem de busca garante que cards ativos tenham prioridade
 
 5. **Se card não encontrado:**
    - Listar cards disponíveis em todas as pastas
@@ -74,8 +73,5 @@ Receber nome de um card e retornar o caminho absoluto do arquivo, buscando em to
 ```
 
 ## Notas
-- Match é case-insensitive para facilitar uso
-- Prioriza cards em progresso sobre cards finalizados
 - Não modifica nenhum arquivo
-- Retorna apenas o primeiro match (evita ambiguidade)
 - Comando auxiliar reutilizável por outros slash commands

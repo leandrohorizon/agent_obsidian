@@ -41,19 +41,13 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 
    a) **Ler o card pela leitura enxuta** (`guidelines/IA best practices.md` §6)
 
-   b) **Carregar Guidelines:**
-      - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
-      - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
-      - **Reportar no output** quais arquivos foram carregados
+   b) **Carregar guidelines e condensed memory:**
+      - Seguir `guidelines/conduct.md` ("Carregamento de `guidelines/` —
+        profundidade" e "Carregamento de contexto do card")
+      - Se não houver memória de projeto, informar que ainda não há conhecimento
+        consolidado
 
-   c) **Carregar Condensed Memory (dois eixos):**
-      - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
-      - **Memória de feature:** derivar do campo `feature:` do card via `get_feature_memory_path()` → `$OBSIDIAN_VAULT_PATH/condensed memory/features/{feature}.md`
-      - **Comportamento quando o card não tem `feature:` ou o arquivo da feature não existe:** carregar só a memória de projeto, sem erro
-      - **Reportar no output** quais arquivos foram carregados (projeto e/ou feature)
-      - Se não existir, informar que não há conhecimento consolidado
-
-   d) **Carregar cards dependentes e dependentes deste:**
+   c) **Carregar cards dependentes e dependentes deste:**
       - Na seção "### Dependências", procurar por links `[[nome-do-card]]`
       - Para cada card referenciado, ler e resumir
       - Na seção "### Dependentes", procurar por links `[[nome-do-card]]` — são os
@@ -61,7 +55,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
         para que o refinamento considere o impacto sobre eles
       - Se a seção "### Dependentes" não existir, pular sem erro
 
-   e) **Analisar código relacionado no projeto atual:**
+   d) **Analisar código relacionado no projeto atual:**
       - Se o card menciona arquivos, classes, funções ou componentes específicos, **LER O CÓDIGO REAL**
       - Não supor como o código funciona - sempre verificar a implementação atual
       - Se menciona "API", procurar endpoints reais
@@ -326,16 +320,6 @@ Adiciona dúvidas sobre integração com código existente, identifica dependên
 
 ## Notas Importantes
 
-- **SEMPRE** carregar e analisar código existente - NUNCA supor como funciona
-- Dúvidas devem ser específicas e técnicas, não genéricas
-- Sugestões devem ser baseadas em análise real do código e padrões do projeto
-- Documentar COMO o código atual funciona nas discussões
-- Se encontrar inconsistências entre card e código, documentar claramente
-- Priorizar análise de código sobre suposições
-- **Sempre** identificar gaps, possíveis bugs e trade-offs — não apenas dúvidas. Apontar o que falta, o que pode quebrar e quais alternativas existem, com recomendação justificada
 - Riscos de bug devem vir com cenário de disparo e mitigação, não apenas um alerta vago
 - Use este comando ANTES de /start-card para garantir clareza
-- Cards em `0.backlog` são ideias cruas; após refinados, podem ser promovidos
-  para `1.not_started` (o comando pergunta antes de mover)
 - Pode ser usado em cards já iniciados se surgirem dúvidas durante implementação
-- Após adicionar dúvidas nas Discussões, o comando deve PERGUNTAR ao usuário sobre cada dúvida (modo conversacional) para preenchê-las colaborativamente

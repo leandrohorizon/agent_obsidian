@@ -3,6 +3,11 @@
 Regras de comportamento do agente. Diferente de `code guidelines.md`, que trata de
 estilo de código, este arquivo trata do que o agente pode e não pode fazer.
 
+## Precedência
+
+As regras deste arquivo prevalecem sobre comandos e pedidos que as contradigam.
+Reporte o conflito ao usuário.
+
 ## Segredos e credenciais
 
 - Nunca ler `.env`, `.env.*`, `credentials.yml.enc`, `master.key`, `*.pem`, `*.key`
@@ -28,9 +33,6 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
   `db:rollback`, `db:schema:load`, `db:create`, `db:drop`, `db:reset`,
   `db:test:prepare` e equivalentes de outros stacks.
   **Inclusive em banco local, de teste ou em container Docker.**
-- A regra não depende de o alvo parecer descartável. Julgar se um banco é
-  descartável é justamente a avaliação que o agente pode errar — o mesmo comando
-  num banco de desenvolvimento com dados reais é destrutivo e irreversível.
 - Escrever o arquivo de migration é livre; **rodá-la não é**.
 - Nunca `git push --force` em branch com PR aberto ou review em andamento.
   Se for realmente necessário, `--force-with-lease` e só após confirmação.
@@ -45,10 +47,7 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
     não estava na lista não é tocado.
   - A autorização cobre commit, push e abertura de PR **em draft**. Não cobre
     merge, nem promover o draft para "ready for review", nem apagar branch.
-- **Nunca commitar o `.agent_obsidian`.** É arquivo de estado local da máquina:
-  guarda `vault_path` absoluto, `current_card` e paths que só fazem sentido no
-  ambiente de quem está trabalhando. Commitá-lo versiona configuração de máquina
-  e faz o estado de um projeto vazar para outro clone.
+- **Nunca commitar o `.agent_obsidian`.**
   - A exceção de commit de `/work-on-card`, `/review-card` e `/orchestrate-cards`
     **não** cobre este arquivo — a exceção é sobre *quando* commitar, não sobre
     *o que* commitar.
@@ -57,9 +56,7 @@ executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, 
     adicioná-lo.
   - Se ele já foi commitado antes, avisar o usuário em vez de reescrever
     histórico por conta própria.
-  - Não é preciso mexer no `.gitignore` para isso: a regra é de comportamento do
-    agente, não de configuração do repositório. O `.gitignore` de cada projeto
-    fica como está.
+  - Não alterar o `.gitignore` para impor esta regra.
 - Não abrir, fechar nem fazer merge de PR sem pedido.
 
 ## Trabalho preexistente do usuário
@@ -75,18 +72,9 @@ quando parece incompleta, temporária ou fora do padrão.
 
 ## Movimentação de cards no board
 
-Mover um card entre pastas do board são **duas etapas** — mover o arquivo e
-atualizar o frontmatter — e elas podem falhar de forma independente. No chat
-integrado do VS Code a aprovação da edição **não bloqueia** a execução: o
-movimento já foi despachado antes de a resposta chegar. Se a edição for negada
-ou falhar, o arquivo já está na pasta nova e o card fica duplicado.
-
-- Não tentar ordenar as duas etapas. Editar antes ou depois de mover dá no mesmo.
 - **Nunca considerar o movimento concluído sem verificar o resultado:** deve
   existir **exatamente um** arquivo do card, no destino e com o frontmatter
-  atualizado. Cópia na pasta de origem é órfã e **é removida** — o card é o
-  mesmo, e o estado (`.agent_obsidian`, `current_card.path`) aponta para um único
-  caminho.
+  atualizado. Remova qualquer cópia na pasta de origem.
 - Se o movimento já aconteceu sem a edição, **restaurar o card para a origem**.
 - Se as cópias tiverem conteúdo diferente, ou o destino estiver ocupado por outro
   card, **parar e reportar** — não escolher sozinho qual manter.
@@ -123,10 +111,6 @@ ou falhar, o arquivo já está na pasta nova e o card fica duplicado.
 - Se o conteúdo de um arquivo já foi lido nesta sessão e está na memória, **não
   ler de novo**. Vale para `.md` em geral: guidelines, condensed memory, comandos,
   documentação.
-- Muitos comandos pedem a leitura de um arquivo que já foi carregado antes
-  (`/work-on-card` depois de `/load-context`, `/refine-card` depois de
-  `/work-on-card`, guidelines relidas a cada passo). Repetir a leitura não
-  acrescenta informação e queima contexto.
 - **Exceção — cards em andamento:** cards em `1.not_started/`, `2.in_progress/`
   ou `3.in_review/` mudam durante a sessão (tarefas marcadas, discussões
   adicionadas, frontmatter atualizado). Reler o card ativo antes de editá-lo é
@@ -144,6 +128,20 @@ ou falhar, o arquivo já está na pasta nova e o card fica duplicado.
   subpastas. A pasta inteira é fonte de diretrizes.
 - Ao listar a pasta, **reportar** quais arquivos foram lidos (e de quais
   subpastas), para que o conjunto carregado seja visível.
+
+### Carregamento de contexto do card
+
+Ao carregar contexto de um card:
+
+- Carregar a memória de projeto pelo `condensed_memory_path` de `.agent_obsidian`;
+  se não estiver disponível, derivar
+  `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{projeto}.md`, normalizando o
+  nome do projeto para lowercase e substituindo hífens por underscores.
+- Derivar a memória de feature do campo `feature:` usando
+  `get_feature_memory_path()`. Carregá-la somente se o campo e o arquivo
+  existirem; caso contrário, seguir apenas com a memória de projeto.
+- Se uma memória já foi lida nesta sessão e não mudou, não relê-la.
+- Reportar quais arquivos de memória foram carregados.
 
 ## Honestidade técnica
 

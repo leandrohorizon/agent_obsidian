@@ -30,21 +30,13 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - Se não encontrar, listar cards disponíveis
    - Identificar estado atual (qual pasta está)
 
-4. **Carregar Guidelines:**
-   - Listar `$OBSIDIAN_VAULT_PATH/guidelines/` e ler **todos** os arquivos da pasta (não apenas os conhecidos — a pasta pode ganhar arquivos novos)
-   - Se as guidelines já foram lidas nesta sessão e continuam na memória, **não reler** — só listar a pasta para detectar arquivo novo
-   - **Reportar no output** quais arquivos foram carregados
+4. **Carregar guidelines e condensed memory:**
+   - Seguir `guidelines/conduct.md` ("Carregamento de `guidelines/` —
+     profundidade" e "Carregamento de contexto do card")
+   - Se não houver memória de projeto, informar que ainda não há conhecimento
+     consolidado
 
-5. **Carregar Condensed Memory (dois eixos):**
-   - **Memória de projeto:** se `.agent_obsidian` existe e tem `condensed_memory_path`, usar ele diretamente; senão, detectar projeto: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'` e construir `$OBSIDIAN_VAULT_PATH/condensed memory/projects/{nome-do-projeto}.md`
-   - **Memória de feature:** derivar do campo `feature:` do card via `get_feature_memory_path()` → `$OBSIDIAN_VAULT_PATH/condensed memory/features/{feature}.md`
-   - **Comportamento quando o card não tem `feature:` ou o arquivo da feature não existe:** carregar só a memória de projeto, sem erro
-   - Se a memória já foi lida nesta sessão e continua na memória, **não reler**
-   - **Reportar no output** quais arquivos foram carregados (projeto e/ou feature)
-   - Se não existir, informar que não há conhecimento consolidado ainda
-   - Estes arquivos contêm aprendizados de tarefas anteriores
-
-7. **Carregar cards dependentes e dependentes deste:**
+5. **Carregar cards dependentes e dependentes deste:**
    - Na seção "### Dependências", procurar por links `[[nome-do-card]]`
    - Para cada card referenciado:
      - Ler o card dependente
@@ -56,12 +48,12 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      card. Serve para mostrar o impacto de alterar este card.
    - Se a seção "### Dependentes" não existir no card, pular sem erro
 
-7. **Verificar contexto do repositório:**
+6. **Verificar contexto do repositório:**
    - Executar `git branch --show-current` para verificar branch
    - Executar `git status --short` para ver alterações pendentes
    - Executar `git log -1 --oneline` para ver último commit
 
-8. **Sincronizar branch e estado (`.agent_obsidian`):**
+7. **Sincronizar branch e estado (`.agent_obsidian`):**
    - Comparar a branch atual (`git branch --show-current`) com a branch do card
      (campo `branch:` do frontmatter)
    - **Se divergirem**, o card está ativo mas o repositório está em outra branch.
@@ -96,7 +88,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - Se a branch atual já é a do card e o `current_card` já está correto, não
      alterar nada — apenas reportar que está sincronizado
 
-9. **Analisar modificações da branch:**
+8. **Analisar modificações da branch:**
    - Identificar branch base (main, master, ou similar)
    - Listar commits da branch: `git log origin/{base}..HEAD --oneline`
    - Analisar arquivos modificados na branch (commitados):
@@ -113,7 +105,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      - Para arquivos não commitados: `git diff --stat -- {arquivo}`
    - **IMPORTANTE:** Excluir arquivos claramente não relacionados ao card (ex: .obsidian/, outros cards, etc.)
 
-10. **Apresentar resumo do contexto:**
+9. **Apresentar resumo do contexto:**
    ```
    📋 Contexto carregado: {nome-do-card}
 
@@ -223,13 +215,6 @@ deve trocar para a branch correta e atualiza o `.agent_obsidian`.
 
 ## Notas Importantes
 - Este comando **não altera o conteúdo do card** — é de leitura para contexto
-- Ele **pode** trocar de branch (com confirmação), rodar `git pull` e atualizar o
-  `.agent_obsidian` para refletir o card carregado (ver passo 8)
-- Use-o no início de cada sessão para ter contexto completo
-- Especialmente útil após pausas longas ou trocas de contexto
-- O condensed memory fornece conhecimento acumulado de tarefas anteriores
-- Cards dependentes ajudam a entender integrações e requisitos
-- Guidelines (conduta + código) garantem consistência e comportamento correto
 
 ### Análise de Modificações da Branch
 - O comando analisa TODAS as modificações na branch (commitadas e não commitadas)

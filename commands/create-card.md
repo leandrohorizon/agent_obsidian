@@ -94,7 +94,6 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
    ```
 
 ## Notas Importantes
-- A detecção automática evita cards desatualizados ou no estado errado
 - O frontmatter YAML substitui a antiga seção "## Repositório"
 - Cards criados em `1.not_started` podem ser movidos com `/start-card`
 - Cards em `0.backlog` são ideias ainda não refinadas/priorizadas; use
