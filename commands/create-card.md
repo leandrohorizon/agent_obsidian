@@ -68,6 +68,11 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
      correspondência, aceitar uma nova feature (slug lowercase com hífens).
    - Preencher o placeholder `feature:` com o slug escolhido (ou deixar vazio
      se o usuário não definir).
+   - **Tarefas:** registrar o trabalho da tarefa, não passo já garantido pelo
+     fluxo — testes, lint, commit, push, PR, mover card, consolidar memória
+     (`guidelines/IA best practices.md` §7). Registrar em vez disso o
+     comportamento a implementar, o teste a **escrever** e o que ele prova,
+     migração, rollback e documentação cujo conteúdo muda.
 
 7. **Criar o arquivo:**
    - Salvar em: `$OBSIDIAN_VAULT_PATH/board/{estado-detectado}/{nome-do-card}.md`

@@ -90,6 +90,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
       - São tarefas genéricas como "Tarefa 1", "Tarefa 2"?
       - Cada tarefa pode ser completada independentemente?
       - Faltam tarefas importantes (testes, documentação, validações)?
+      - Há tarefa descrevendo passo já garantido pelo fluxo (`guidelines/IA best practices.md` §7)? Remover
 
    c) **Dependências:**
       - Lista todas as dependências técnicas (APIs, serviços, bibliotecas)?
@@ -221,6 +222,10 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
    - Padrões do projeto (condensed memory)
    - Guidelines (conduta + código)
    - Boas práticas (testes, documentação, validações)
+
+   Não criar nem manter tarefa que descreve passo já garantido pelo fluxo — testes,
+   lint, commit, push, PR, mover card, consolidar memória
+   (`guidelines/IA best practices.md` §7).
 
    Exemplo de transformação:
    ```
