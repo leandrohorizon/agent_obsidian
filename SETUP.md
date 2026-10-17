@@ -68,6 +68,26 @@ Depois dentro do Claude Code:
 
 Se estiver configurado corretamente, você verá o status do seu board Obsidian.
 
+### 4. VS Code Copilot (skills)
+
+O `sync-commands` grava as skills em `~/.agent_obsidian/skills/`. O VS Code
+Copilot só as encontra se essa pasta estiver declarada — sem a configuração, ele
+cai no padrão `~/.copilot/skills/`, que **não** é atualizado pelo sync e fica
+desatualizado em silêncio.
+
+Em `settings.json` do usuário (`Ctrl+Shift+P` → *Preferences: Open User Settings
+(JSON)*):
+
+```json
+"chat.agentSkillsLocations": [
+  "${userHome}/.agent_obsidian/skills"
+]
+```
+
+Depois de configurar, **remova** `~/.copilot/skills/` para não manter duas
+cópias divergentes. Recarregue a janela do VS Code e confirme que as skills do
+Agent Obsidian aparecem na lista.
+
 ## Comandos Disponíveis
 
 ### `/board-status`
@@ -222,6 +242,22 @@ $OBSIDIAN_VAULT_PATH/
     └── features/         # Memória por feature (atravessa repos)
         └── feature-x.md
 ```
+
+`operational memory/` faz parte da instalação e precisa existir no clone do
+vault — o `/work-on-card` lê essa pasta e não a cria em runtime:
+
+```
+$OBSIDIAN_VAULT_PATH/operational memory/
+├── README.md    # Especificação: fronteira, formato, confiança, poda
+├── git.md       # Comportamento do git
+├── github.md    # API do GitHub, PRs, checks
+├── shell.md     # Shell, encoding, caminhos
+└── vscode.md    # VS Code, Copilot, skills
+```
+
+Cada arquivo de área tem teto de ~40 linhas. `README.md` não é carregado em
+tarefas — só os arquivos de área. O nome do arquivo é a ferramenta concreta
+(`git`, `github`, `shell`, `vscode`), não uma categoria.
 
 ## Arquivo de Estado `.agent_obsidian`
 

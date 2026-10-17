@@ -44,6 +44,35 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    d) **Template do card:**
       - Entender a estrutura esperada do card (Descrição, Dependências, Dependentes, Tarefas, Discussões, Descrição Técnica, Conhecimento Adquirido)
 
+   e) **Memória operacional:** é o **único** comando que a carrega.
+      - Path: `{vault_path}/operational memory/`, derivado do `.agent_obsidian`
+        (não há chave própria no estado). Usar `vault_path`; se o estado não
+        existir, usar `$OBSIDIAN_VAULT_PATH`.
+      - Ler **todos** os arquivos de área (`git.md`, `github.md`, `shell.md`,
+        `vscode.md`) **exceto `README.md`** — o README é a especificação do
+        mecanismo e só se lê ao criar ou editar uma entrada.
+      - Se a pasta não existir, avisar uma vez e seguir (não criar em runtime).
+      - Aplicar apenas entradas com `Confiança: verificado` ou `fato`.
+        `preferência` é consulta, não instrução.
+      - Reler a área antes de aplicar ou substituir uma entrada, mesmo que já
+        tenha sido lida nesta sessão (`conduct.md` §Leitura de arquivos).
+
+      **Protocolo de fallback (captura operacional):**
+      1. Aplicar a abordagem padrão.
+      2. Se ela **não atender aos requisitos** (erro, saída errada, requisito não
+         cumprido), tentar a alternativa.
+      3. Se a alternativa **passar**, gravar a entrada na área correspondente,
+         seguindo `operational memory/README.md`: título = situação (não o
+         comando), `Situação`, `Padrão`, `Falhou porque`, `Alternativa`,
+         `Evidência`, `Confiança`, `Escopo`, `Validado em`, `Origem`.
+      4. Sem o par `padrão falhou` → `alternativa passou`, **não** gravar
+         `verificado`; no máximo `preferência`, e no máximo `fato` para a
+         observação isolada.
+      5. Respeitar o teto de ~40 linhas por arquivo: podar ou fundir antes de
+         acrescentar. Entrada que deixou de valer é **removida na hora**.
+      6. Nunca gravar segredo, credencial, dado pessoal, conteúdo de cliente ou
+         payload real — registrar o mecanismo e a forma do erro.
+
 5. **Analisar tarefas:**
    - Identificar todos os checkboxes `- [ ]` no card
    - Listar as tarefas pendentes

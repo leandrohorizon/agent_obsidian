@@ -378,6 +378,12 @@ Use `/refine-card` em cards vagos para:
 ├── condensed memory/           # Bases de conhecimento em dois eixos
 │   ├── projects/               # Memória por repositório
 │   └── features/               # Memória por feature (atravessa repos)
+├── operational memory/         # Memória de execução (falhou → funcionou)
+│   ├── README.md               # Especificação do formato e da fronteira
+│   ├── git.md
+│   ├── github.md
+│   ├── shell.md
+│   └── vscode.md
 ├── templates/                  # Template de card
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)

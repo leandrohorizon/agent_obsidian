@@ -105,6 +105,13 @@ quando parece incompleta, temporária ou fora do padrão.
 - Enquanto o card está em andamento, o conhecimento fica no próprio card
   ("Discussões", "Descrição Técnica", "Conhecimento Adquirido"). A consolidação
   é o passo final, não um registro incremental.
+- **Exceção — `operational memory/` está fora do escopo desta regra.** Essa pasta
+  registra técnica de execução, não conhecimento de projeto ou de feature, e é
+  escrita **durante** a tarefa pelo `/work-on-card`, no momento em que a
+  abordagem padrão falha e a alternativa passa. O motivo: a evidência bruta do
+  par `falhou` → `funcionou` (comando, saída, ordem) se perde se o registro
+  esperar o merge. A regra acima continua valendo integralmente para
+  `condensed memory/projects/` e `condensed memory/features/`.
 
 ## Leitura de arquivos
 
@@ -115,6 +122,10 @@ quando parece incompleta, temporária ou fora do padrão.
   ou `3.in_review/` mudam durante a sessão (tarefas marcadas, discussões
   adicionadas, frontmatter atualizado). Reler o card ativo antes de editá-lo é
   correto e necessário.
+- **Exceção — `operational memory/`:** entrada criada na própria sessão muda a
+  próxima ação (é justamente o que ela existe para fazer). Reler a área no
+  momento de aplicar ou substituir uma entrada é correto; a versão lida antes da
+  escrita pode já estar desatualizada.
 - Cards em `4.done/` e `5.archived/` são estáveis: se já foram lidos, não reler.
 - Se houver motivo para acreditar que o arquivo mudou (o usuário editou, outro
   processo escreveu, a leitura anterior foi truncada ou resumida), reler é

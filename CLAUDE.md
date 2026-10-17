@@ -15,6 +15,9 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   ├── condensed memory/         # Knowledge bases in two axes
 │   │   ├── projects/             # Per-repository memory
 │   │   └── features/             # Per-feature memory (crosses repos)
+│   ├── operational memory/       # Execution memory (failed → worked)
+│   │   ├── README.md             # Format, border rule, confidence, pruning
+│   │   └── {area}.md             # git, shell, testes, ferramentas
 │   ├── commands/                 # Slash command definitions
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
@@ -382,10 +385,16 @@ Executes tasks in a card with full context.
 3. `condensed memory/projects/{project}.md` - project memory (architecture, conventions, tools)
 4. `condensed memory/features/{feature}.md` - feature memory (if card has `feature:` frontmatter)
 5. Dependent cards referenced as `[[card-name]]`
+6. `operational memory/*.md` (except `README.md`) - execution memory: entries with
+   `Confiança: verificado` or `fato` are applied; `preferência` is consulted only.
+   This is the **only** command that loads this folder.
 
 **Actions:**
 - Identifies pending tasks (`- [ ]`)
 - Executes tasks following the guidelines
+- **Operational fallback:** when the standard approach fails and an alternative
+  works, records the entry in `operational memory/{area}.md` (fields per
+  `operational memory/README.md`), respecting the ~40-line ceiling per file
 - Marks tasks complete (`- [x]`)
 - Documents decisions in "Discussões" section
 - Updates "Descrição Técnica" and "Conhecimento Adquirido"
@@ -937,6 +946,12 @@ If you're unsure which card you were working on:
 │   └── features/             # Per-feature memory (crosses repositories)
 │       ├── feature-x.md
 │       └── feature-y.md
+├── operational memory/       # Execution memory — loaded only by /work-on-card
+│   ├── README.md             # Spec: border, entry format, confidence, pruning
+│   ├── git.md                # git behavior
+│   ├── github.md             # GitHub API, PRs, checks
+│   ├── shell.md              # shell, encoding, paths
+│   └── vscode.md             # VS Code, Copilot, skills
 ├── templates/
 │   └── card template.md      # Template for new cards
 ├── guidelines/               # Agent directives (all files loaded)
@@ -957,6 +972,7 @@ If you're unsure which card you were working on:
 - Integrates with Claude Code via custom slash commands
 - Tracks state per project via `.agent_obsidian` files
 - Consolidates knowledge per project and per feature via condensed memory (two-axis model)
+- Records execution lessons (standard approach failed → alternative worked) in operational memory
 - Automates git workflow (branches, commits, PRs)
 - Builds long-term memory through completed cards
 - Enables AI to work on tasks with full context and standards
