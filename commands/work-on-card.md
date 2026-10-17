@@ -52,6 +52,8 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
         `vscode.md`) **exceto `README.md`** — o README é a especificação do
         mecanismo e só se lê ao criar ou editar uma entrada.
       - Se a pasta não existir, avisar uma vez e seguir (não criar em runtime).
+        Arquivo de área ausente é normal (não são versionados): criar com o
+        cabeçalho `# Operacional — {area}` só quando houver entrada para gravar.
       - Aplicar apenas entradas com `Confiança: verificado` ou `fato`.
         `preferência` é consulta, não instrução.
       - Reler a área antes de aplicar ou substituir uma entrada, mesmo que já

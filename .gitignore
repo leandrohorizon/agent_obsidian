@@ -15,9 +15,12 @@
 !guidelines/
 !guidelines/**
 
-# Memória operacional (carregada apenas pelo /work-on-card; precisa existir no clone)
+# Memória operacional: só o contrato é versionado. As entradas das áreas
+# (git.md, github.md, shell.md, vscode.md) são conteúdo local, como os cards e as
+# condensed memories — cada máquina constrói a sua.
 !operational memory/
-!operational memory/**
+!operational memory/README.md
+!operational memory/.gitkeep
 
 # Especificação da condensed memory (o conteúdo das memórias continua fora do
 # versionamento; só o contrato do formato é versionado)

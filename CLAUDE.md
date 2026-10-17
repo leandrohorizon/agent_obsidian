@@ -17,8 +17,9 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   │   ├── projects/             # Per-repository memory
 │   │   └── features/             # Per-feature memory (crosses repos)
 │   ├── operational memory/       # Execution memory (failed → worked)
-│   │   ├── README.md             # Format, border rule, confidence, pruning
-│   │   └── {area}.md             # git, shell, testes, ferramentas
+│   │   ├── README.md             # Contract: format, border, pruning (versioned)
+│   │   ├── .gitkeep
+│   │   └── {area}.md             # Local, not versioned (git, github, shell, vscode)
 │   ├── commands/                 # Slash command definitions
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
@@ -954,10 +955,8 @@ If you're unsure which card you were working on:
 │       └── feature-y.md
 ├── operational memory/       # Execution memory — loaded only by /work-on-card
 │   ├── README.md             # Spec: border, entry format, confidence, pruning
-│   ├── git.md                # git behavior
-│   ├── github.md             # GitHub API, PRs, checks
-│   ├── shell.md              # shell, encoding, paths
-│   └── vscode.md             # VS Code, Copilot, skills
+│   ├── .gitkeep
+│   └── {area}.md             # Local, not versioned — git, github, shell, vscode
 ├── templates/
 │   └── card template.md      # Template for new cards
 ├── guidelines/               # Agent directives (all files loaded)
