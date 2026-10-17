@@ -235,6 +235,12 @@ com "pathspec ... did not match"`, não o comando colado com token na query stri
 
 ## Versionamento
 
-Só este `README.md` é versionado. `projects/`, `features/` e `operational/` são
-conteúdo local — cada máquina constrói a sua, como os cards. Consequência: as
-pastas não existem no clone e são criadas na primeira escrita.
+Só este `README.md` é versionado **como conteúdo**. `projects/`, `features/` e
+`operational/` guardam conteúdo local — cada máquina constrói o seu, como os
+cards. As três pastas existem no clone por um `.gitkeep` versionado
+(`!condensed memory/**/.gitkeep` no `.gitignore`): sem ele a pasta não apareceria,
+porque nenhum arquivo de conteúdo é versionado. É o mesmo arranjo das pastas de
+estado do `board/`.
+
+O `.gitkeep` só se justifica nesse cenário. Numa pasta com arquivo versionado
+ela existe sozinha, e o `.gitkeep` passa a ser ruído.

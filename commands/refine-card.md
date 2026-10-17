@@ -66,7 +66,8 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 4. **Validar/preencher `feature:` no frontmatter:**
    - Ler o campo `feature:` do frontmatter do card (via `parse_frontmatter`)
    - Se ausente ou vazio:
-     - Listar os arquivos existentes em `$OBSIDIAN_VAULT_PATH/condensed memory/features/`
+     - Listar os arquivos `.md` existentes em `$OBSIDIAN_VAULT_PATH/condensed memory/features/`
+       (ignorar `.gitkeep` e o `README.md` da raiz, que é a especificação)
      - Sugerir a feature mais próxima do card (slug lowercase com hífens)
      - Se não houver correspondência, propor uma nova feature seguindo a régua
        de granularidade (a feature nomeia a análise ponta a ponta, não o campo

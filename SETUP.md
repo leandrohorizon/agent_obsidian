@@ -238,17 +238,21 @@ $OBSIDIAN_VAULT_PATH/
 └── condensed memory/     # Conhecimento em três eixos
     ├── README.md         # Especificação do formato (versionada)
     ├── projects/         # Memória por repositório (arquivo plano)
+    │   ├── .gitkeep      # Mantém a pasta no clone (conteúdo é local)
     │   ├── projeto-a.md
     │   └── projeto-b.md
     ├── features/         # Memória por feature (atravessa repos)
+    │   ├── .gitkeep
     │   └── feature-x.md
     └── operational/      # Memória de execução (falhou → funcionou)
-        └── {area}.md     # Local, não versionado — git, github, shell, vscode
+        ├── .gitkeep
+        └── {area}.md     # Local — git, github, shell, vscode
 ```
 
-Só `condensed memory/README.md` é versionado. O conteúdo de `projects/`,
-`features/` e `operational/` é local, como os cards — cada máquina constrói o
-seu, e as pastas nascem na primeira escrita.
+Só `condensed memory/README.md` é versionado como conteúdo. O que está em
+`projects/`, `features/` e `operational/` é local, como os cards — cada máquina
+constrói o seu. As três pastas existem no clone pelo `.gitkeep`; sem ele não
+apareceriam, porque nenhum arquivo de conteúdo é versionado.
 
 Na memória operacional, um arquivo por área, teto de ~40 linhas cada, criado na
 primeira entrada que precisar dele. O nome do arquivo é a ferramenta concreta

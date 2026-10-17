@@ -381,9 +381,9 @@ Use `/refine-card` em cards vagos para:
 ├── commands/                   # Definições dos slash commands
 ├── condensed memory/           # Bases de conhecimento em três eixos
 │   ├── README.md               # Especificação do formato (versionada)
-│   ├── projects/               # Memória por repositório
-│   ├── features/               # Memória por feature (atravessa repos)
-│   └── operational/            # Memória de execução (falhou → funcionou)
+│   ├── projects/               # Memória por repositório (.gitkeep)
+│   ├── features/               # Memória por feature (.gitkeep)
+│   └── operational/            # Memória de execução (.gitkeep)
 ├── templates/                  # Template de card
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)

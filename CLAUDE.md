@@ -14,9 +14,9 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   ├── board/                    # Kanban board (all projects)
 │   ├── condensed memory/         # Knowledge bases in three axes
 │   │   ├── README.md             # Format spec (versioned)
-│   │   ├── projects/             # Per-repository memory
-│   │   ├── features/             # Per-feature memory (crosses repos)
-│   │   └── operational/          # Execution memory (failed → worked)
+│   │   ├── projects/             # Per-repository memory (.gitkeep)
+│   │   ├── features/             # Per-feature memory (.gitkeep)
+│   │   └── operational/          # Execution memory (.gitkeep)
 │   ├── commands/                 # Slash command definitions
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
@@ -944,13 +944,16 @@ If you're unsure which card you were working on:
 ├── condensed memory/         # Knowledge bases in three axes
 │   ├── README.md             # Format spec for the three axes (versioned)
 │   ├── projects/             # Per-repository memory (stable, transversal)
+│   │   ├── .gitkeep
 │   │   ├── agent_obsidian.md
 │   │   ├── {project1}.md
 │   │   └── {project2}.md
 │   ├── features/             # Per-feature memory (crosses repositories)
+│   │   ├── .gitkeep
 │   │   ├── feature-x.md
 │   │   └── feature-y.md
 │   └── operational/          # Execution memory — loaded only by /work-on-card
+│       ├── .gitkeep
 │       └── {area}.md         # Local, not versioned — git, github, shell, vscode
 ├── templates/
 │   └── card template.md      # Template for new cards
