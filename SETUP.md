@@ -68,6 +68,26 @@ Depois dentro do Claude Code:
 
 Se estiver configurado corretamente, você verá o status do seu board Obsidian.
 
+### 4. VS Code Copilot (skills)
+
+O `sync-commands` grava as skills em `~/.agent_obsidian/skills/`. O VS Code
+Copilot só as encontra se essa pasta estiver declarada — sem a configuração, ele
+cai no padrão `~/.copilot/skills/`, que **não** é atualizado pelo sync e fica
+desatualizado em silêncio.
+
+Em `settings.json` do usuário (`Ctrl+Shift+P` → *Preferences: Open User Settings
+(JSON)*):
+
+```json
+"chat.agentSkillsLocations": [
+  "${userHome}/.agent_obsidian/skills"
+]
+```
+
+Depois de configurar, **remova** `~/.copilot/skills/` para não manter duas
+cópias divergentes. Recarregue a janela do VS Code e confirme que as skills do
+Agent Obsidian aparecem na lista.
+
 ## Comandos Disponíveis
 
 ### `/board-status`
@@ -215,13 +235,28 @@ $OBSIDIAN_VAULT_PATH/
 │   ├── code guidelines.md   # Padrões de desenvolvimento
 │   └── IA best practices.md # Boas práticas de uso de IA por agentes
 ├── docs/                 # Documentação de projeto (PDFs, specs)
-└── condensed memory/     # Conhecimento consolidado em dois eixos
+└── condensed memory/     # Conhecimento em três eixos
+    ├── README.md         # Especificação do formato (versionada)
     ├── projects/         # Memória por repositório (arquivo plano)
+    │   ├── .gitkeep      # Mantém a pasta no clone (conteúdo é local)
     │   ├── projeto-a.md
     │   └── projeto-b.md
-    └── features/         # Memória por feature (atravessa repos)
-        └── feature-x.md
+    ├── features/         # Memória por feature (atravessa repos)
+    │   ├── .gitkeep
+    │   └── feature-x.md
+    └── operational/      # Memória de execução (falhou → funcionou)
+        ├── .gitkeep
+        └── {area}.md     # Local — git, github, shell, vscode
 ```
+
+Só `condensed memory/README.md` é versionado como conteúdo. O que está em
+`projects/`, `features/` e `operational/` é local, como os cards — cada máquina
+constrói o seu. As três pastas existem no clone pelo `.gitkeep`; sem ele não
+apareceriam, porque nenhum arquivo de conteúdo é versionado.
+
+Na memória operacional, um arquivo por área, teto de ~40 linhas cada, criado na
+primeira entrada que precisar dele. O nome do arquivo é a ferramenta concreta
+(`git`, `github`, `shell`, `vscode`), não uma categoria.
 
 ## Arquivo de Estado `.agent_obsidian`
 

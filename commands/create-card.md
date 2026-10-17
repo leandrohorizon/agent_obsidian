@@ -62,10 +62,10 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
      completed: {YYYY-MM-DD se done}
      ---
      ```
-   - **Sugerir a feature:** listar os arquivos existentes em
-     `$OBSIDIAN_VAULT_PATH/condensed memory/features/` (sem extensão .md) e
-     sugerir ao usuário a feature mais próxima do card. Se não houver
-     correspondência, aceitar uma nova feature (slug lowercase com hífens).
+   - **Sugerir a feature:** listar os arquivos `.md` existentes em
+     `$OBSIDIAN_VAULT_PATH/condensed memory/features/` (sem extensão; ignorar
+     `.gitkeep`) e sugerir ao usuário a feature mais próxima do card. Se não
+     houver correspondência, aceitar uma nova feature (slug lowercase com hífens).
    - Preencher o placeholder `feature:` com o slug escolhido (ou deixar vazio
      se o usuário não definir).
    - **Tarefas:** registrar o trabalho da tarefa, não passo já garantido pelo
