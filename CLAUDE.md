@@ -13,6 +13,7 @@ This system uses a **distributed state architecture** with centralized knowledge
 ├── obsidian/user/              # Centralized vault (this repo)
 │   ├── board/                    # Kanban board (all projects)
 │   ├── condensed memory/         # Knowledge bases in two axes
+│   │   ├── README.md             # Format spec (versioned)
 │   │   ├── projects/             # Per-repository memory
 │   │   └── features/             # Per-feature memory (crosses repos)
 │   ├── operational memory/       # Execution memory (failed → worked)
@@ -168,6 +169,10 @@ condensed memory/
 A card declares its feature in the frontmatter (`feature: feature-x`) and `/condense-memory` **routes** each extracted piece of knowledge to the correct axis, instead of dumping everything into one file. This solves the case where a feature (e.g. feature-x) spans three repositories — the full-flow knowledge lives in a single feature file, accessible from any project.
 
 **Format of the project memory file:**
+
+> Canonical spec: `condensed memory/README.md`. It defines headers, categories,
+> formatting rules and the border between the three memories. This block is a
+> summary; on divergence, the spec wins.
 ```markdown
 # Condensed Memory - {project_name}
 
@@ -939,6 +944,7 @@ If you're unsure which card you were working on:
 │   ├── orchestrate-cards.md
 │   └── condense-memory.md
 ├── condensed memory/         # Knowledge bases in two axes
+│   ├── README.md             # Format spec: headers, categories, border
 │   ├── projects/             # Per-repository memory (stable, transversal)
 │   │   ├── agent_obsidian.md
 │   │   ├── {project1}.md

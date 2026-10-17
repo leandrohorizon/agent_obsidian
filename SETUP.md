@@ -236,6 +236,7 @@ $OBSIDIAN_VAULT_PATH/
 │   └── IA best practices.md # Boas práticas de uso de IA por agentes
 ├── docs/                 # Documentação de projeto (PDFs, specs)
 └── condensed memory/     # Conhecimento consolidado em dois eixos
+    ├── README.md         # Especificação do formato (versionada)
     ├── projects/         # Memória por repositório (arquivo plano)
     │   ├── projeto-a.md
     │   └── projeto-b.md

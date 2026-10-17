@@ -229,6 +229,10 @@ Regras de negócio, padrões, gotchas
 
 ## Formato da Condensed Memory
 
+> Contrato canônico: **[condensed memory/README.md](condensed%20memory/README.md)**.
+> Ele define cabeçalhos, categorias, regras de forma e a fronteira entre as três
+> memórias. O que segue é resumo; em caso de divergência, a especificação vence.
+
 O conhecimento é estruturado em **dois eixos** para fácil consumo pela IA.
 
 ### Memória de Projeto (`condensed memory/projects/{projeto}.md`)
@@ -376,6 +380,7 @@ Use `/refine-card` em cards vagos para:
 │   └── 5.archived/
 ├── commands/                   # Definições dos slash commands
 ├── condensed memory/           # Bases de conhecimento em dois eixos
+│   ├── README.md               # Especificação do formato (versionada)
 │   ├── projects/               # Memória por repositório
 │   └── features/               # Memória por feature (atravessa repos)
 ├── operational memory/         # Memória de execução (falhou → funcionou)

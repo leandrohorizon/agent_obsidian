@@ -19,6 +19,11 @@
 !operational memory/
 !operational memory/**
 
+# Especificação da condensed memory (o conteúdo das memórias continua fora do
+# versionamento; só o contrato do formato é versionado)
+!condensed memory/
+!condensed memory/README.md
+
 # Definições dos slash commands (incluindo commands/lib/)
 !commands/
 !commands/**

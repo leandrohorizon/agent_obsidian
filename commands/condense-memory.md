@@ -126,170 +126,23 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
      `⚠️ Card sem feature: — conhecimento de feature não roteado. Preencha feature: no frontmatter.`
    - Se `feature:` é uma lista YAML (`feature: [a, b]`) → escrever o recorte pertinente de cada item em cada arquivo de feature correspondente
 
-   **FORMATO DO ARQUIVO DE PROJETO - Estrutura obrigatória:**
+   **FORMATO — fonte única:** o cabeçalho, as categorias e as regras de forma dos
+   dois eixos estão em `condensed memory/README.md`. Ler esse arquivo antes de
+   escrever e segui-lo; não reinventar template.
 
-   ```markdown
-   # Condensed Memory - {nome_projeto}
+   Pontos que a especificação fixa e não devem ser contrariados aqui:
+   - Projeto: header com `Última atualização` / `Cards processados` / `Origem`;
+     categorias 🏗️ Arquitetura, 📋 Padrões e Convenções, 🛠️ Ferramentas e Comandos,
+     ⚙️ Configuração, 💡 Aprendizados Chave
+   - Feature: header com `Última atualização` / `Repositórios envolvidos` /
+     `Cards de origem`; categorias 🔀 Fluxo Ponta a Ponta, 🤝 Contratos entre
+     Serviços, 📐 Regras de Negócio, ⚠️ Edge Cases — nunca as 5 de projeto
+   - Item sempre com `**Decisão:**` ou `**Rationale:**` para o "por quê"
+   - Origem listada uma vez no header, não repetida por item
 
-   > Última atualização: YYYY-MM-DD
-   > Cards processados: N
-   > Origem: [card1, card2, ...]
-
-   ---
-
-   ## 🏗️ Arquitetura
-
-   ### Nome do Subsistema
-   Descrição concisa do subsistema (1-2 linhas)
-   - Detalhe técnico 1
-   - Detalhe técnico 2
-   - Exemplo inline quando relevante: `código ou comando`
-
-   **Decisão:** Explique por quê essa arquitetura foi escolhida e qual problema resolve.
-
-   ### Outro Subsistema
-   ...
-
-   ---
-
-   ## 📋 Padrões e Convenções
-
-   ### Nome do Padrão
-   Como fazer as coisas consistentemente
-   - Regra 1
-   - Regra 2
-
-   **Rationale:** Por que seguimos este padrão.
-
-   ---
-
-   ## 🛠️ Ferramentas e Comandos
-
-   ### /nome-do-comando
-   O que o comando faz (1 linha)
-   - Parâmetro 1: descrição
-   - Parâmetro 2: descrição
-   - Comportamento importante
-
-   ### Biblioteca ou Script
-   Para que serve
-   - Como usar
-   - Configuração necessária
-
-   ---
-
-   ## ⚙️ Configuração
-
-   ### Variáveis de Ambiente
-   - `VAR_NAME`: descrição e exemplo de valor
-
-   ### Setup
-   Passos necessários para configurar o ambiente
-
-   ---
-
-   ## 💡 Aprendizados Chave
-
-   - Insight importante sobre trade-off ou decisão
-   - Problema comum e como evitar
-   - Edge case valioso de se conhecer
-   ```
-
-   **REGRAS DE FORMATAÇÃO:**
-
-   1. **Origem no topo:** Liste todos os cards processados uma vez no header, não repita em cada item
-      ```markdown
-      > Origem: [card1, card2, card3]
-      ```
-
-   2. **Destacar decisões:** Use sempre `**Decisão:**` ou `**Rationale:**` para explicar "por quê"
-      ```markdown
-      **Decisão:** Usar sistema de arquivos em vez de DB para evitar dependências externas.
-      ```
-
-   3. **Hierarquia clara:** Categoria → Subsistema → Detalhes → Decisão
-      ```markdown
-      ## 🏗️ Arquitetura
-        ### Board Kanban em Obsidian
-          - Pastas como estados
-          - Cards como arquivos
-          **Decisão:** Simplicidade e portabilidade
-      ```
-
-   4. **Compactar informação:** Agrupar items relacionados, evitar repetição
-      ❌ Evitar:
-      ```markdown
-      - Sistema usa git
-      - Git permite rastreamento
-      - Branch criada no git
-      ```
-      ✅ Fazer:
-      ```markdown
-      Sistema integrado com Git para rastreamento:
-      - Branch automática por card
-      - Metadados referenciam commit/branch
-      ```
-
-   5. **Emojis para navegação:** Use os emojis definidos para cada categoria (🏗️📋🛠️⚙️💡)
-
-   **FORMATO DO ARQUIVO DE FEATURE - Estrutura obrigatória:**
-
-   ```markdown
-   # Feature - {slug-da-feature}
-
-   > Última atualização: YYYY-MM-DD
-   > Repositórios envolvidos: [repo1, repo2, ...]
-   > Cards de origem: [card1, card2, ...]
-
-   ---
-
-   ## 🔀 Fluxo Ponta a Ponta
-
-   ### Nome do Fluxo
-   Sequência completa atravessando serviços/repositórios
-   - Etapa 1 (em {repo}): o que acontece
-   - Etapa 2 (em {repo}): o que acontece
-   - Exemplo inline quando relevante: `código ou comando`
-
-   **Decisão:** Por que o fluxo é assim e qual problema resolve.
-
-   ---
-
-   ## 🤝 Contratos entre Serviços
-
-   ### Nome do Contrato
-   O que cada lado envia/consome
-   - {serviço A} envia: campos, formato
-   - {serviço B} consome: campos, formato
-   - Exemplo de payload quando relevante
-
-   ---
-
-   ## 📐 Regras de Negócio
-
-   ### Nome da Regra
-   Regra ou validação específica da feature
-   - Comportamento esperado em cada cenário
-
-   **Rationale:** Por que a regra existe.
-
-   ---
-
-   ## ⚠️ Edge Cases
-
-   - Caso limite, intermitência ou comportamento inesperado
-   - Problema conhecido e como foi resolvido
-   ```
-
-   **REGRAS DE FORMATAÇÃO DO ARQUIVO DE FEATURE:**
-   1. **Cabeçalho com repositórios e cards de origem:** liste os repositórios
-      envolvidos e os cards de origem uma vez no topo, não repita em cada item
-   2. **Categorias próprias de feature:** use 🔀🤝📐⚠️ (fluxo, contratos, regras,
-      edge cases) — NÃO reaproveite as 5 categorias de projeto
-   3. **Destaque decisões:** use `**Decisão:**` ou `**Rationale:**` para o "por quê"
-   4. **Compactar:** agrupe itens relacionados, evite verbosidade
-   5. **Deduplicação por eixo:** ao consolidar múltiplos cards da mesma feature,
-      deduplique dentro do arquivo de feature (mesma regra do eixo de projeto)
+   **Fronteira entre os eixos** (também em `condensed memory/README.md`):
+   conhecimento que vale em qualquer repositório é operacional e vai para
+   `operational memory/`, não para o §💡 Aprendizados Chave.
 
 8. **Evitar duplicação:**
    - Antes de adicionar conhecimento, verificar se já existe em cada eixo

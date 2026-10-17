@@ -65,9 +65,7 @@ existe, então só encontra a entrada se o gatilho for algo que ela reconhece.
 `verificado` não exige reprodução N vezes nem aprovação humana: exige o par
 observado (passos 2 e 4). O que não passa por esse par não é verificado.
 
-## Exemplos
-
-### ✅ Entrada bem formada — `verificado`
+## Exemplo
 
 ```markdown
 ### git-mv-com-whitelist-de-gitignore
@@ -83,49 +81,19 @@ observado (passos 2 e 4). O que não passa por esse par não é verificado.
 **Origem:** `condensed memory (pré-migração)`
 ```
 
-Por que funciona: `Situação` é o gatilho que a IA reconhece **antes** de digitar o
-comando; `Padrão` é literalmente o que ela faria sozinha; `Evidência` prova o
-passo 4; `Escopo` impede que o aprendizado vaze para onde não vale.
+Cada campo tem função: `Situação` é o gatilho que a IA reconhece **antes** de
+digitar o comando; `Padrão` é o que ela faria sozinha; `Evidência` prova o passo
+4; `Escopo` impede que o aprendizado vaze para onde não vale.
 
-### ✅ Entrada legítima — `fato`, correção ainda não verificada
+Nos outros níveis, só estes campos mudam:
 
-```markdown
-### skills-do-vscode-copilot-vem-de-copilot-skills
+| Nível | `Confiança` | `Alternativa` e `Evidência` |
+|---|---|---|
+| `fato` | `fato — observação direta; correção não verificada` | alternativa ainda não rodou; evidência do que se observou |
+| `preferência` | `preferência` | `Falhou porque: não falhou — só mais verboso`; `Evidência: nenhuma comparável` |
 
-**Situação:** alterar um comando em `commands/` e esperar que a mudança valha na sessão do VS Code Copilot.
-**Padrão:** rodar `sync-commands.ps1` e assumir que a skill foi atualizada.
-**Falhou porque:** o sync escreve em `~/.agent_obsidian/skills/`, mas o Copilot carrega de
-`~/.copilot/skills/` quando `chat.agentSkillsLocations` não está configurado.
-**Alternativa:** configurar `"chat.agentSkillsLocations": ["${userHome}/.agent_obsidian/skills"]`.
-**Evidência:** `chat.agentSkillsLocations` ausente em `settings.json`; `start-card/SKILL.md`
-com 26/09 em `.copilot` contra 11/10 em `.agent_obsidian`.
-**Confiança:** fato — a observação é direta; a eficácia da correção não foi verificada.
-**Escopo:** VS Code Copilot com skills locais. Não se aplica a Claude Code nem Gemini CLI.
-**Validado em:** 2026-10-17 · VS Code 1.x · Windows
-**Origem:** [[memoria operacional da IA]]
-```
-
-`fato` é o nível honesto para "observei isto"; a correção proposta não pode ser
-promovida a `verificado` a partir dela, só depois que a alternativa de fato rodar.
-
-### ✅ Entrada legítima — `preferência`
-
-```markdown
-### listar-arquivos-do-board-por-profundidade
-
-**Situação:** precisar da árvore de `board/` para decidir onde um card deveria estar.
-**Padrão:** `Get-ChildItem -Recurse board`.
-**Falhou porque:** não falhou — a saída é correta, só mais verbosa que o necessário.
-**Alternativa:** `Get-ChildItem board -Directory -Recurse | Select-Object FullName`.
-**Evidência:** nenhuma comparável; critério subjetivo de legibilidade.
-**Confiança:** preferência
-**Escopo:** Windows/PowerShell. Em bash, `find board -type d` já é o padrão.
-**Validado em:** 2026-10-17 · PowerShell 5.1
-**Origem:** [[memoria operacional da IA]]
-```
-
-`preferência` é honesta sobre não ter baseline. A IA **consulta**, não aplica
-sozinha — e nunca promove isso a `verificado`.
+`fato` é o nível honesto para "observei isto" e não sobe para `verificado` sem o
+par rodar. `preferência` a IA **consulta**, não aplica sozinha.
 
 ### ❌ O que não vira entrada
 
@@ -135,7 +103,7 @@ sozinha — e nunca promove isso a `verificado`.
 | "Timeout ao chamar a API externa." | falha transitória isolada | Discussões do card |
 | "Use `--legacy-peer-deps`." | sem mecanismo nem escopo | inválida até ter `Falhou porque` |
 | "Funciona melhor com `pnpm`." | sem baseline comparável | no máximo `preferência` |
-| "Rodei `curl -H 'Authorization: Bearer eyJ...'`." | **segredo** | nunca — registrar só a forma do erro |
+| Header `Authorization` real colado como evidência | **segredo** | nunca — registrar só a forma do erro |
 | "Na minha máquina o projeto fica em `C:\Users\...`." | detalhe local, sem valor reutilizável | nada |
 
 ## Áreas
@@ -182,9 +150,3 @@ Nunca registrar, nem como exemplo, nem "mascarado":
 Registre o **mecanismo e a forma do erro**, não a saída bruta. Exemplo: `exit 128
 com "pathspec ... did not match"`, não o comando colado com token na query string.
 
-## O que não vira entrada
-
-- resultado que o próprio fluxo já verifica (teste verde, lint limpo)
-- preferência estética sem baseline → no máximo `preferência`, nunca `verificado`
-- falha transitória isolada (timeout de rede, instabilidade de CI)
-- detalhe local sem valor reutilizável (nome de pasta da máquina, atalho pessoal)
