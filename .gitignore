@@ -15,6 +15,17 @@
 !guidelines/
 !guidelines/**
 
+# Especificação da condensed memory: só o contrato é versionado. O conteúdo de
+# projects/, features/ e operational/ é local, como os cards — cada máquina
+# constrói o seu. As pastas existem no clone via .gitkeep (nenhum arquivo de
+# conteúdo é versionado lá, então o .gitkeep é o único motivo para existirem).
+!condensed memory/
+!condensed memory/README.md
+!condensed memory/projects/
+!condensed memory/features/
+!condensed memory/operational/
+!condensed memory/**/.gitkeep
+
 # Definições dos slash commands (incluindo commands/lib/)
 !commands/
 !commands/**

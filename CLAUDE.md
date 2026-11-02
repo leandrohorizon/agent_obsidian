@@ -12,9 +12,11 @@ This system uses a **distributed state architecture** with centralized knowledge
 ~/workspace/
 ├── obsidian/user/              # Centralized vault (this repo)
 │   ├── board/                    # Kanban board (all projects)
-│   ├── condensed memory/         # Knowledge bases in two axes
-│   │   ├── projects/             # Per-repository memory
-│   │   └── features/             # Per-feature memory (crosses repos)
+│   ├── condensed memory/         # Knowledge bases in three axes
+│   │   ├── README.md             # Format spec (versioned)
+│   │   ├── projects/             # Per-repository memory (.gitkeep)
+│   │   ├── features/             # Per-feature memory (.gitkeep)
+│   │   └── operational/          # Execution memory (.gitkeep)
 │   ├── commands/                 # Slash command definitions
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
@@ -165,6 +167,10 @@ condensed memory/
 A card declares its feature in the frontmatter (`feature: feature-x`) and `/condense-memory` **routes** each extracted piece of knowledge to the correct axis, instead of dumping everything into one file. This solves the case where a feature (e.g. feature-x) spans three repositories — the full-flow knowledge lives in a single feature file, accessible from any project.
 
 **Format of the project memory file:**
+
+> Canonical spec: `condensed memory/README.md`. It defines headers, categories,
+> formatting rules and the border between the three memories. This block is a
+> summary; on divergence, the spec wins.
 ```markdown
 # Condensed Memory - {project_name}
 
@@ -382,10 +388,16 @@ Executes tasks in a card with full context.
 3. `condensed memory/projects/{project}.md` - project memory (architecture, conventions, tools)
 4. `condensed memory/features/{feature}.md` - feature memory (if card has `feature:` frontmatter)
 5. Dependent cards referenced as `[[card-name]]`
+6. `condensed memory/operational/*.md` - execution memory (loaded only by this
+   command): entries with `Confiança: verificado` or `fato` are applied;
+   `preferência` is consulted only.
 
 **Actions:**
 - Identifies pending tasks (`- [ ]`)
 - Executes tasks following the guidelines
+- **Operational fallback:** when the standard approach fails and an alternative
+  works, records the entry in `condensed memory/operational/{area}.md` (fields per
+  `condensed memory/README.md`), respecting the ~40-line ceiling per file
 - Marks tasks complete (`- [x]`)
 - Documents decisions in "Discussões" section
 - Updates "Descrição Técnica" and "Conhecimento Adquirido"
@@ -929,14 +941,20 @@ If you're unsure which card you were working on:
 │   ├── load-context.md
 │   ├── orchestrate-cards.md
 │   └── condense-memory.md
-├── condensed memory/         # Knowledge bases in two axes
+├── condensed memory/         # Knowledge bases in three axes
+│   ├── README.md             # Format spec for the three axes (versioned)
 │   ├── projects/             # Per-repository memory (stable, transversal)
+│   │   ├── .gitkeep
 │   │   ├── agent_obsidian.md
 │   │   ├── {project1}.md
 │   │   └── {project2}.md
-│   └── features/             # Per-feature memory (crosses repositories)
-│       ├── feature-x.md
-│       └── feature-y.md
+│   ├── features/             # Per-feature memory (crosses repositories)
+│   │   ├── .gitkeep
+│   │   ├── feature-x.md
+│   │   └── feature-y.md
+│   └── operational/          # Execution memory — loaded only by /work-on-card
+│       ├── .gitkeep
+│       └── {area}.md         # Local, not versioned — git, github, shell, vscode
 ├── templates/
 │   └── card template.md      # Template for new cards
 ├── guidelines/               # Agent directives (all files loaded)
@@ -956,7 +974,7 @@ If you're unsure which card you were working on:
 - Uses Obsidian as a Kanban board (folders = states)
 - Integrates with Claude Code via custom slash commands
 - Tracks state per project via `.agent_obsidian` files
-- Consolidates knowledge per project and per feature via condensed memory (two-axis model)
+- Consolidates knowledge via condensed memory (three axes: project, feature, operational)
 - Automates git workflow (branches, commits, PRs)
 - Builds long-term memory through completed cards
 - Enables AI to work on tasks with full context and standards
