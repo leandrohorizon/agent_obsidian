@@ -37,16 +37,11 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      consolidado
 
 5. **Carregar cards dependentes e dependentes deste:**
-   - Na seção "### Dependências", procurar por links `[[nome-do-card]]`
-   - Para cada card referenciado:
-     - Ler o card dependente
-     - Resumir informações relevantes (Descrição, Conhecimento Adquirido)
-     - Se o card dependente já foi lido nesta sessão e está em `4.done/` ou `5.archived/`, **não reler** (são estáveis)
-   - Se não houver dependências, pular este passo
-   - **Na seção "### Dependentes"**, procurar por links `[[nome-do-card]]` — são os
-     cards que dependem deste. Para cada um, ler e resumir o que ele consome deste
-     card. Serve para mostrar o impacto de alterar este card.
-   - Se a seção "### Dependentes" não existir no card, pular sem erro
+   - Onde ler e como tratar cada forma: `guidelines/IA best practices.md` §8
+   - Para cada card dependência: ler o card e resumir
+   - Para cada card dependente: ler e resumir o que ele consome deste card
+   - Se o card já foi lido nesta sessão e está em `4.done/` ou `5.archived/`, **não reler** (são estáveis)
+   - Se não houver nenhuma das duas formas, pular este passo
 
 6. **Verificar contexto do repositório:**
    - Executar `git branch --show-current` para verificar branch

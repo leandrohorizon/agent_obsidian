@@ -341,8 +341,19 @@ Os comandos `/start-card`, `/work-on-card` e `/review-card` precisam ser executa
 1. **Use tab completion**: Os nomes dos cards podem ter espaços, use aspas
 2. **Commits incrementais**: `/work-on-card` pode fazer commits automáticos
 3. **Contexto automático**: Todos os comandos carregam todos os arquivos de `guidelines/` e o condensed memory
-4. **Dependências**: Use `[[nome-do-card]]` para referenciar cards relacionados
+4. **Dependências**: Use as propriedades `depends_on` e `dependents` com `[[nome-do-card]]` para referenciar cards relacionados (`guidelines/IA best practices.md` §8)
 5. **Documentação**: Sempre preencha "Conhecimento Adquirido pela IA" para melhorar o condensed memory
+
+## Dashboard (opcional)
+
+O fluxo funciona inteiro por comandos. Se quiser uma visão do board dentro do
+Obsidian — Kanban por pasta, lista com filtros e painel do `current_card` de cada
+projeto — existe um plugin à parte, em repositório próprio:
+[dashboard-agent-obsidian](https://github.com/leandrohorizon/dashboard-agent-obsidian).
+
+Instalação, configuração e desenvolvimento estão no README de lá. Este vault não
+versiona o plugin; `.obsidian/plugins/dashboard-agent-obsidian/` guarda só o
+artefato instalado, local como qualquer outro plugin do Obsidian.
 
 ## Próximos Passos
 

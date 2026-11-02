@@ -201,14 +201,14 @@ branch: feature/card-name
 status: In Progress
 feature: feature-x
 started: 2026-01-15
+depends_on:
+  - "[[outro-card]]"
+dependents:
+  - "[[card-que-depende-deste]]"
 ---
 
 ## Descrição
 O que precisa ser feito e por quê
-
-## Dependências
-- [[outro-card]] - o que ele fornece
-- APIs externas, bibliotecas
 
 ## Tarefas
 - [ ] Tarefa específica 1
@@ -226,6 +226,11 @@ Detalhes da implementação
 Regras de negócio, padrões, gotchas
 (Isso alimenta a condensed memory)
 ```
+
+Dependências ficam no frontmatter (`depends_on` e `dependents`), não em seção:
+o Obsidian as trata como links nativos e o plugin consegue lê-las sem parsear
+markdown. Cards criados antes dessa convenção usam as seções `### Dependências` /
+`### Dependentes` e continuam funcionando por fallback.
 
 ## Formato da Condensed Memory
 
@@ -360,12 +365,29 @@ Use `/refine-card` em cards vagos para:
 - Validar integração com sistemas existentes
 - Executar múltiplas vezes para análise mais profunda
 
+### Dashboard do Board (opcional)
+
+O fluxo funciona inteiro por comandos — o dashboard é conveniência, não
+dependência. Quem quiser ver o board dentro do Obsidian tem um plugin à parte,
+em repositório próprio: **[dashboard-agent-obsidian](https://github.com/leandrohorizon/dashboard-agent-obsidian)**.
+
+- Kanban cujas colunas são as pastas de estado, e lista com filtros por projeto,
+  feature, texto e data de modificação
+- Painel do `current_card` de cada projeto, lido do `.agent_obsidian` fora do vault
+- Ações que apenas **copiam** o comando do fluxo — o plugin não executa nada
+- Não move card entre pastas: quem muda estado são `/start-card`, `/review-card` e `/complete-card`
+
+Instalação, configuração e desenvolvimento estão no README do repositório do
+plugin. Este vault não versiona o plugin; `.obsidian/plugins/` guarda só o
+artefato instalado, local como qualquer outro plugin do Obsidian.
+
 ## Documentação
 
 - **[SETUP.md](SETUP.md)** - Instalação e configuração detalhada
 - **[CLAUDE.md](CLAUDE.md)** - Arquitetura completa e referência de comandos
 - **[guidelines/](guidelines/)** - Diretrizes do agente (todos os arquivos são carregados)
 - **[templates/](templates/)** - Template de card
+- **[Dashboard do board](https://github.com/leandrohorizon/dashboard-agent-obsidian)** - Plugin de Obsidian, em repositório próprio
 
 ## Estrutura do Projeto
 

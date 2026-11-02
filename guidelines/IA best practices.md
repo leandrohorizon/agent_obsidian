@@ -54,9 +54,9 @@ Card é artefato de execução e cresce durante a vida dele: `### Discussões` e
 
 | Seção | Visão padrão |
 |---|---|
-| Frontmatter YAML | incluir |
+| Frontmatter YAML | incluir — inclui `depends_on` e `dependents` (§8) |
 | `### Descrição` | incluir |
-| `### Dependências` / `### Dependentes` | incluir |
+| `### Dependências` / `### Dependentes` (cards antigos) | incluir — ver §8 |
 | `### Tarefas` — pendentes (`- [ ]`) | incluir |
 | `### Tarefas` — concluídas (`- [x]`) | omitir por padrão; leitura opcional sob demanda |
 | `### Discussões` | omitir por padrão; leitura opcional sob demanda |
@@ -68,7 +68,7 @@ O `pr_url` do frontmatter é a fonte única do PR — cards antigos podem ter um
 **Procedimento:**
 
 1. Mapear os headings com `grep -n '^#{2,3} '` — barato e suficiente para achar as faixas.
-2. Ler frontmatter, `### Descrição` e `### Dependências`/`### Dependentes`.
+2. Ler frontmatter, `### Descrição` e, para dependências, seguir o §8.
 3. Ler `### Tarefas` e filtrar os pendentes **dentro da faixa**, não no arquivo todo.
 4. Ler `### Descrição Técnica do que Foi Feito` e `### Conhecimento Adquirido pela IA`.
 
@@ -100,3 +100,31 @@ O `pr_url` do frontmatter é a fonte única do PR — cards antigos podem ter um
   ser **escrito** e o que ele prova, migração, rollback, documentação cujo conteúdo muda.
 - Tarefa cujo efeito é verificar o que o fluxo já verifica é removida, não mantida.
 - Vale ao criar card, ao refinar card e ao ajustar as tarefas de um card em andamento.
+
+## 8. Dependências do card — onde ler
+
+Dependências e dependentes vivem no **frontmatter**, não em seção:
+
+```yaml
+depends_on:
+  - "[[card-do-qual-depende]]"
+dependents:
+  - "[[card-que-depende-deste]]"
+```
+
+**Ordem de leitura:** `depends_on` e `dependents` primeiro. Se a propriedade não
+existir ou estiver vazia, cair nas seções `### Dependências` / `### Dependentes` —
+cards criados antes dessa convenção usam a seção e continuam válidos.
+
+**Valores aceitos:** wikilink entre aspas (`"[[card]]"`), nome simples, lista YAML
+ou separação por vírgula. Wikilink com alias (`[[a|b]]`) vale pelo alvo (`a`).
+
+**Sem migração:** card antigo não é reescrito para adotar a propriedade. As duas
+formas convivem; o fallback é o que sustenta isso.
+
+**Ausência não é erro:** card sem dependência declarada é o caso comum — não
+avisar e não criar propriedade vazia.
+
+**Ruído a ignorar:** dentro das seções antigas, o blockquote do template (`>`) e
+a prosa ("— o que ele fornece", "dependências externas") não são dependência de
+card. Só `[[link]]` que resolve para card do board conta.

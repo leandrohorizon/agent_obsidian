@@ -8,6 +8,8 @@ created:
 started:
 reviewed:
 completed:
+depends_on:
+dependents:
 ---
 
 ### Descrição
@@ -17,23 +19,7 @@ completed:
 
 
 ---
-### Dependências
 
-> Documente sistemas, serviços, bibliotecas, APIs, tarefas ou outros cards dos quais esta implementação depende para funcionar corretamente. Use `[[nome-do-card]]` para linkar cards do board.
-
-- [[card-do-qual-depende]] — o que ele fornece
-
-
-
----
-### Dependentes
-
-> Liste os cards que dependem deste. Use `[[nome-do-card]]`. O Obsidian resolve o backlink automaticamente; esta seção existe para que quem trabalha neste card veja o impacto de mudá-lo.
-- [[card-que-depende-deste]] — o que ele consome
-
-
-
----
 ### Tarefas
 
 > Coloque todos os TODOs aqui. Serve como um lembrete do que precisa ser desenvolvido, validado ou revisado.

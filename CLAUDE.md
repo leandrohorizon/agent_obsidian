@@ -110,18 +110,20 @@ pr_status: Merged
 
 ### Card Structure
 
-Every card follows this template:
+Every card follows this template. Dependencies are frontmatter properties
+(`depends_on` / `dependents`), not sections; the sections below them are legacy
+and still readable:
 
 ```markdown
+---
+depends_on:
+  - "[[other-card-name]]"
+dependents:
+  - "[[card-that-depends-on-this]]"
+---
+
 ## Descrição
 Brief description of what needs to be done and why
-
-## Dependências
-- [[other-card-name]] - what it provides
-- External dependencies (APIs, services, libraries)
-
-## Dependentes
-- [[card-that-depends-on-this]] - what it consumes from this card
 
 ## Tarefas
 - [ ] Specific actionable task 1
@@ -840,17 +842,26 @@ Switch between projects by just `cd`-ing - commands adapt automatically.
 
 ### Handling Dependencies Between Cards
 
-Reference cards in the "Dependências" section, and declare who depends on this card in the "Dependentes" section:
-```markdown
-## Dependências
-- [[authentication-card]] - Provides user auth system
-- [[database-migration-card]] - Creates required tables
+Declare the two directions in the card's frontmatter: `depends_on` for what this
+card needs, `dependents` for who needs this card.
 
-## Dependentes
-- [[checkout-card]] - Consumes the auth token format defined here
+```yaml
+depends_on:
+  - "[[authentication-card]]"
+  - "[[database-migration-card]]"
+dependents:
+  - "[[checkout-card]]"
 ```
 
-Both sections use plain Obsidian wiki-links (`[[card-name]]`). Obsidian resolves the backlink automatically, so the "Dependentes" section exists to make the reverse direction explicit: whoever works on this card sees who will be affected before changing a contract or decision.
+Both are plain Obsidian wiki-links, so the properties panel renders them as
+clickable links and the backlink panel still works. `dependents` exists to make
+the reverse direction explicit: whoever works on this card sees who will be
+affected before changing a contract or decision.
+
+Cards created before this convention used the `### Dependências` and
+`### Dependentes` sections instead. Every reader — the commands and the
+dashboard plugin — checks the property first and falls back to the section, so
+both forms keep working.
 
 `/work-on-card`, `/load-context` and `/refine-card` automatically load both the cards this card depends on and the cards that depend on it. `/orchestrate-cards` uses the same information to order parallel execution.
 
