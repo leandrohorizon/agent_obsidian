@@ -33,16 +33,14 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
       do card"). Aplicar as guidelines ao escrever código.
 
    b) **Cards dependentes e dependentes deste:**
-      - Procurar por links `[[card-name]]` na seção "Dependências" do card
-      - Ler cada card referenciado para entender contexto
-      - Se o card dependente já foi lido nesta sessão e está em `4.done/` ou `5.archived/`, **não reler** (são estáveis)
-      - Procurar por links `[[card-name]]` na seção "Dependentes" — são os cards que
-        dependem deste. Ler cada um para saber o que ele consome deste card, e
-        considerar esse impacto antes de alterar contratos, decisões ou tarefas
-      - Se a seção "Dependentes" não existir, pular sem erro
+     - Onde ler e como tratar cada forma: `guidelines/IA best practices.md` §8
+     - Ler cada card referenciado; se já foi lido nesta sessão e está em
+       `4.done/` ou `5.archived/`, **não reler** (são estáveis)
+     - Considerar o impacto nos dependentes antes de alterar contratos, decisões
+       ou tarefas
 
    d) **Template do card:**
-      - Entender a estrutura esperada do card (Descrição, Dependências, Dependentes, Tarefas, Discussões, Descrição Técnica, Conhecimento Adquirido)
+     - Entender a estrutura esperada do card (Descrição, Tarefas, Discussões, Descrição Técnica, Conhecimento Adquirido)
 
    e) **Memória operacional:** é o **único** comando que a carrega.
       - Path: `{vault_path}/condensed memory/operational/`, derivado do

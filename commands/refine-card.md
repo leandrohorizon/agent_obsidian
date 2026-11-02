@@ -48,12 +48,10 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
         consolidado
 
    c) **Carregar cards dependentes e dependentes deste:**
-      - Na seção "### Dependências", procurar por links `[[nome-do-card]]`
-      - Para cada card referenciado, ler e resumir
-      - Na seção "### Dependentes", procurar por links `[[nome-do-card]]` — são os
-        cards que dependem deste. Ler e resumir o que cada um consome deste card,
+      - Onde ler e como tratar cada forma: `guidelines/IA best practices.md` §8
+      - Para cada card dependência, ler e resumir
+      - Para cada card dependente, ler e resumir o que ele consome deste card,
         para que o refinamento considere o impacto sobre eles
-      - Se a seção "### Dependentes" não existir, pular sem erro
 
    d) **Analisar código relacionado no projeto atual:**
       - Se o card menciona arquivos, classes, funções ou componentes específicos, **LER O CÓDIGO REAL**
