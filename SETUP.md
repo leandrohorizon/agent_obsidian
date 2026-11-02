@@ -1,6 +1,6 @@
-# Setup - Integração Obsidian + Claude Code
+# Setup - Integração Obsidian + Claude Code e VS Code Copilot
 
-Este documento explica como configurar a integração entre seu vault Obsidian e Claude Code para gerenciar tarefas através de slash commands globais.
+Este documento explica como configurar a integração entre seu vault Obsidian, Claude Code e VS Code Copilot para gerenciar tarefas.
 
 ## Pré-requisitos
 
@@ -70,23 +70,22 @@ Se estiver configurado corretamente, você verá o status do seu board Obsidian.
 
 ### 4. VS Code Copilot (skills)
 
-O `sync-commands` grava as skills em `~/.agent_obsidian/skills/`. O VS Code
-Copilot só as encontra se essa pasta estiver declarada — sem a configuração, ele
-cai no padrão `~/.copilot/skills/`, que **não** é atualizado pelo sync e fica
-desatualizado em silêncio.
+O VS Code Copilot descobre skills pessoais automaticamente em
+`~/.copilot/skills/`. Para sincronizar apenas para o Copilot, execute na raiz
+deste repositório:
 
-Em `settings.json` do usuário (`Ctrl+Shift+P` → *Preferences: Open User Settings
-(JSON)*):
-
-```json
-"chat.agentSkillsLocations": [
-  "${userHome}/.agent_obsidian/skills"
-]
+```powershell
+.\sync-commands.ps1 vscode
 ```
 
-Depois de configurar, **remova** `~/.copilot/skills/` para não manter duas
-cópias divergentes. Recarregue a janela do VS Code e confirme que as skills do
-Agent Obsidian aparecem na lista.
+No macOS/Linux, use `./sync-commands.sh vscode`. As skills aparecerão no
+Agent Customizations (`Ctrl+Shift+P` → **Chat: Open Customizations** → **Skills**)
+e no menu `/` de uma nova conversa do Copilot.
+
+Se você configurou anteriormente `chat.agentSkillsLocations` apontando para
+`~/.agent_obsidian/skills`, remova essa entrada das configurações do VS Code:
+o Copilot usa os caminhos nativos de skills e não carrega esse local
+personalizado. Depois da sincronização, recarregue a janela do VS Code.
 
 ## Comandos Disponíveis
 
