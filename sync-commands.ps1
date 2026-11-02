@@ -1,9 +1,9 @@
 # sync-commands.ps1 - Sincroniza comandos do board Kanban para Claude Code e Gemini CLI
-# Uso: .\sync-commands.ps1 [claude|gemini|all]
+# Uso: .\sync-commands.ps1 [claude|gemini|vscode|all]
 
 param (
     [Parameter(Position = 0)]
-    [ValidateSet("claude", "gemini", "all", "help")]
+    [ValidateSet("claude", "gemini", "vscode", "all", "help")]
     [string]$TargetAI = "all"
 )
 
@@ -12,7 +12,8 @@ $SourceDir = Join-Path $PSScriptRoot "commands"
 $HomeDir = [System.Environment]::GetFolderPath("UserProfile")
 $ClaudeTargetDir = Join-Path $HomeDir ".claude\commands"
 $GeminiTargetDir = Join-Path $HomeDir ".gemini\commands"
-$SkillsTargetDir = Join-Path $HomeDir ".agent_obsidian\skills"
+$SkillsTargetDir = Join-Path $HomeDir ".copilot\skills"
+$LegacySkillsDir = Join-Path $HomeDir ".agent_obsidian\skills"
 
 # Funcao de ajuda
 function Show-Help {
@@ -21,7 +22,8 @@ function Show-Help {
     Write-Host "Opcoes:"
     Write-Host "  claude    Sincroniza apenas comandos para o Claude Code (.md)"
     Write-Host "  gemini    Sincroniza apenas comandos para o Gemini CLI (.toml)"
-    Write-Host "  all       Sincroniza para ambas as plataformas (padrao)"
+    Write-Host "  vscode    Sincroniza apenas skills para o VS Code Copilot"
+    Write-Host "  all       Sincroniza para Claude Code, Gemini CLI e VS Code (padrao)"
     Write-Host "  help      Mostra esta mensagem de ajuda"
     Write-Host ""
 }
@@ -34,15 +36,15 @@ if ($TargetAI -eq "help") {
 Write-Host "--- Sincronizando comandos do board Kanban (Alvo: $TargetAI) ---" -ForegroundColor Yellow
 Write-Host ""
 Write-Host "Origem: $SourceDir"
-if ($TargetAI -ne "gemini") { Write-Host "Destino Claude: $ClaudeTargetDir" }
-if ($TargetAI -ne "claude") { Write-Host "Destino Gemini: $GeminiTargetDir" }
+if ($TargetAI -ne "gemini" -and $TargetAI -ne "vscode") { Write-Host "Destino Claude: $ClaudeTargetDir" }
+if ($TargetAI -ne "claude" -and $TargetAI -ne "vscode") { Write-Host "Destino Gemini: $GeminiTargetDir" }
 Write-Host ""
 
 # Criar diretorios de destino se nao existirem
-if ($TargetAI -ne "gemini") {
+if ($TargetAI -ne "gemini" -and $TargetAI -ne "vscode") {
     if (-not (Test-Path $ClaudeTargetDir)) { New-Item -ItemType Directory -Force -Path $ClaudeTargetDir | Out-Null }
 }
-if ($TargetAI -ne "claude") {
+if ($TargetAI -ne "claude" -and $TargetAI -ne "vscode") {
     if (-not (Test-Path $GeminiTargetDir)) { New-Item -ItemType Directory -Force -Path $GeminiTargetDir | Out-Null }
 }
 if (-not (Test-Path $SkillsTargetDir)) { New-Item -ItemType Directory -Force -Path $SkillsTargetDir | Out-Null }
@@ -112,6 +114,19 @@ function Convert-ToSkill {
     return $true  # atualizado
 }
 
+# Verifica se a skill gerada esta no formato que o VS Code descobre:
+# pasta, SKILL.md e frontmatter com `name` igual ao nome da pasta.
+# Fora desse formato o VS Code ignora a skill sem avisar.
+function Test-SkillValid {
+    param($SkillName)
+
+    $skillFile = Join-Path (Join-Path $SkillsTargetDir $SkillName) "SKILL.md"
+    if (-not (Test-Path $skillFile)) { return $false }
+
+    $lines = Get-Content -Path $skillFile -TotalCount 3 -Encoding UTF8
+    return $lines -contains "name: $SkillName"
+}
+
 # Funcao para sincronizar a pasta lib/ (common.sh) para um destino
 function Sync-Lib {
     param($DestinationLib)
@@ -138,12 +153,13 @@ $syncedClaude = 0
 $syncedGemini = 0
 $syncedSkills = 0
 $syncedLib = 0
+$generatedSkills = @()
 
 foreach ($file in $files) {
     $baseName = $file.BaseName
 
     # --- Claude Sync (.md) ---
-    if ($TargetAI -ne "gemini") {
+    if ($TargetAI -ne "gemini" -and $TargetAI -ne "vscode") {
         $targetPath = Join-Path $ClaudeTargetDir $file.Name
         if ((Test-Path $targetPath) -and (Get-FileHash $file.FullName).Hash -eq (Get-FileHash $targetPath).Hash) {
             # inalterado
@@ -154,7 +170,7 @@ foreach ($file in $files) {
     }
 
     # --- Gemini Sync (.toml) ---
-    if ($TargetAI -ne "claude") {
+    if ($TargetAI -ne "claude" -and $TargetAI -ne "vscode") {
         $targetPath = Join-Path $GeminiTargetDir "$baseName.toml"
         if (Convert-MdToToml -InputFile $file.FullName -OutputFile $targetPath) {
             $syncedGemini++
@@ -170,28 +186,42 @@ foreach ($file in $files) {
         if (Convert-ToSkill -InputFile $file.FullName -OutputFile $skillFile -SkillName $baseName) {
             $syncedSkills++
         }
+        $generatedSkills += $baseName
     }
 
     Write-Host "  OK: $baseName" -ForegroundColor Green
 }
 
 # --- Sincronizar lib/ (common.sh) para destinos ---
-if ($TargetAI -ne "gemini") {
+if ($TargetAI -ne "gemini" -and $TargetAI -ne "vscode") {
     Sync-Lib -DestinationLib (Join-Path $ClaudeTargetDir "lib")
 }
 Sync-Lib -DestinationLib (Join-Path $SkillsTargetDir "lib")
+
+$invalidSkills = @($generatedSkills | Where-Object { -not (Test-SkillValid $_) })
 
 Write-Host ""
 Write-Host "Sincronizacao concluida!" -ForegroundColor Green
 Write-Host ""
 Write-Host "Resumo:"
-if ($TargetAI -ne "gemini") { Write-Host "  - Claude Code: $syncedClaude arquivos atualizados/copiados" }
-if ($TargetAI -ne "claude") { Write-Host "  - Gemini CLI: $syncedGemini arquivos (.toml) gerados" }
+if ($TargetAI -ne "gemini" -and $TargetAI -ne "vscode") { Write-Host "  - Claude Code: $syncedClaude arquivos atualizados/copiados" }
+if ($TargetAI -ne "claude" -and $TargetAI -ne "vscode") { Write-Host "  - Gemini CLI: $syncedGemini arquivos (.toml) gerados" }
 Write-Host "  - VS Code Skills: $syncedSkills skills (SKILL.md) geradas em $SkillsTargetDir"
 Write-Host "  - lib/ (common.sh) sincronizados: $syncedLib"
 Write-Host ""
 Write-Host "Comandos prontos!"
-if ($TargetAI -ne "gemini") { Write-Host "   Claude: Use /start-card, /work-on-card, etc." }
-if ($TargetAI -ne "claude") { Write-Host "   Gemini: Use /start-card, /work-on-card, etc. (Dica: /commands reload)" }
-Write-Host "   VS Code: Skills disponiveis em ~/.agent_obsidian/skills/"
+if ($TargetAI -ne "gemini" -and $TargetAI -ne "vscode") { Write-Host "   Claude: Use /start-card, /work-on-card, etc." }
+if ($TargetAI -ne "claude" -and $TargetAI -ne "vscode") { Write-Host "   Gemini: Use /start-card, /work-on-card, etc. (Dica: /commands reload)" }
+Write-Host "   VS Code Copilot: Skills disponiveis em ~/.copilot/skills/"
 Write-Host ""
+
+if (Test-Path $LegacySkillsDir) {
+    Write-Host "$LegacySkillsDir existe e nao e lido pelo VS Code Copilot - remova para nao manter copia divergente." -ForegroundColor Yellow
+    Write-Host ""
+}
+
+if ($invalidSkills.Count -gt 0) {
+    Write-Host "Skills fora do formato que o VS Code descobre (name diferente da pasta ou SKILL.md ausente):" -ForegroundColor Red
+    $invalidSkills | ForEach-Object { Write-Host "   - $_" -ForegroundColor Red }
+    exit 1
+}
