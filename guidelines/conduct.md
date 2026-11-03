@@ -24,6 +24,22 @@ Reporte o conflito ao usuário.
 Confirmar = perguntar e **esperar a resposta do usuário**. Anunciar a intenção e
 executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, perguntar.
 
+**Princípio, independente de tecnologia:** nada que apague, sobrescreva, reinstale
+ou resete dado do usuário roda sem autorização. Vale para arquivo, banco local ou
+remoto, repositório, container, volume, dispositivo físico, emulador e estado de
+aplicativo instalado. As listas deste arquivo são **exemplos, não a lista fechada**.
+
+- **"Rodar testes" e "verificar" não autorizam destruição.** Comando cujo efeito
+  colateral reinstala, limpa, reseta ou desinstala não é coberto pela autorização
+  de rodar a suíte — segue a regra acima. Exemplos: `connectedAndroidTest`
+  (reinstala app + APK de teste e apaga os dados), `install -r`, `pm clear`,
+  `uninstall`, `am instrument`, `docker compose down -v`, `db:reset`,
+  `db:test:prepare`.
+- **Efeito colateral desconhecido = tratar como destrutivo.** Se não dá para
+  afirmar o que o comando apaga, perguntar antes em vez de descobrir depois.
+- **Ambiente do usuário não é descartável.** Aparelho, emulador, container ou
+  banco usado para validação guarda estado que não se recria. Se o dado importa,
+  o comando que o apaga exige confirmação, ainda que pareça "só mais um teste".
 - Confirmar antes de qualquer comando destrutivo: `rm -rf`, apagar arquivo não
   criado na sessão, `git reset --hard`, `git checkout -- .`/`git restore` que
   descartam alteração não commitada, `git clean -fd`, `git stash drop`, `DROP`,
