@@ -1,7 +1,7 @@
 Você é um orquestrador que coordena subagentes para trabalhar em **todos** os cards em `1.not_started/` de uma vez, cada um em seu próprio contexto isolado.
 
 ## Tarefa
-Para cada card em `1.not_started/`, executar a sequência completa de trabalho — `/start-card` → `/work-on-card` → `/review-card` — usando um subagente dedicado por card, e abrir o PR **em draft**.
+Executar em lote somente cards de implementação em `1.not_started/`, usando um subagente dedicado por card e abrindo PRs **em draft**.
 
 ## Argumentos
 - `[filtro]`: (Opcional) Nome parcial ou lista de cards para processar. Se omitido, processa **todos** os cards em `1.not_started/`.
@@ -11,6 +11,7 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
 1. **Verificar configuração:**
    - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
    - Verificar se estamos em um repositório git
+   - Ler `guidelines/card work types.md` para selecionar somente implementações
    - Ler `.agent_obsidian` (criar/validar via `validate_agent_state()` se necessário)
    - Se `current_card` não for null, **avisar** que já existe um card ativo neste
      projeto e perguntar se o usuário quer continuar mesmo assim (o orquestrador
@@ -19,7 +20,10 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
 2. **Listar os cards alvo:**
    - Listar todos os arquivos `.md` em `$OBSIDIAN_VAULT_PATH/board/1.not_started/`
    - Se `[filtro]` foi fornecido, restringir a lista aos cards que casam com o filtro
-   - Se a lista estiver vazia, informar e encerrar
+   - Ler `work_type` de cada candidato; ausente significa `implementation`
+   - Processar apenas `implementation`; excluir `report` e `investigation` e informar quais foram ignorados
+   - Reportar tipos desconhecidos como inválidos e não processá-los
+   - Se não houver cards de implementação elegíveis, informar os ignorados e encerrar
    - **Apresentar a lista ao usuário e pedir confirmação** antes de prosseguir:
      ```
      Vou trabalhar nos seguintes cards (em paralelo, um subagente por card):
@@ -27,7 +31,7 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
      - card-b
      - card-c
 
-     Cada card seguirá: /start-card → /work-on-card → /review-card (PR em draft).
+     Cada card de implementação seguirá: /start-card → /work-on-card → /review-card (PR em draft).
      Confirma? (1. Sim  2. Não)
      ```
    - **Aguardar a resposta.** Não iniciar sem confirmação
@@ -129,6 +133,7 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
 /orchestrate-cards
 ```
 Processa todos os cards em `1.not_started/` em paralelo, cada um com PR em draft.
+Cards `report` e `investigation` são ignorados e informados no resultado; use `/work-on-card` e `/complete-card` individualmente para esses tipos.
 
 ### Trabalhar em um subconjunto
 ```

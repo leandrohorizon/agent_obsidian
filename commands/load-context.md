@@ -29,6 +29,8 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      - `$OBSIDIAN_VAULT_PATH/board/4.done/`
    - Se não encontrar, listar cards disponíveis
    - Identificar estado atual (qual pasta está)
+   - Ler `guidelines/card work types.md`
+   - Card sem `work_type` é `implementation`; valor desconhecido interrompe o carregamento com erro explícito
 
 4. **Carregar guidelines e condensed memory:**
    - Seguir `guidelines/conduct.md` ("Carregamento de `guidelines/` —
@@ -44,11 +46,12 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - Se não houver nenhuma das duas formas, pular este passo
 
 6. **Verificar contexto do repositório:**
-   - Executar `git branch --show-current` para verificar branch
-   - Executar `git status --short` para ver alterações pendentes
-   - Executar `git log -1 --oneline` para ver último commit
+   - Para `implementation`, executar `git branch --show-current`, `git status --short` e `git log -1 --oneline`
+   - Para `report` e `investigation`, não exigir Git nem usar branch/commits como contexto do card
 
 7. **Sincronizar branch e estado (`.agent_obsidian`):**
+   - Aplicável somente a `implementation`; para `report` e `investigation`, não comparar branch, perguntar sobre checkout, executar checkout/pull ou afirmar que a branch está sincronizada
+   - Atualizar `.agent_obsidian.current_card` para o card carregado, preservando todos os outros campos, também para `report` e `investigation`
    - Comparar a branch atual (`git branch --show-current`) com a branch do card
      (campo `branch:` do frontmatter)
    - **Se divergirem**, o card está ativo mas o repositório está em outra branch.
@@ -84,6 +87,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
      alterar nada — apenas reportar que está sincronizado
 
 8. **Analisar modificações da branch:**
+   - Aplicável somente a `implementation`
    - Identificar branch base (main, master, ou similar)
    - Listar commits da branch: `git log origin/{base}..HEAD --oneline`
    - Analisar arquivos modificados na branch (commitados):
@@ -101,6 +105,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
    - **IMPORTANTE:** Excluir arquivos claramente não relacionados ao card (ex: .obsidian/, outros cards, etc.)
 
 9. **Apresentar resumo do contexto:**
+   - Para `report` e `investigation`, substituir os campos Branch/Pull por `Git: não aplicável a este tipo` e omitir as seções de contexto/modificações da branch.
    ```
    📋 Contexto carregado: {nome-do-card}
 

@@ -40,6 +40,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 3. **Carregar contexto completo (usando lógica do /load-context):**
 
    a) **Ler o card pela leitura enxuta** (`guidelines/IA best practices.md` §6)
+      - Interpretar `work_type` conforme `guidelines/card work types.md`: ausente significa `implementation`; valor desconhecido deve ser reportado e interrompe o refinamento, sem substituição silenciosa
 
    b) **Carregar guidelines e condensed memory:**
       - Seguir `guidelines/conduct.md` ("Carregamento de `guidelines/` —
@@ -86,6 +87,7 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 
    b) **Tarefas:**
       - As tarefas estão específicas e acionáveis?
+      - O tipo de trabalho e seus entregáveis estão claros e coerentes com o template?
       - São tarefas genéricas como "Tarefa 1", "Tarefa 2"?
       - Cada tarefa pode ser completada independentemente?
       - Faltam tarefas importantes (testes, documentação, validações)?

@@ -1,7 +1,7 @@
 Você é um assistente que gerencia um board Kanban em Obsidian e executa tarefas de desenvolvimento.
 
 ## Tarefa
-Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidelines + condensed memory + dependências) e executando as tarefas no projeto atual.
+Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidelines + condensed memory + dependências) e executando as tarefas conforme o `work_type`.
 
 ## Argumentos
 - `<nome-do-card>`: (Opcional) Nome do card (sem extensão .md) ou caminho parcial. Se não fornecido, usa o card do `.agent_obsidian`
@@ -10,8 +10,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
 
 1. **Verificar configuração:**
    - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
-   - Verificar se estamos em um repositório git
-   - Confirmar que estamos na branch correta (mencionada no card)
+   - Ler `guidelines/card work types.md`
 
 2. **Determinar qual card trabalhar:**
    - Se `<nome-do-card>` foi fornecido como argumento, usar ele e buscar normalmente
@@ -25,6 +24,9 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (e outros diretórios se necessário)
    - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
    - **Sempre ler o card aqui**, mesmo que `/start-card` tenha acabado de rodar — este é o comando que trabalha no card, e o card pode ter mudado desde o início
+   - Card sem `work_type` é `implementation`; valor desconhecido interrompe o trabalho explicitamente
+   - Para `implementation`, verificar que está em repositório Git e confirmar a branch do card
+   - Para `report` e `investigation`, não exigir Git, trocar branch ou fazer pull
 
 4. **Carregar contexto completo:**
 
@@ -117,9 +119,12 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    - Para cada tarefa pendente:
      - Explicar o que vai fazer
      - Executar a tarefa (ler código, fazer alterações, rodar testes, etc.)
+     - `report`: não alterar código do projeto; produzir o documento solicitado em `docs/{projeto}/reports/` dentro do vault e registrar o caminho no card
+     - `investigation`: tratar o código do projeto como somente leitura; registrar evidências, conclusões, incertezas e referências no card; documento opcional em `docs/{projeto}/investigations/` dentro do vault
+     - Se uma investigação identificar trabalho de implementação, criar um card relacionado com `work_type: implementation`; não converter este card nem alterar código
      - Marcar checkbox como completo `- [x]` no card
      - Atualizar seção "Discussões" com decisões tomadas
-     - Fazer commits git incrementais se apropriado
+     - Fazer commits git incrementais somente para `implementation`
 
 7. **Documentar o trabalho no card:**
    - Atualizar seção "### Descrição Técnica do que Foi Feito"
@@ -135,6 +140,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    - Escrever ou atualizar testes quando necessário
 
 9. **Testes e lint - escopo conforme o tamanho do projeto:**
+   - Aplicável somente a `implementation`; para `report` e `investigation`, não executar testes/lint nem modificar código do projeto
    - Obter a lista de arquivos alterados: `git status --porcelain` e `git diff --name-only`
    - **Avaliar o tamanho da suíte** antes de decidir o escopo (ex: `ls **/*_spec.rb | wc -l`, `find . -name "*.test.*" | wc -l`)
      - **Suíte pequena/rápida** (poucas dezenas de arquivos ou roda em segundos): rodar tudo, é mais seguro e pega quebras em consumidores do código alterado

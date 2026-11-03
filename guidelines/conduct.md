@@ -98,20 +98,27 @@ quando parece incompleta, temporária ou fora do padrão.
 
 ## Condensed memory
 
-- Só escrever na condensed memory (`condensed memory/projects/` e
-  `condensed memory/features/`) quando a tarefa estiver **concluída e mergeada**.
-- Card em `1.not_started/`, `2.in_progress/` ou `3.in_review/` **não** gera
-  escrita na memória. O gatilho é o `/complete-card`, que roda depois do merge.
-- Enquanto o card está em andamento, o conhecimento fica no próprio card
-  ("Discussões", "Descrição Técnica", "Conhecimento Adquirido"). A consolidação
-  é o passo final, não um registro incremental.
+- Para `implementation`, só escrever na condensed memory
+  (`condensed memory/projects/` e `condensed memory/features/`) quando a tarefa
+  estiver **concluída e mergeada**. O gatilho é `/complete-card` após o merge.
+- Para `investigation`, a exceção é explícita: somente depois de mover o card
+  para `4.done/` e receber confirmação do usuário, `/condense-memory` pode
+  escrever conhecimento reutilizável. Não há merge porque esse tipo não cria
+  branch nem PR.
+- `report` nunca gera escrita em memória.
+- Card em `1.not_started/`, `2.in_progress/` ou `3.in_review/` não gera escrita
+  em memória de projeto/feature. Enquanto o trabalho está em andamento, o
+  conhecimento fica no próprio card.
+- A consolidação é o passo final, não um registro incremental; usar no card as
+  seções "Discussões", "Descrição Técnica" e "Conhecimento Adquirido".
 - **Exceção — `condensed memory/operational/` está fora do escopo desta regra.**
   Essa pasta registra técnica de execução, não conhecimento de projeto ou de
   feature, e é escrita **durante** a tarefa pelo `/work-on-card`, no momento em
   que a abordagem padrão falha e a alternativa passa. O motivo: a evidência bruta
   do par `falhou` → `funcionou` (comando, saída, ordem) se perde se o registro
-  esperar o merge. A regra acima continua valendo integralmente para
-  `condensed memory/projects/` e `condensed memory/features/`.
+  esperar o merge. As regras acima continuam valendo integralmente para
+  `condensed memory/projects/` e `condensed memory/features/`, incluindo a
+  exceção explícita de investigação concluída e confirmada.
 
 ## Leitura de arquivos
 

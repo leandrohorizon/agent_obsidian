@@ -11,25 +11,34 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
 1. **Verificar configuração:**
    - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
    - Se não estiver, instruir: `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
-   - Verificar se estamos em um repositório git (executar `git rev-parse --git-dir`)
+   - Ler `guidelines/card work types.md` antes de escolher o fluxo
+   - Inferir `work_type` do pedido quando estiver claro; perguntar apenas se estiver ambíguo
+   - Para `implementation`, verificar se estamos em um repositório git (`git rev-parse --git-dir`)
+   - Para `report` e `investigation`, Git é opcional e não determina estado nem branch
 
 2. **Detectar estado do card baseado em git:**
 
-   a) **Verificar se existe PR:**
+   Para `implementation`:
+   - **Verificar se existe PR:**
       - Executar: `gh pr list --state all --search "head:$(git branch --show-current)" --json number,state`
       - Se encontrar PR com state="MERGED" → card vai para `4.done`
       - Se encontrar PR com state="OPEN" → card vai para `3.in_review`
 
-   b) **Verificar se existe commits na branch atual:**
+   - **Verificar se existem commits na branch atual:**
       - Obter branch atual: `git branch --show-current`
       - Verificar se não é main/master: se for, estado é `1.not_started`
       - Contar commits na branch: `git rev-list --count HEAD ^main 2>/dev/null || git rev-list --count HEAD ^master 2>/dev/null`
       - Se commits > 0 → card vai para `2.in_progress`
 
-   c) **Estado padrão:**
+   - **Estado padrão:**
       - Se não há PR e não há commits específicos da branch → `1.not_started`
       - **Exceção:** se o usuário pedir explicitamente para criar no backlog
         (card ainda não refinado ou não priorizado), usar `0.backlog`
+
+   Para `report` e `investigation`:
+   - Usar `1.not_started` por padrão ou `0.backlog` se o usuário pedir
+     explicitamente uma ideia ainda não refinada. Não consultar PR, commits nem
+     branch para esses tipos.
 
 3. **Determinar diretório de destino:**
    - `0.backlog` → `$OBSIDIAN_VAULT_PATH/board/0.backlog/`
@@ -44,17 +53,23 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
 
 5. **Coletar informações do projeto (se aplicável):**
    - URL do repositório remoto: `git remote get-url origin 2>/dev/null`
-   - Branch atual: `git branch --show-current`
+   - Para `implementation`, branch atual: `git branch --show-current`
+   - Para `report` e `investigation`, deixar `branch:` vazio
    - Data atual: `date +%Y-%m-%d`
 
 6. **Criar conteúdo do card usando template:**
-   - Ler template de: `$OBSIDIAN_VAULT_PATH/templates/card template.md`
+   - Selecionar o template pelo tipo:
+     - `implementation`: `templates/card template.md`
+     - `report`: `templates/report card template.md`
+     - `investigation`: `templates/investigation card template.md`
    - Preencher os placeholders do frontmatter com os valores coletados:
      ```yaml
      ---
      repo: {url-do-repo ou "Local (sem remote configurado)"}
-     branch: {nome-da-branch}
-     status: {Not Started|In Progress|In Review|Done}
+     branch: {nome-da-branch para implementation; vazio nos demais}
+     work_type: {implementation|report|investigation}
+     status:
+       - {Not Started|In Progress|In Review|Done}
      feature: {slug-da-feature ou vazio}
      created: {YYYY-MM-DD}
      started: {YYYY-MM-DD se in_progress}
@@ -73,6 +88,9 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
      (`guidelines/IA best practices.md` §7). Registrar em vez disso o
      comportamento a implementar, o teste a **escrever** e o que ele prova,
      migração, rollback e documentação cujo conteúdo muda.
+   - Para relatórios e investigações, documentos opcionais/obrigatórios ficam
+     no vault central em `docs/{projeto}/reports/` ou
+     `docs/{projeto}/investigations/`, conforme o template.
 
 7. **Criar o arquivo:**
    - Salvar em: `$OBSIDIAN_VAULT_PATH/board/{estado-detectado}/{nome-do-card}.md`
@@ -86,7 +104,7 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
    📂 Localização: board/{estado-detectado}/
    📊 Estado detectado: {estado} {explicação do porquê}
 
-   {se in_progress ou além:}
+   {se implementation in_progress ou além:}
    🌿 Branch: {branch-name}
    {se houver remote:}
    📦 Repo: {repo-name}
@@ -97,6 +115,7 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
    - Use /work-on-card "{nome-do-card}" para trabalhar nas tarefas
    - Preencha a seção "Descrição" com detalhes da tarefa
    ```
+   Para `report` e `investigation`, omitir linhas de branch/PR.
 
 ## Notas Importantes
 - O frontmatter YAML substitui a antiga seção "## Repositório"
@@ -105,3 +124,5 @@ Criar um novo card no board, detectando automaticamente o estado correto baseado
   `/refine-card` para amadurecer e mover para `1.not_started`
 - Se o card for detectado como `done`, ele já conterá os metadados de conclusão
 - Use gh CLI para detecção de PRs (requer `gh` instalado)
+- Para `report` e `investigation`, não inferir estado Git nem mostrar branch/PR;
+  os documentos são salvos no vault, não no repositório do projeto
