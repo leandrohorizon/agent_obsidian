@@ -1,7 +1,7 @@
 Você é um assistente que gerencia um board Kanban em Obsidian para rastrear tarefas de desenvolvimento.
 
 ## Tarefa
-Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress" e criando uma branch git no projeto atual.
+Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o fluxo Git pertinente ao tipo de trabalho.
 
 ## Argumentos
 - `<nome-do-card>`: Nome do card (sem extensão .md) ou caminho parcial
@@ -31,17 +31,21 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
 
 4. **Ler o card:**
    - Ler apenas o necessário para o resumo: frontmatter, `### Descrição` e os títulos das tarefas
+   - Ler `guidelines/card work types.md`
+   - Se `work_type` estiver ausente, tratar como `implementation`
+   - Se `work_type` tiver valor inválido, interromper sem mover o card nem alterar o Git
    - Mostrar resumo breve ao usuário
 
 5. **Detectar informações git:**
-   - Obter URL: `git remote get-url origin` (ou "Local (sem remote)")
-   - Obter branch atual: `git branch --show-current`
-   - Detectar a branch base do repositório: `main` ou `master`
+   - Para `implementation`, obter URL (`git remote get-url origin` ou "Local (sem remote)"), branch atual e branch base do repositório (`main` ou `master`)
      - Verificar qual existe: `git rev-parse --verify main` / `git rev-parse --verify master`
      - Se ambas existirem, preferir `main`
      - Se nenhuma existir, usar a branch atual como base e avisar
+   - Para `report` e `investigation`, não exigir repositório Git nem consultar branches; obter a URL do repositório somente se disponível e manter `branch:` vazio
+   - Para `experiment`, não executar nenhum comando Git e manter `repo:` e `branch:` vazios
 
 6. **Perguntar ao usuário sobre a branch base (SEMPRE, antes de criar a branch):**
+   - Aplicável somente a `implementation`
    - Se a branch atual **não** é a base (`main`/`master`), perguntar:
      ```
      Você está na branch `{branch-atual}`.
@@ -60,6 +64,7 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
      - Executar: `git checkout {base}`
 
 7. **Fazer pull da branch base (SEMPRE, sem exceção):**
+   - Aplicável somente a `implementation`
    - Executar: `git pull` na branch base
    - **Sempre rodar**, mesmo que o usuário tenha escolhido continuar na branch
      atual — a branch de trabalho precisa estar atualizada com o remoto antes de
@@ -69,13 +74,15 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
    - Se não houver remote configurado, avisar e seguir (não há o que puxar)
 
 8. **Criar branch git:**
+   - Aplicável somente a `implementation`
    - Criar nome baseado no card (lowercase, hífens)
    - Executar: `git checkout -b feature/nome-da-branch`
 
 9. **Atualizar frontmatter do card:**
    - Adicionar ou atualizar campos:
-     - `repo: {url-do-repo}`
-     - `branch: feature/nome-do-card`
+     - `repo: {url-do-repo}` para `implementation`, `report` e `investigation`; manter vazio para `experiment`
+     - `branch: feature/nome-do-card` para `implementation`; manter vazio para os demais tipos
+     - Não alterar `work_type`
      - `status: In Progress`
      - `started: {YYYY-MM-DD de hoje}`
 
@@ -97,6 +104,9 @@ Iniciar o trabalho em um card, movendo-o de "1.not_started" para "2.in_progress"
    - Escrever de volta
 
 12. **Confirmar:**
+   - Para `implementation`, informar branch base e branch criada como abaixo.
+   - Para `report` e `investigation`, omitir as linhas de branch base/branch criada; confirmar que não houve checkout, pull ou criação de branch e informar o destino esperado dos documentos (`docs/{projeto}/reports/` ou `docs/{projeto}/investigations/`).
+   - Para `experiment`, omitir dados de repositório e branch; confirmar que nenhum comando Git foi executado e que a pasta atual será usada para criar e manter a ferramenta até limpeza manual.
    ```
    ✅ Card iniciado!
 

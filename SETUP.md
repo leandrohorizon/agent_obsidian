@@ -51,6 +51,7 @@ Você deve ver:
 - `start-card.md`
 - `work-on-card.md`
 - `review-card.md`
+- `review-pr.md`
 - `complete-card.md`
 - `condense-memory.md`
 
@@ -99,7 +100,7 @@ Mostra o status atual do board com quantidade de cards em cada estágio.
 ```
 
 ### `/start-card <nome>`
-Inicia trabalho em um card, movendo de "not_started" para "in_progress" e criando branch git.
+Inicia trabalho em um card, movendo para "in_progress"; só implementação cria branch git.
 
 **Uso:**
 ```
@@ -109,11 +110,10 @@ cd ~/meu-projeto
 
 **O que faz:**
 - Move card de `1.not_started/` → `2.in_progress/`
-- Detecta repositório git atual e a branch base (`main`/`master`)
-- Pergunta se deve mudar para a branch base antes de criar a branch do card
-- Faz `git pull` da branch base (sempre)
-- Cria branch no formato `feature/nome-do-card`
-- Atualiza card com informações do repositório
+- Para implementação, detecta repositório Git, pergunta sobre a branch base, faz `git pull` e cria `feature/nome-do-card`
+- Para relatório e investigação, não troca branch, faz pull ou cria branch; mantém `branch:` vazio
+- Para experimento, não executa nenhum comando Git e mantém `repo:` e `branch:` vazios
+- Atualiza o frontmatter conforme o tipo de trabalho
 
 ### `/work-on-card <nome>`
 Trabalha nas tarefas do card, com contexto completo (guidelines + condensed memory + dependências).
@@ -124,17 +124,21 @@ Trabalha nas tarefas do card, com contexto completo (guidelines + condensed memo
 ```
 
 **O que faz:**
-- Lê o card completo
+- Lê o card pela leitura enxuta
 - Carrega **todos** os arquivos de `guidelines/` para seguir padrões e regras de comportamento
-- Carrega `condensed memory.md` com conhecimento acumulado
+- Carrega a memória de projeto e, quando aplicável, a de feature; `/work-on-card` também carrega a memória operacional
 - Lê cards dependentes mencionados em `[[links]]`
 - Executa tarefas pendentes `- [ ]`
 - Marca tarefas como completas `- [x]`
 - Documenta decisões e conhecimento no card
-- Faz commits por unidade lógica (`guidelines/commit guidelines.md`)
+- Em cards `implementation`, faz commits por unidade lógica (`guidelines/commit guidelines.md`)
+- Relatórios produzem documentos em `docs/{projeto}/reports/` no vault sem alterar código
+- Investigações tratam o código do projeto como somente leitura e podem produzir documentos em `docs/{projeto}/investigations/`
+- Experimentos criam ferramentas pequenas na pasta de trabalho atual; testes são opcionais, não usam Git nem escrevem na memória
 
 ### `/review-card <nome>`
 Prepara card para revisão, move para "in_review" e auxilia na criação de PR.
+Aplica-se somente a cards de implementação; relatórios, investigações e experimentos são concluídos diretamente.
 
 **Uso:**
 ```
@@ -150,6 +154,24 @@ Prepara card para revisão, move para "in_review" e auxilia na criação de PR.
 - Atualiza card com link do PR
 - Move card de `2.in_progress/` → `3.in_review/`
 
+### `/review-pr <pr>`
+Revisa um PR recebido usando as guidelines do vault e as memórias do projeto, citando a regra por trás de cada achado.
+
+**Uso:**
+```
+/review-pr 123
+/review-pr https://github.com/org/repo/pull/123
+```
+
+**O que faz:**
+- Lê o PR com `gh pr view` e recorta o diff com `gh pr diff --name-only`, lendo arquivo por arquivo
+- Carrega todos os arquivos de `guidelines/` e a memória do repositório, quando existir
+- Identifica o card do PR pelo `pr_url` do board e a memória de feature pelo `feature:` do card
+- Entrega achados com arquivo, linha, severidade e a regra citada; sugestão sem regra fica em seção separada
+- Declara convenção desconhecida quando o repositório não tem memória e revisa só pela API quando não há clone
+- Propõe card novo para trabalho de código, sempre com confirmação antes de gravar no vault
+- **Não publica nada no PR** e não move card
+
 ### `/complete-card <nome>`
 Finaliza um card, movendo para "done" e garantindo documentação completa.
 
@@ -160,15 +182,14 @@ Finaliza um card, movendo para "done" e garantindo documentação completa.
 
 **O que faz:**
 - Valida completude do card
-- Verifica se PR foi merged
+- Para implementação, verifica se PR foi merged
 - Adiciona timestamps de conclusão
-- Move card de `3.in_review/` → `4.done/`
-- Volta para a branch default (`main`/`master`) e faz `git pull`
-- Apaga a branch do card localmente (`git branch -d`)
-- Marca como pronto para consolidação de memória
+- Move implementação de `3.in_review/` e relatório/investigação/experimento de `2.in_progress/` para `4.done/`
+- Só para implementação, volta para a branch default, faz pull e tenta apagar a branch local
+- Consolida memória automaticamente para implementação; nunca para relatório ou experimento; pede confirmação para investigação
 
 ### `/condense-memory`
-Processa todos os cards em "4.done" e consolida conhecimento em `condensed memory.md`.
+Consolida implementações elegíveis em `4.done`; relatórios e experimentos nunca são incluídos e investigações precisam ser nomeadas explicitamente.
 
 **Uso:**
 ```
@@ -176,21 +197,36 @@ Processa todos os cards em "4.done" e consolida conhecimento em `condensed memor
 ```
 
 **O que faz:**
-- Lê todos os cards em `4.done/`
+- Processa implementações pendentes em `4.done/`; não consolida relatórios nem experimentos
+- Investigações só são processadas quando nomeadas explicitamente
 - Extrai conhecimento das seções:
   - "Conhecimento Adquirido pela IA"
   - "Discussões"
-  - "Descrição Técnica"
-- Categoriza por tipo:
-  - Regras de Negócio
-  - Padrões Técnicos
-  - Integrações e APIs
-  - Problemas e Soluções
-  - Ferramentas
-- Atualiza `condensed memory.md`
+  - "Descrição Técnica" (implementation) ou "Descobertas e Conclusões" (investigation)
+- Roteia cada item para o eixo adequado:
+  - Projeto: arquitetura, padrões e convenções, ferramentas, configuração e aprendizados
+  - Feature: fluxo ponta a ponta, contratos entre serviços, regras de negócio e edge cases
+- Atualiza `condensed memory/projects/{projeto}.md` e, quando aplicável, `condensed memory/features/{feature}.md`
 - Marca cards como processados
 
 ## Fluxo de Trabalho Típico
+
+### Relatório ou investigação sem Git
+
+Crie o card com `work_type: report` ou `work_type: investigation` e inicie com
+`/start-card`. O card vai de `2.in_progress/` diretamente para `4.done/` via
+`/complete-card`, sem branch, commit, PR ou revisão em `3.in_review/`.
+Relatórios ficam em `docs/{projeto}/reports/`; documentos de investigação são
+opcionais em `docs/{projeto}/investigations/`, ambos no vault. A investigação
+só é consolidada em memória após confirmação; relatórios nunca são consolidados.
+
+### Experimento com ferramenta isolada
+
+Crie o card com `work_type: experiment`, entre na pasta de trabalho do
+experimento e use `/start-card`. O fluxo não executa nenhum comando Git. Crie e
+valide a ferramenta nessa pasta; testes automatizados são opcionais. Use
+`/complete-card` para concluir diretamente em `4.done`. Os arquivos permanecem
+na pasta até limpeza manual e nunca são enviados para condensed memory.
 
 ```bash
 # 1. Ver o que tem para fazer
@@ -199,22 +235,17 @@ Processa todos os cards em "4.done" e consolida conhecimento em `condensed memor
 # 2. Ir para o projeto e iniciar card
 cd ~/projetos/projeto-a
 /start-card "card-exemplo"
-# → Pergunta se deve mudar para main/master antes de criar a branch
-# → Faz pull da branch base (sempre)
-# → Cria a branch feature/card-exemplo
+# → Move para 2.in_progress sem checkout, pull ou branch
 
 # 3. Trabalhar nas tarefas (pode executar múltiplas vezes)
 /work-on-card "card-exemplo"
+# → Relatório: salva em docs/{projeto}/reports/ no vault
+# → Investigação: registra descobertas no card e pode salvar documento no vault
 
-# 4. Quando terminar, preparar para revisão
-/review-card "card-exemplo"
-
-# 5. Após PR aprovado e merged, finalizar
+# 4. Quando terminar, concluir diretamente
 /complete-card "card-exemplo"
-# → Volta para a branch default e apaga a branch do card
-
-# 6. Periodicamente, consolidar conhecimento
-/condense-memory
+# → Move de 2.in_progress para 4.done sem Git
+# → Relatório nunca consolida memória; investigação pede confirmação
 ```
 
 ## Estrutura do Vault
@@ -229,12 +260,17 @@ $OBSIDIAN_VAULT_PATH/
 │   ├── 4.done/           # Cards finalizados
 │   └── 5.archived/       # Cards antigos/cancelados
 ├── templates/
-│   └── card template.md  # Template para novos cards
+│   └── card/
+│       ├── implementation.md
+│       ├── report.md
+│       ├── investigation.md
+│       └── experiment.md
 ├── guidelines/           # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md           # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md   # Padrões de desenvolvimento
 │   ├── commit guidelines.md # Composição do histórico de commits
-│   └── IA best practices.md # Boas práticas de uso de IA por agentes
+│   ├── IA best practices.md # Boas práticas de uso de IA por agentes
+│   └── card work types.md   # Comportamento e ciclo de vida por work_type
 ├── docs/                 # Documentação de projeto (PDFs, specs)
 └── condensed memory/     # Conhecimento em três eixos
     ├── README.md         # Especificação do formato (versionada)
@@ -335,15 +371,15 @@ Se estiver vazio, verifique se adicionou ao arquivo correto (~/.zshrc ou ~/.bash
 - O card pode estar em outro estágio do board
 
 ### Erro: "Não está em um repositório git"
-Os comandos `/start-card`, `/work-on-card` e `/review-card` precisam ser executados dentro de um repositório git.
+Os cards de implementação exigem um repositório git para iniciar e revisar. Cards `report` e `investigation` não exigem Git; `experiment` não executa nenhum comando Git.
 
 ## Dicas
 
 1. **Use tab completion**: Os nomes dos cards podem ter espaços, use aspas
-2. **Commits por unidade lógica**: `/work-on-card` compõe o histórico conforme `guidelines/commit guidelines.md`
+2. **Commits por unidade lógica**: `/work-on-card` compõe o histórico conforme `guidelines/commit guidelines.md`, somente em cards `implementation`; experimentos nunca executam Git
 3. **Contexto automático**: Todos os comandos carregam todos os arquivos de `guidelines/` e o condensed memory
 4. **Dependências**: Use as propriedades `depends_on` e `dependents` com `[[nome-do-card]]` para referenciar cards relacionados (`guidelines/IA best practices.md` §8)
-5. **Documentação**: Sempre preencha "Conhecimento Adquirido pela IA" para melhorar o condensed memory
+5. **Documentação**: Registre descobertas reutilizáveis de implementações/investigações; relatórios e experimentos não geram consolidação de memória
 
 ## Dashboard (opcional)
 
@@ -362,7 +398,7 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 2. Escolha um card de `1.not_started/` (ou refine um de `0.backlog/` com `/refine-card`)
 3. Use `/start-card` para começar
 4. Use `/work-on-card` quantas vezes precisar
-5. Finalize com `/review-card` e `/complete-card`
+5. Para implementação, finalize com `/review-card` e `/complete-card`; para relatório/investigação, use `/complete-card` diretamente
 6. Periodicamente execute `/condense-memory`
 
 > Para trabalhar em **todos** os cards de `1.not_started/` de uma vez, use
