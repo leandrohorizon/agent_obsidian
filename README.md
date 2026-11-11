@@ -136,11 +136,11 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 | `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
 | `/review-card [nome]`     | Cria PR, move para review              | `/review-card`                                          |
 | `/complete-card [nome]`   | Finaliza, consolida conhecimento       | `/complete-card`                                        |
-| `/load-context [nome]`    | Carrega contexto, sincroniza branch    | `/load-context`                                         |
+| `/load-context [nome]`    | Carrega contexto do card ou do projeto | `/load-context`                                         |
 | `/orchestrate-cards [filtro]` | Trabalha em todos os cards de `1.not_started` (PR em draft) | `/orchestrate-cards` |
 | `/condense-memory [nome]` | Consolida conhecimento do card         | `/condense-memory`                                      |
 
-**Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido.
+**Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido. Sem card ativo, o `/load-context` roda no modo de projeto: carrega guidelines, memória do projeto, estado do Git (só leitura) e os cards deste repositório em `2.in_progress`/`3.in_review`, sem pedir nome de card e sem alterar o `.agent_obsidian`.
 
 ## Exemplo de Workflow
 

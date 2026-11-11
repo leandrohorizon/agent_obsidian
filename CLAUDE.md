@@ -541,12 +541,22 @@ Finalizes card after PR is merged.
 ---
 
 ### `/load-context [nome]`
-Loads complete context for a card (read-only for card content, for understanding).
+Loads complete context for a card, or for the project when there is no card (read-only).
 
 **Arguments:**
-- `[nome]`: Optional - uses `.agent_obsidian` if omitted
+- `[nome]`: Optional - uses `.agent_obsidian` if omitted; when the state has `current_card: null` the command runs in **project mode** instead of asking for a card name
 
-**Actions:**
+**Project mode (no card):**
+1. Reads `$OBSIDIAN_VAULT_PATH`; an existing `.agent_obsidian` is read-only (no `/init-agent-state`, no `validate_agent_state()` repair)
+2. Loads all files in `guidelines/` and the project memory (`condensed_memory_path`, or derived from the normalized directory name via `/detect-project`)
+3. Reads git state only: `git branch --show-current`, `git status --short`, `git log -1 --oneline`, plus ahead/behind from `git status -sb`
+4. Lists this repository's cards in `2.in_progress/` and `3.in_review/`, matched by normalizing both the card's `repo:` and the remote to `owner/repo` (handles `https://…` and `git@…`), grouped by folder so the state stays visible
+5. **Writes nothing:** no `git checkout`/`git pull`/`git fetch`, no `current_card`, nothing written to `.agent_obsidian`
+6. Excludes feature memory (needs the card's `feature:`), operational memory (reserved to `/work-on-card` by `conduct.md`), cards outside the two active folders and branch diffs
+
+**Work type deviations (card mode):** steps 7 and 8 (branch sync, branch diff analysis) run only for `implementation`; `report`, `investigation`, `experiment` and unknown values skip both, while the git state read in step 6 still happens.
+
+**Actions (card mode):**
 1. Reads card (via direct path if from state)
 2. Loads all files in `guidelines/`
 3. Loads condensed memory (both axes: project + feature)
@@ -580,6 +590,7 @@ Loads complete context for a card (read-only for card content, for understanding
 
 **Use Cases:**
 - Start new work session
+- Start a session in a repository that has no active card (project mode)
 - Resume after interruption
 - Review before PR
 - Resume a card that lives on another branch
