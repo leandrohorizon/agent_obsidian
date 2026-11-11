@@ -116,7 +116,9 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
          payload real — registrar o mecanismo e a forma do erro.
 
 5. **Analisar tarefas:**
-   - Identificar todos os checkboxes `- [ ]` no card
+   - Identificar todos os checkboxes `- [ ]` na seção `### Tarefas` do card
+     (a seção `### Verificação Pós-Deploy` é executada pelo `/complete-card`,
+     depois do deploy — não é tarefa deste comando)
    - Listar as tarefas pendentes
    - Priorizar tarefas não completadas
 

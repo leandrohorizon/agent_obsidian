@@ -55,17 +55,18 @@ Carregar todo o contexto necessário. **Com card:** o próprio card, guidelines 
    - Para `experiment`, não executar nenhum comando Git nem apresentar dados de Git
 
 7. **Sincronizar branch e estado (`.agent_obsidian`):**
-   - Valor desconhecido de `work_type` interrompe o fluxo com erro explícito,
-     conforme o passo 3.
-   - Para `implementation` ou quando `work_type` estiver ausente:
-     - Comparar a branch atual (`git branch --show-current`) com a branch do
-       card (campo `branch:` do frontmatter).
-     - **Se divergirem**, perguntar antes de trocar:
-       ```
-       O card está na branch `{branch-do-card}`, mas o repositório está em `{branch-atual}`.
-       Deseja mudar para `{branch-do-card}`?
+   - Aplicável somente a `implementation`; para `report`, `investigation` e `experiment`, não comparar branch, perguntar sobre checkout, executar comandos Git ou afirmar que a branch está sincronizada
+   - Valor desconhecido de `work_type` interrompe o fluxo com erro explícito, conforme o passo 3
+   - Atualizar `.agent_obsidian.current_card` para o card carregado, preservando todos os outros campos, também para `report`, `investigation` e `experiment`
+   - Comparar a branch atual (`git branch --show-current`) com a branch do card
+     (campo `branch:` do frontmatter)
+   - **Se divergirem**, o card está ativo mas o repositório está em outra branch.
+     Perguntar ao usuário antes de trocar:
+     ```
+     O card está na branch `{branch-do-card}`, mas o repositório está em `{branch-atual}`.
+     Deseja mudar para `{branch-do-card}`?
 
-       1. Sim — trocar de branch (recomendado)
+        1. Sim — trocar de branch (recomendado)
        2. Não — continuar em `{branch-atual}`
        ```
      - **Aguardar a resposta.** Não trocar de branch sem confirmação.
@@ -92,10 +93,8 @@ Carregar todo o contexto necessário. **Com card:** o próprio card, guidelines 
      todos os outros campos. O passo 6 continua valendo, conforme os limites de
      cada tipo.
 
-8. **Analisar modificações da branch** — somente para `implementation` (ou
-   quando `work_type` estiver ausente). Para `report`, `investigation` e
-   `experiment`, pular este passo; valor desconhecido já foi interrompido no
-   passo 3.
+8. **Analisar modificações da branch:**
+   - Aplicável somente a `implementation` (ou quando `work_type` estiver ausente); para `report`, `investigation` e `experiment`, pular este passo. Valor desconhecido interrompeu o fluxo no passo 3.
    - Identificar branch base (main, master, ou similar)
    - Listar commits da branch: `git log origin/{base}..HEAD --oneline`
    - Analisar arquivos modificados na branch (commitados):

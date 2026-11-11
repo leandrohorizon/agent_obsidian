@@ -38,9 +38,14 @@ cd ~/meu-projeto
 
 # Completar após merge
 /complete-card
+# ✅ Verifica pós-deploy antes de concluir (quando o projeto tem deploy)
 # ✅ Move para done
 # ✅ Volta para a branch default e apaga a branch do card
 # ✅ Consolida conhecimento para tarefas futuras
+
+# Verificações com prazo, depois do deploy
+/check-tasks
+# ✅ Executa as verificações vencidas de tasks/
 ```
 
 ## Tipos de trabalho
@@ -150,9 +155,10 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 | `/refine-card <nome>`     | Clarifica cards vagos antes de iniciar | `/refine-card "adicionar feature"`                      |
 | `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
 | `/review-card [nome]`     | Cria PR para implementação              | `/review-card`                                          |
+| `/complete-card [nome]`   | Finaliza; memória e verificação dependem do tipo | `/complete-card`                                 |
 | `/review-pr <pr>`         | Revisa PR com guidelines e memórias    | `/review-pr 123`                                        |
-| `/complete-card [nome]`   | Finaliza; memória depende do tipo       | `/complete-card`                                        |
 | `/load-context [nome]`    | Carrega contexto do card ou do projeto; sincroniza branch só para implementação | `/load-context`                           |
+| `/check-tasks`            | Executa verificações pós-deploy vencidas de `tasks/` | `/check-tasks`                            |
 | `/orchestrate-cards [filtro]` | Orquestra implementações (PR em draft) | `/orchestrate-cards`                              |
 | `/condense-memory [nome]` | Consolida memória conforme tipo         | `/condense-memory`                                      |
 
@@ -190,9 +196,16 @@ cd ~/projeto-calculadora
 # Depois do merge do PR
 /complete-card
 # Move para: board/4.done/
+# Verifica pós-deploy: espera o deploy com janela limitada, roda o que é imediato e
+# grava o que tem prazo em tasks/ (não conclui se o deploy não tiver rodado)
 # Volta para a branch default e apaga a branch do card
 # Roteia conhecimento para: condensed memory/projects/calculadora.md e condensed memory/features/{feature}.md
 # Limpa current card no .agent_obsidian
+
+# Verificações com prazo, dias depois
+/check-tasks
+# Lista todas as vencidas de tasks/ (data ≤ hoje) e executa as confirmadas
+# Sugere card de correção quando uma falha
 
 # Iniciar próxima feature
 /start-card "modo científico"
@@ -247,6 +260,26 @@ Dependências ficam no frontmatter (`depends_on` e `dependents`), não em seçã
 o Obsidian as trata como links nativos e o plugin consegue lê-las sem parsear
 markdown. Cards criados antes dessa convenção usam as seções `### Dependências` /
 `### Dependentes` e continuam funcionando por fallback.
+
+### Verificação pós-deploy
+
+Card de implementação cujo projeto tem deploy **e** cuja mudança é observável em
+execução ganha a seção `### Verificação Pós-Deploy`, **fora** de `### Tarefas`
+(verificação pode falhar sem que o card deixe de estar concluído). Cada linha
+declara onde olhar, o que se espera ver, a janela de observação e o critério de
+falha — e aponta para a memória que já registra a consulta, em vez de duplicá-la.
+
+A verificação tem dois tempos:
+
+- **Imediata** (log depois do deploy, uptime, healthcheck, estado no banco) roda
+  dentro do `/complete-card`, antes do `4.done`;
+- **Com prazo** ("conferir daqui a 24h") vira arquivo em `tasks/`, na raiz do
+  vault, e é executada depois pelo `/check-tasks`.
+
+Falha não bloqueia a conclusão: sugere card de correção e entra na memória
+consolidada. Se a janela de espera pelo deploy fechar sem deploy, o card **não**
+é concluído e o comando pede para ser chamado de novo. `tasks/` fica fora do
+board de propósito: é fila de verificação com data, não estado de card.
 
 ## Formato da Condensed Memory
 
@@ -416,13 +449,14 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 │   ├── 3.in_review/
 │   ├── 4.done/
 │   └── 5.archived/
+├── tasks/                      # Verificações pós-deploy com prazo (fila, fora do board)
 ├── commands/                   # Definições dos slash commands
 ├── condensed memory/           # Bases de conhecimento em três eixos
 │   ├── README.md               # Especificação do formato (versionada)
 │   ├── projects/               # Memória por repositório (.gitkeep)
 │   ├── features/               # Memória por feature (.gitkeep)
 │   └── operational/            # Memória de execução (.gitkeep)
-├── templates/                  # Templates de implementação, relatório, investigação e experimento
+├── templates/                  # Templates de card (implementação, relatório, investigação, experimento) e de verificação em `tasks/`
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md      # Padrões de desenvolvimento

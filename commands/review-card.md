@@ -28,7 +28,9 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    - Para `experiment`, não executar nenhum comando Git
    - Só após confirmar `implementation`, verificar o repositório Git e se há alterações para revisar
    - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]` — as tarefas
-     concluídas são leitura sob demanda, então lê-las aqui é o caso de uso previsto
+     concluídas são leitura sob demanda, então lê-las aqui é o caso de uso previsto.
+     A seção `### Verificação Pós-Deploy` não entra nesta checagem: ela é executada
+     pelo `/complete-card` e pode falhar sem que o card deixe de estar concluído
    - Se houver tarefas pendentes, avisar o usuário
 
 4. **Revisar o trabalho:**

@@ -24,6 +24,7 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   │   ├── commit guidelines.md  # Commit history composition
 │   │   ├── IA best practices.md  # AI context and tooling practices
 │   │   └── card work types.md    # Work-type behavior and lifecycle
+│   ├── tasks/                    # Dated post-deploy checks (.gitkeep, local content)
 │   └── docs/                     # Project documentation (PDFs, specs)
 │
 ├── project-example/           # Project 1
@@ -135,6 +136,11 @@ code creates a separate related `implementation` card. `3.in_review` and
 `guidelines/card work types.md`.
 Experiment files remain in the current folder until manually removed.
 
+Implementation cards whose project has a deploy **and** whose change is
+observable at runtime also go through post-deploy verification inside
+`/complete-card` (see "Post-Deploy Verification"). The other types never verify
+the environment.
+
 ### Card Structure
 
 Every card follows this template. Dependencies are frontmatter properties
@@ -172,6 +178,70 @@ Technical details of the implementation
 Business rules, patterns identified, gotchas, insights
 (This section feeds into condensed memory)
 ```
+
+### Post-Deploy Verification
+
+A card can carry checks that only make sense **after the solution is deployed**:
+logs, database state, metrics, real behavior. They live in
+`### Verificação Pós-Deploy` in the card, **outside** `### Tarefas`, because
+`/complete-card` requires every task to be `- [x]` and a verification may
+legitimately fail without the card being unfinished.
+
+**Two combined tests decide whether the section applies.** Both must hold:
+
+1. **The project has a deploy** — evidence in the repository
+   (`.github/workflows/*deploy*.yml`, `docker-compose*.yml`, `Procfile`,
+   `post-receive` hook) or in project/feature memory.
+2. **The change is observable at runtime** — something changes in a log, endpoint
+   response, database state, schedule or resource usage. A behavior-preserving
+   refactor, documentation or typo fails this test.
+
+When either test fails, the section stays empty and `/complete-card` skips it.
+
+Each row has four columns: where to look / what is expected / observation window /
+failure criterion. The **query itself is not duplicated**: the card points to the
+memory that already records it (e.g. `condensed memory/features/deploy-n8n.md`,
+"Validação de memória pós-deploy (três sinais)" and "Retenção de imagens e rollback").
+
+**Two clocks, not one:**
+
+| Kind | Where it runs | When |
+|---|---|---|
+| Immediate — log right after deploy, uptime, healthcheck, database state | inside `/complete-card`, before `4.done` | same session |
+| With a deadline — "check in 24h" | file in `tasks/`, read back by `/check-tasks` | later session |
+
+A failure **never blocks** completion: it suggests a correction card and goes into
+"Conhecimento Adquirido pela IA", which is what `/condense-memory` reads. There is
+no "awaiting verification" state on the board — verification is synchronous inside
+`/complete-card`, and only the deadline leaves the card.
+
+Waiting for the deploy has a bounded window. If the window closes without a deploy,
+`/complete-card` **does not complete**: no frontmatter update, no move, no state
+clear, no Git, no memory — the user calls it again later. Merge and deploy are not
+the same event, so the merge timestamp proves nothing.
+
+**Reading the environment:** invoking `/complete-card` **is** the explicit request
+required by `conduct.md` §Ambientes, limited to (a) read-only queries, (b) only the
+ones declared in the card section, (c) anything outside the list or that writes
+stops and asks. `/check-tasks` follows the same rule.
+
+**The four paths:**
+
+| Case | Expected behavior |
+|---|---|
+| Card without deploy, or change not observable | No new step: the section is skipped and the reason appears in the summary |
+| Immediate verification fails | Card completes; correction card suggested; failure recorded in "Conhecimento Adquirido" |
+| Verification with a deadline | File written to `tasks/`; card completes; automation offered, never created silently |
+| Deploy has not run when the window closes | Card is **not** completed; the command stops and asks the user to call it again |
+
+**`tasks/` is outside the board on purpose.** It is a queue of dated checks, not
+card state. Content is local, like the cards: `.gitignore` keeps only
+`tasks/.gitkeep`. File format: `templates/tasks/verificacao-pos-deploy.md` (origin
+card, repo, environment, queries, failure criterion, due date, status).
+
+**Never in the checklist:** cleanup of flags or compatibility code (implementation
+work that belongs to the original card), running the test suite (validates code,
+not the environment), running the deploy, and any query without a verifiable source.
 
 ### Knowledge Consolidation System
 
@@ -345,12 +415,21 @@ cd ~/workspace/project-example
 # 5. Complete the card after PR merge
 /complete-card
 # → Validates documentation complete
+# → Verifies post-deploy checks before moving: waits for the deploy in a bounded
+#   window (stops without completing if it has not run), runs immediate checks,
+#   writes deadline checks to tasks/, records outcomes in "Conhecimento Adquirido"
 # → Moves card: 3.in_review → 4.done
 # → Updates frontmatter (status: Done, pr_status: Merged)
 # → Clears current_card in .agent_obsidian (sets to null)
 # → Automatically calls /condense-memory to consolidate knowledge
 
-# 6. Knowledge automatically available for future tasks
+# 6. Dated post-deploy checks come back later
+/check-tasks
+# → Lists every pending check in tasks/ whose due date is today or past
+# → Runs the ones the user confirms and records the outcome in the file
+# → Suggests a correction card when a check fails
+
+# 7. Knowledge automatically available for future tasks
 /work-on-card "add scientific mode"
 # → Loads condensed memory with learnings from previous card
 ```
@@ -564,6 +643,9 @@ Reviews a **received** pull request using the vault guidelines and the project/f
 
 **Verification cases:** one finding that cites the violated guideline section, and one PR without a card and without a clone that still completes.
 
+Only applies to implementation. Reports, investigations and experiments skip
+`3.in_review` and go directly from `2.in_progress` to `/complete-card`.
+
 ---
 
 ### `/complete-card [nome]`
@@ -575,25 +657,32 @@ Finalizes a card; implementation cards follow merge, while reports, investigatio
 **Actions:**
 1. Finds implementation cards in `3.in_review/`; reports, investigations and experiments can be completed from `2.in_progress/`
 2. Validates:
-   - All tasks completed
+   - All tasks in `### Tarefas` completed (the `### Verificação Pós-Deploy` section is not part of this validation)
    - "Descrição Técnica" filled
    - "Conhecimento Adquirido" filled
    - PR merged (if applicable)
-3. Updates frontmatter:
+3. For implementation, **verifies post-deploy checks before moving** (see "Post-Deploy Verification"):
+   - Applies the two combined tests (project has deploy **and** change observable); if either fails, skips with the reason in the summary
+   - Waits for the deploy inside a bounded window — if it closes without a deploy, **stops without completing** and asks the user to call it again
+   - Runs immediate checks; writes deadline checks to `tasks/`
+   - Records each outcome in the section and in "Conhecimento Adquirido pela IA"
+   - On failure, suggests a correction card and continues completion regardless of the answer
+   - Offers the VS Code local automation that calls `/check-tasks`; never creates it silently
+4. Updates frontmatter:
    ```yaml
    status: Done
    completed: YYYY-MM-DD
    pr_status: Merged
    ```
-4. Moves implementation `3.in_review/` cards and non-code `2.in_progress/` cards to `4.done/`
-5. **Clears `.agent_obsidian`:** Sets `current_card: null`
-6. For implementation, **returns to the default branch and deletes the card branch:**
+5. Moves implementation `3.in_review/` cards and non-code `2.in_progress/` cards to `4.done/`
+6. **Clears `.agent_obsidian`:** Sets `current_card: null`
+7. For implementation, **returns to the default branch and deletes the card branch:**
    - Detects the default branch (`main`/`master`), preferring `main`
    - Guards against uncommitted changes before the checkout (stops and warns)
    - Runs `git checkout {default}` then `git pull` (aborts on failure)
    - Deletes the card branch with `git branch -d` — never `-D`; if git refuses because of unmerged commits, stops and reports
    - Does **not** delete the remote branch — only prints the cleanup command, since deleting a remote branch is destructive and requires an explicit request
-7. Automatically consolidates implementation memory; never consolidates reports or experiments; asks before consolidating investigation findings
+8. Automatically consolidates implementation memory; never consolidates reports or experiments; asks before consolidating investigation findings
 
 ---
 
@@ -611,7 +700,7 @@ Loads complete context for a card, or for the project when there is no card (rea
 5. **Writes nothing:** no `git checkout`/`git pull`/`git fetch`, no `current_card`, nothing written to `.agent_obsidian`
 6. Excludes feature memory (needs the card's `feature:`), operational memory (reserved to `/work-on-card` by `conduct.md`), cards outside the two active folders and branch diffs
 
-**Work type deviations (card mode):** steps 7 and 8 (branch sync, branch diff analysis) run only for `implementation`; `report`, `investigation`, `experiment` and unknown values skip both, while the git state read in step 6 still happens.
+**Work type deviations (card mode):** steps 7 and 8 (branch sync, branch diff analysis) run only for `implementation`; `report`, `investigation` and `experiment` skip both, while the git state read in step 6 still happens. Unknown `work_type` values stop the flow at step 3.
 
 **Actions (card mode):**
 1. Reads card (via direct path if from state)
@@ -731,6 +820,23 @@ batch runs and are processed only when named explicitly.
 - **Highlight Decisions:** Always use `**Decisão:**` or `**Rationale:**`
 - **Be Compact:** Group related info, avoid verbosity
 - **Source Once:** List processed cards in header, not per item
+
+---
+
+### `/check-tasks`
+Executes the dated post-deploy checks queued in `tasks/`.
+
+**Arguments:**
+- None. It always works from the `tasks/` queue — no card name, no `current_card`.
+
+**Actions:**
+1. Resolves the vault (`$OBSIDIAN_VAULT_PATH`, else `vault_path` from `.agent_obsidian`); never relies on `current_card`, so it behaves the same under a manual call, a VS Code local automation or an external cron
+2. Lists `tasks/*.md` and selects every **pending** check whose due date is **today or past** — catch-up by definition, so an execution lost while the machine was off is recovered on the next run
+3. Shows the queue and asks which checks to run; confirmation comes from the user or from the authorization recorded when the automation was created, and without either it only lists
+4. Runs the confirmed checks — read-only queries only, only the ones declared in the file, following the pointer in `memoria_consultas`
+5. Records the outcome in the file itself (`status: verificado | falhou | inconclusivo`, `verificado_em`, `### Resultado`) and keeps the file in `tasks/` as history
+6. On failure, suggests a correction card (`/create-card` only after confirmation)
+7. Never writes to `board/` or to condensed memory
 
 ---
 
@@ -1031,9 +1137,13 @@ If you're unsure which card you were working on:
 │   ├── review-card.md
 │   ├── review-pr.md
 │   ├── complete-card.md
+│   ├── check-tasks.md
 │   ├── load-context.md
 │   ├── orchestrate-cards.md
 │   └── condense-memory.md
+├── tasks/                    # Dated post-deploy checks (queue, outside the board)
+│   ├── .gitkeep
+│   └── {card}-{YYYY-MM-DD}.md # Local, not versioned
 ├── condensed memory/         # Knowledge bases in three axes
 │   ├── README.md             # Format spec for the three axes (versioned)
 │   ├── projects/             # Per-repository memory (stable, transversal)
@@ -1049,11 +1159,13 @@ If you're unsure which card you were working on:
 │       ├── .gitkeep
 │       └── {area}.md         # Local, not versioned — git, github, shell, vscode
 ├── templates/
-│   └── card/
-│       ├── implementation.md
-│       ├── report.md
-│       ├── investigation.md
-│       └── experiment.md
+│   ├── card/
+│   │   ├── implementation.md
+│   │   ├── report.md
+│   │   ├── investigation.md
+│   │   └── experiment.md
+│   └── tasks/
+│       └── verificacao-pos-deploy.md   # Format of a queued post-deploy check
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
 │   ├── code guidelines.md    # Development standards
@@ -1073,6 +1185,7 @@ If you're unsure which card you were working on:
 - Uses Obsidian as a Kanban board (folders = states)
 - Integrates with Claude Code via custom slash commands
 - Tracks state per project via `.agent_obsidian` files
+- Verifies post-deploy behavior inside `/complete-card`, with deadline checks queued in `tasks/` for `/check-tasks`
 - Consolidates knowledge via condensed memory (three axes: project, feature, operational)
 - Automates git workflow (branches, commits, PRs)
 - Builds long-term memory through completed cards
