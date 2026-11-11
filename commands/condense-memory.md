@@ -50,7 +50,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
      - Seção "### Descrição"
      - Seção "### Conhecimento Adquirido pela IA"
      - Seção "### Discussões"
-     - Seção "### Descrição Técnica do que Foi Feito"
+     - Seção do entregável do tipo: "### Descrição Técnica do que Foi Feito" (implementation) ou "### Descobertas e Conclusões" (investigation)
 
 6. **Extrair e processar conhecimento:**
 

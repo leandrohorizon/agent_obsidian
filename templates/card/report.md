@@ -35,17 +35,16 @@ dependents:
 
 ---
 
-### Descrição Técnica do que Foi Feito
+### Documento Produzido
 
-> Detalhe o documento produzido e seu caminho no vault central.
+> Registre o caminho do documento em `docs/{projeto}/reports/`, um resumo do que ele cobre e como foi verificado.
 
 Documento produzido:
 
 ---
 
-### Conhecimento Adquirido pela IA
+### Fontes e Referências
 
-> Relatórios não são consolidados em memória. Este campo não gera conhecimento para a condensed memory.
-
+> Liste as fontes consultadas (arquivos, documentos, dados) que sustentam o relatório.
 
 ---

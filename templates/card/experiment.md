@@ -37,15 +37,8 @@ dependents:
 
 ---
 
-### Descrição Técnica do que Foi Feito
+### Ferramenta e Resultado
 
-> Descreva a ferramenta criada, como executá-la e os resultados observados.
-
----
-
-### Conhecimento Adquirido pela IA
-
-> Experimentos não são consolidados em memória. Registre resultados e referências somente neste card.
-
+> Descreva a ferramenta criada, como executá-la, os caminhos relativos dos artefatos e o resultado observado.
 
 ---

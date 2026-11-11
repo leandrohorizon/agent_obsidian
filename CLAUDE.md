@@ -660,7 +660,7 @@ batch runs and are processed only when named explicitly.
      - "Descrição"
      - "Conhecimento Adquirido pela IA"
      - "Discussões"
-     - "Descrição Técnica"
+     - "Descrição Técnica" (implementation) or "Descobertas e Conclusões" (investigation)
 5. **Applies deduplication:**
    - Identifies repeated information
    - Consolidates related concepts

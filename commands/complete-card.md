@@ -29,10 +29,10 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Para `experiment`, não executar nenhum comando Git
 
 4. **Validar completude:**
-   - Para `implementation`: todas as tarefas, descrição técnica, conhecimento adquirido e PR (`pr_url`) conforme o fluxo existente
-   - Para `report`: todas as tarefas concluídas, documento presente em `docs/{projeto}/reports/` no vault e caminho registrado na descrição técnica
-   - Para `investigation`: todas as tarefas concluídas; descobertas, conclusões e referências registradas no card; documento em `docs/{projeto}/investigations/` é opcional
-   - Para `experiment`: todas as tarefas concluídas; ferramenta e resultado presentes na pasta atual; caminho relativo e instruções de uso registrados na descrição técnica
+   - Para `implementation`: todas as tarefas, "Descrição Técnica do que Foi Feito", "Conhecimento Adquirido pela IA" e PR (`pr_url`) conforme o fluxo existente
+   - Para `report`: todas as tarefas concluídas, documento presente em `docs/{projeto}/reports/` no vault e caminho registrado em "Documento Produzido"
+   - Para `investigation`: todas as tarefas concluídas; descobertas, conclusões e referências registradas em "Descobertas e Conclusões" e "Referências"; documento em `docs/{projeto}/investigations/` é opcional
+   - Para `experiment`: todas as tarefas concluídas; ferramenta e resultado presentes na pasta atual; caminho relativo e instruções de uso registrados em "Ferramenta e Resultado"
    - ✅ Seção "Discussões" documentada? (leitura sob demanda)
 
 5. **Completar documentação:**

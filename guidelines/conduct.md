@@ -126,7 +126,8 @@ quando parece incompleta, temporária ou fora do padrão.
   em memória de projeto/feature. Enquanto o trabalho está em andamento, o
   conhecimento fica no próprio card.
 - A consolidação é o passo final, não um registro incremental; usar no card as
-  seções "Discussões", "Descrição Técnica" e "Conhecimento Adquirido".
+  seções de discussão, entregável e conhecimento do tipo (templates em
+  `templates/card/`).
 - **Exceção — `condensed memory/operational/` está fora do escopo desta regra.**
   Essa pasta registra técnica de execução, não conhecimento de projeto ou de
   feature, e é escrita **durante** a tarefa pelo `/work-on-card`, no momento em

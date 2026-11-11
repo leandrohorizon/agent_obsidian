@@ -183,7 +183,7 @@ Consolida implementações elegíveis em `4.done`; relatórios e experimentos nu
 - Extrai conhecimento das seções:
   - "Conhecimento Adquirido pela IA"
   - "Discussões"
-  - "Descrição Técnica"
+  - "Descrição Técnica" (implementation) ou "Descobertas e Conclusões" (investigation)
 - Roteia cada item para o eixo adequado:
   - Projeto: arquitetura, padrões e convenções, ferramentas, configuração e aprendizados
   - Feature: fluxo ponta a ponta, contratos entre serviços, regras de negócio e edge cases

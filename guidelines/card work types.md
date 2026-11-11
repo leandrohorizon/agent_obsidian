@@ -48,7 +48,7 @@ somente o que está autorizado para ele.
 - Ler o projeto e fontes externas, sem alterar código.
 - Produzir o documento do relatório em `docs/{projeto}/reports/` no vault central.
 - Registrar no card o caminho do documento.
-- Atualizar as seções do card (Descrição, Tarefas, Discussões, Descrição Técnica).
+- Atualizar as seções do card (Descrição, Tarefas, Discussões, Documento Produzido, Fontes e Referências).
 - Concluir diretamente de `2.in_progress` para `4.done`, sem `3.in_review`.
 
 ### `investigation`

@@ -43,7 +43,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
        ou tarefas
 
    d) **Template do card:**
-     - Entender a estrutura esperada do card (Descrição, Tarefas, Discussões, Descrição Técnica, Conhecimento Adquirido)
+     - Entender a estrutura esperada do card conforme o `work_type`: seções comuns (Descrição, Tarefas, Discussões) e as seções de entregável do tipo (templates em `templates/card/`)
 
    e) **Memória operacional:** é o **único** comando que a carrega.
       - Para `experiment`, não registrar entradas de memória operacional; resultados e aprendizados ficam somente no card.
@@ -133,10 +133,11 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
      - Fazer commits git incrementais somente para `implementation`
 
 7. **Documentar o trabalho no card:**
-   - Atualizar seção "### Descrição Técnica do que Foi Feito"
-   - Adicionar detalhes de implementação
-   - Atualizar seção "### Conhecimento Adquirido pela IA"
-   - Documentar regras de negócio, padrões identificados, aprendizados
+   - `implementation`: preencher "### Descrição Técnica do que Foi Feito" e "### Conhecimento Adquirido pela IA"
+   - `report`: preencher "### Documento Produzido" (caminho) e "### Fontes e Referências"
+   - `investigation`: preencher "### Descobertas e Conclusões", "### Referências" e "### Conhecimento Adquirido pela IA"
+   - `experiment`: preencher "### Ferramenta e Resultado" (como usar, caminhos relativos e resultado observado)
+   - Registrar decisões em "### Discussões"
 
 8. **Seguir as guidelines:**
    - Aplicar princípios SOLID, DRY, KISS

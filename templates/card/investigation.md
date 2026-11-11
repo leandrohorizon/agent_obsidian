@@ -36,9 +36,15 @@ dependents:
 
 ---
 
-### Descrição Técnica do que Foi Feito
+### Descobertas e Conclusões
 
-> Descreva as descobertas e registre referências, incertezas e o caminho do documento, se houver.
+> Registre as descobertas, as conclusões e as incertezas, separando fato de hipótese.
+
+---
+
+### Referências
+
+> Liste arquivos, linhas de código, documentos e fontes que sustentam as descobertas.
 
 ---
 
