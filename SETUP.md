@@ -51,6 +51,7 @@ Você deve ver:
 - `start-card.md`
 - `work-on-card.md`
 - `review-card.md`
+- `review-pr.md`
 - `complete-card.md`
 - `condense-memory.md`
 
@@ -149,6 +150,24 @@ Prepara card para revisão, move para "in_review" e auxilia na criação de PR.
 - Oferece criar PR com `gh pr create`
 - Atualiza card com link do PR
 - Move card de `2.in_progress/` → `3.in_review/`
+
+### `/review-pr <pr>`
+Revisa um PR recebido usando as guidelines do vault e as memórias do projeto, citando a regra por trás de cada achado.
+
+**Uso:**
+```
+/review-pr 123
+/review-pr https://github.com/org/repo/pull/123
+```
+
+**O que faz:**
+- Lê o PR com `gh pr view` e recorta o diff com `gh pr diff --name-only`, lendo arquivo por arquivo
+- Carrega todos os arquivos de `guidelines/` e a memória do repositório, quando existir
+- Identifica o card do PR pelo `pr_url` do board e a memória de feature pelo `feature:` do card
+- Entrega achados com arquivo, linha, severidade e a regra citada; sugestão sem regra fica em seção separada
+- Declara convenção desconhecida quando o repositório não tem memória e revisa só pela API quando não há clone
+- Propõe card novo para trabalho de código, sempre com confirmação antes de gravar no vault
+- **Não publica nada no PR** e não move card
 
 ### `/complete-card <nome>`
 Finaliza um card, movendo para "done" e garantindo documentação completa.
