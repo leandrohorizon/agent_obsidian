@@ -150,6 +150,7 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 | `/refine-card <nome>`     | Clarifica cards vagos antes de iniciar | `/refine-card "adicionar feature"`                      |
 | `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
 | `/review-card [nome]`     | Cria PR para implementação              | `/review-card`                                          |
+| `/review-pr <pr>`         | Revisa PR com guidelines e memórias    | `/review-pr 123`                                        |
 | `/complete-card [nome]`   | Finaliza; memória depende do tipo       | `/complete-card`                                        |
 | `/load-context [nome]`    | Carrega contexto do card ou do projeto; sincroniza branch só para implementação | `/load-context`                           |
 | `/orchestrate-cards [filtro]` | Orquestra implementações (PR em draft) | `/orchestrate-cards`                              |

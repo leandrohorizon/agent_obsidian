@@ -538,6 +538,30 @@ Only applies to implementation. Reports, investigations and experiments skip
 
 ---
 
+### `/review-pr <pr>`
+Reviews a **received** pull request using the vault guidelines and the project/feature memories, so every finding cites the rule behind it. Read-only analysis: nothing is published on GitHub and no card is moved.
+
+**Arguments:**
+- `<pr>`: Required - PR number or URL
+- `[caminho-do-clone]`: Optional - local clone path when the repository is not in `~/workspace/{repo}`
+
+**Actions:**
+1. Reads the PR with `gh pr view` (state, head SHA, base branch, files, body)
+2. Loads all files in `guidelines/` — they apply to any repository
+3. Finds the PR's card by `pr_url` in the board and derives the feature memory from its `feature:`; continues without a card when none exists
+4. Classifies the repository case: cloned with memory, cloned without memory, or not cloned
+5. Enumerates changed files with `gh pr diff --name-only`, then reads each file's patch, skipping lockfiles, generated code and binaries
+6. Reports findings with `file:line`, severity, cited rule, evidence and a falsification step
+7. Keeps findings without a citable rule in a separate **suggestions** section (concrete alternative plus how to test, max 5)
+8. Declares `Convenção do repositório: desconhecida` when the repository has no memory instead of assuming its standards
+9. Proposes a new card for code work, **always asking before writing**; without a clone the card stays in `0.backlog` as a proposal
+10. Documents the findings in the PR card's `### Discussões` without touching status or folder
+11. Never publishes: no `gh pr review`, `gh pr comment` or review/comment API calls
+
+**Verification cases:** one finding that cites the violated guideline section, and one PR without a card and without a clone that still completes.
+
+---
+
 ### `/complete-card [nome]`
 Finalizes a card; implementation cards follow merge, while reports, investigations and experiments can finish directly.
 
@@ -752,7 +776,7 @@ Verify installation:
 ls ~/.claude/commands/
 ```
 
-Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `complete-card.md`, `load-context.md`, `refine-card.md`, `orchestrate-cards.md`, `condense-memory.md`
+Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `review-pr.md`, `complete-card.md`, `load-context.md`, `refine-card.md`, `orchestrate-cards.md`, `condense-memory.md`
 
 ### VS Code Skills Installation
 
@@ -995,6 +1019,7 @@ If you're unsure which card you were working on:
 │   ├── work-on-card.md
 │   ├── refine-card.md
 │   ├── review-card.md
+│   ├── review-pr.md
 │   ├── complete-card.md
 │   ├── load-context.md
 │   ├── orchestrate-cards.md
