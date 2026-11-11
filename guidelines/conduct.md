@@ -24,6 +24,22 @@ Reporte o conflito ao usuário.
 Confirmar = perguntar e **esperar a resposta do usuário**. Anunciar a intenção e
 executar em seguida não é confirmação. Na dúvida se algo se enquadra aqui, perguntar.
 
+**Princípio, independente de tecnologia:** nada que apague, sobrescreva, reinstale
+ou resete dado do usuário roda sem autorização. Vale para arquivo, banco local ou
+remoto, repositório, container, volume, dispositivo físico, emulador e estado de
+aplicativo instalado. As listas deste arquivo são **exemplos, não a lista fechada**.
+
+- **"Rodar testes" e "verificar" não autorizam destruição.** Comando cujo efeito
+  colateral reinstala, limpa, reseta ou desinstala não é coberto pela autorização
+  de rodar a suíte — segue a regra acima. Exemplos: `connectedAndroidTest`
+  (reinstala app + APK de teste e apaga os dados), `install -r`, `pm clear`,
+  `uninstall`, `am instrument`, `docker compose down -v`, `db:reset`,
+  `db:test:prepare`.
+- **Efeito colateral desconhecido = tratar como destrutivo.** Se não dá para
+  afirmar o que o comando apaga, perguntar antes em vez de descobrir depois.
+- **Ambiente do usuário não é descartável.** Aparelho, emulador, container ou
+  banco usado para validação guarda estado que não se recria. Se o dado importa,
+  o comando que o apaga exige confirmação, ainda que pareça "só mais um teste".
 - Confirmar antes de qualquer comando destrutivo: `rm -rf`, apagar arquivo não
   criado na sessão, `git reset --hard`, `git checkout -- .`/`git restore` que
   descartam alteração não commitada, `git clean -fd`, `git stash drop`, `DROP`,
@@ -98,20 +114,30 @@ quando parece incompleta, temporária ou fora do padrão.
 
 ## Condensed memory
 
-- Só escrever na condensed memory (`condensed memory/projects/` e
-  `condensed memory/features/`) quando a tarefa estiver **concluída e mergeada**.
-- Card em `1.not_started/`, `2.in_progress/` ou `3.in_review/` **não** gera
-  escrita na memória. O gatilho é o `/complete-card`, que roda depois do merge.
-- Enquanto o card está em andamento, o conhecimento fica no próprio card
-  ("Discussões", "Descrição Técnica", "Conhecimento Adquirido"). A consolidação
-  é o passo final, não um registro incremental.
+- Para `implementation`, só escrever na condensed memory
+  (`condensed memory/projects/` e `condensed memory/features/`) quando a tarefa
+  estiver **concluída e mergeada**. O gatilho é `/complete-card` após o merge.
+- Para `investigation`, a exceção é explícita: somente depois de mover o card
+  para `4.done/` e receber confirmação do usuário, `/condense-memory` pode
+  escrever conhecimento reutilizável. Não há merge porque esse tipo não cria
+  branch nem PR.
+- `report` nunca gera escrita em memória.
+- Card em `1.not_started/`, `2.in_progress/` ou `3.in_review/` não gera escrita
+  em memória de projeto/feature. Enquanto o trabalho está em andamento, o
+  conhecimento fica no próprio card.
+- A consolidação é o passo final, não um registro incremental; usar no card as
+  seções de discussão, entregável e conhecimento do tipo (templates em
+  `templates/card/`).
 - **Exceção — `condensed memory/operational/` está fora do escopo desta regra.**
   Essa pasta registra técnica de execução, não conhecimento de projeto ou de
   feature, e é escrita **durante** a tarefa pelo `/work-on-card`, no momento em
   que a abordagem padrão falha e a alternativa passa. O motivo: a evidência bruta
   do par `falhou` → `funcionou` (comando, saída, ordem) se perde se o registro
-  esperar o merge. A regra acima continua valendo integralmente para
-  `condensed memory/projects/` e `condensed memory/features/`.
+  esperar o merge. As regras acima continuam valendo integralmente para
+  `condensed memory/projects/` e `condensed memory/features/`, incluindo a
+  exceção explícita de investigação concluída e confirmada. **Cards
+  `experiment` não escrevem em nenhum eixo de memória, incluindo
+  `condensed memory/operational/`.**
 
 ## Leitura de arquivos
 

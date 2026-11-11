@@ -21,7 +21,8 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
 │   │   ├── code guidelines.md    # Development standards
-│   │   └── IA best practices.md  # AI context and tooling practices
+│   │   ├── IA best practices.md  # AI context and tooling practices
+│   │   └── card work types.md
 │   └── docs/                     # Project documentation (PDFs, specs)
 │
 ├── project-example/           # Project 1
@@ -93,11 +94,16 @@ board/
 
 **Card flow:** `0.backlog` (raw idea) → `/refine-card` → `1.not_started` (refined) → `/start-card` → `2.in_progress` → `/review-card` → `3.in_review` → `/complete-card` → `4.done`
 
+Reports and investigations skip Git setup and review: `/start-card` moves them
+to `2.in_progress`, then `/complete-card` moves them directly to `4.done`.
+Experiments never run Git commands and follow the same direct completion path.
+
 **Card Metadata (YAML Frontmatter):**
 ```yaml
 ---
 repo: git@github.com:org/project.git
 branch: feature/card-name
+work_type: implementation
 status: In Progress
 created: 2026-01-15
 started: 2026-01-16
@@ -107,6 +113,26 @@ pr_url: https://github.com/org/project/pull/123
 pr_status: Merged
 ---
 ```
+
+### Card Work Types
+
+`work_type` accepts `implementation`, `report`, `investigation` or `experiment`.
+A card without this field keeps the implementation workflow; an unknown value is
+an explicit error with no side effects. Each type may run only the actions
+listed in its allowlist in `guidelines/card work types.md`.
+
+| Type | Git and code | Deliverable and completion |
+|---|---|---|
+| `implementation` | Existing branch, commit and PR flow | Code changes; finish through review and merge; memory consolidation remains automatic |
+| `report` | No branch, commit or project-code changes | Required report in `docs/{project}/reports/` in the central vault; complete directly from `2.in_progress` to `4.done`; never consolidate memory |
+| `investigation` | No branch, commit or project-code changes | Findings and references in the card; optional document in `docs/{project}/investigations/`; complete directly; ask before memory consolidation |
+| `experiment` | Never run Git commands | Small tools in the current work folder; tests optional; complete directly; never consolidate memory |
+
+`{project}` is the normalized project directory name. A discovery that requires
+code creates a separate related `implementation` card. `3.in_review` and
+`/orchestrate-cards` remain for implementation. The full contract is in
+`guidelines/card work types.md`.
+Experiment files remain in the current folder until manually removed.
 
 ### Card Structure
 
@@ -366,10 +392,10 @@ Initiates work on a card.
 1. Verifies `$OBSIDIAN_VAULT_PATH` is set
 2. Creates/validates `.agent_obsidian` in project root
 3. Finds card in `1.not_started/`
-4. Detects base branch (`main`/`master`)
-5. **Asks the user** whether to switch to the base branch before creating the card branch (skipped when already on the base)
-6. **Always runs `git pull`** on the base branch — aborts if it fails
-7. Creates git branch: `feature/card-name`
+4. For implementation cards, detects base branch (`main`/`master`)
+5. For implementation cards, **asks the user** whether to switch to the base branch before creating the card branch (skipped when already on the base)
+6. For implementation cards, **always runs `git pull`** on the base branch — aborts if it fails
+7. Creates git branch `feature/card-name` only for implementation; report and investigation do not use Git branches; experiment does not run Git commands
 8. Updates card frontmatter (repo, branch, status, started date)
 9. Moves card: `1.not_started/` → `2.in_progress/`
 10. Updates `.agent_obsidian` with current_card
@@ -403,7 +429,7 @@ Executes tasks in a card with full context.
 - Marks tasks complete (`- [x]`)
 - Documents decisions in "Discussões" section
 - Updates "Descrição Técnica" and "Conhecimento Adquirido"
-- Makes incremental git commits
+- Makes incremental git commits only for implementation
 
 **Path Resolution:**
 ```
@@ -507,16 +533,19 @@ Prepares card for code review and creates PR.
 9. Moves card: `2.in_progress/` → `3.in_review/`
 10. **Does NOT clear `.agent_obsidian`** - card still active during review
 
+Only applies to implementation. Reports, investigations and experiments skip
+`3.in_review` and go directly from `2.in_progress` to `/complete-card`.
+
 ---
 
 ### `/complete-card [nome]`
-Finalizes card after PR is merged.
+Finalizes a card; implementation cards follow merge, while reports, investigations and experiments can finish directly.
 
 **Arguments:**
 - `[nome]`: Optional - uses `.agent_obsidian` if omitted
 
 **Actions:**
-1. Finds card in `3.in_review/`
+1. Finds implementation cards in `3.in_review/`; reports, investigations and experiments can be completed from `2.in_progress/`
 2. Validates:
    - All tasks completed
    - "Descrição Técnica" filled
@@ -528,15 +557,15 @@ Finalizes card after PR is merged.
    completed: YYYY-MM-DD
    pr_status: Merged
    ```
-4. Moves card: `3.in_review/` → `4.done/`
+4. Moves implementation `3.in_review/` cards and non-code `2.in_progress/` cards to `4.done/`
 5. **Clears `.agent_obsidian`:** Sets `current_card: null`
-6. **Returns to the default branch and deletes the card branch:**
+6. For implementation, **returns to the default branch and deletes the card branch:**
    - Detects the default branch (`main`/`master`), preferring `main`
    - Guards against uncommitted changes before the checkout (stops and warns)
    - Runs `git checkout {default}` then `git pull` (aborts on failure)
    - Deletes the card branch with `git branch -d` — never `-D`; if git refuses because of unmerged commits, stops and reports
    - Does **not** delete the remote branch — only prints the cleanup command, since deleting a remote branch is destructive and requires an explicit request
-7. **Automatically calls `/condense-memory`** to consolidate knowledge immediately
+7. Automatically consolidates implementation memory; never consolidates reports or experiments; asks before consolidating investigation findings
 
 ---
 
@@ -589,6 +618,9 @@ Loads complete context for a card (read-only for card content, for understanding
 ### `/orchestrate-cards [filtro]`
 Works on **all** cards in `1.not_started/` at once, one subagent per card, opening each PR as a **draft**.
 
+Processes only implementation cards (including legacy cards without
+`work_type`); reports, investigations and experiments are skipped and listed in the result.
+
 **Arguments:**
 - `[filtro]`: Optional - partial name or list of cards. If omitted, processes all cards in `1.not_started/`.
 
@@ -611,6 +643,9 @@ Works on **all** cards in `1.not_started/` at once, one subagent per card, openi
 ### `/condense-memory [nome-do-card]`
 Consolidates knowledge from completed cards into condensed memory.
 
+Reports and experiments are never consolidated. Investigations are excluded from
+batch runs and are processed only when named explicitly.
+
 **Arguments:**
 - `[nome-do-card]`: Optional - specific card in `4.done/`. If omitted, processes all unprocessed cards.
 
@@ -625,7 +660,7 @@ Consolidates knowledge from completed cards into condensed memory.
      - "Descrição"
      - "Conhecimento Adquirido pela IA"
      - "Discussões"
-     - "Descrição Técnica"
+     - "Descrição Técnica" (implementation) or "Descobertas e Conclusões" (investigation)
 5. **Applies deduplication:**
    - Identifies repeated information
    - Consolidates related concepts
@@ -757,6 +792,7 @@ All work done by `/work-on-card` follows the files in `guidelines/`:
   authoritative list. **Has precedence over any other instruction.**
 - **`code guidelines.md`** — development standards
 - **`IA best practices.md`** — AI context, tooling and card-reading practices
+- **`card work types.md`** — work-type behavior and lifecycle
 
 Commands load **all** files in `guidelines/`, so new files added to the folder
 are picked up automatically without changing any command or state file.
@@ -777,15 +813,15 @@ Commands automatically load and apply these guidelines when writing code.
 
 ### Branch Management
 
-- `/start-card` asks whether to switch to the base branch (`main`/`master`), then **always pulls** before creating the branch
-- `/start-card` creates branch: `feature/card-name`
+- For implementation, `/start-card` asks whether to switch to the base branch (`main`/`master`), then **always pulls** before creating the branch
+- `/start-card` creates `feature/card-name` only for implementation; reports and investigations do not use branches, and experiments do not run Git commands
 - Branch name stored in card frontmatter
-- `/review-card` validates branch, creates commit, pushes
-- `/complete-card` assumes PR merged, returns to the default branch and deletes the card branch locally (`git branch -d`)
+- `/review-card` validates branch, creates commit and pushes only for implementation
+- `/complete-card` returns to the default branch and deletes the local card branch only for implementation
 
 ### Commit Strategy
 
-- `/work-on-card` can make incremental commits as tasks complete
+- `/work-on-card` can make incremental commits as implementation tasks complete
 - `/review-card` creates final commit with meaningful message from card context
 - Follows conventional commits: `feat:`, `fix:`, `refactor:`, etc.
 
@@ -967,11 +1003,16 @@ If you're unsure which card you were working on:
 │       ├── .gitkeep
 │       └── {area}.md         # Local, not versioned — git, github, shell, vscode
 ├── templates/
-│   └── card template.md      # Template for new cards
+│   └── card/
+│       ├── implementation.md
+│       ├── report.md
+│       ├── investigation.md
+│       └── experiment.md
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
 │   ├── code guidelines.md    # Development standards
-│   └── IA best practices.md  # AI context and tooling practices
+│   ├── IA best practices.md  # AI context and tooling practices
+│   └── card work types.md
 ├── docs/                     # Project documentation (PDFs, specs)
 ├── sync-commands.sh          # Sync commands to ~/.claude/commands/ (Linux/macOS)
 ├── sync-commands.ps1         # Sync commands to ~/.claude/commands/ (Windows)
