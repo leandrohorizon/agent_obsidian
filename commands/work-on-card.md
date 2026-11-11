@@ -130,7 +130,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
      - Se uma investigação identificar trabalho de implementação, criar um card relacionado com `work_type: implementation`; não converter este card nem alterar código
      - Marcar checkbox como completo `- [x]` no card
      - Atualizar seção "Discussões" com decisões tomadas
-     - Fazer commits git incrementais somente para `implementation`
+     - Somente para `implementation`, commitar cada unidade lógica conforme `guidelines/commit guidelines.md`
 
 7. **Documentar o trabalho no card:**
    - `implementation`: preencher "### Descrição Técnica do que Foi Feito" e "### Conhecimento Adquirido pela IA"

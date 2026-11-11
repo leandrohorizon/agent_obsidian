@@ -131,7 +131,7 @@ Trabalha nas tarefas do card, com contexto completo (guidelines + condensed memo
 - Executa tarefas pendentes `- [ ]`
 - Marca tarefas como completas `- [x]`
 - Documenta decisões e conhecimento no card
-- Faz commits incrementais em cards de implementação
+- Em cards `implementation`, faz commits por unidade lógica (`guidelines/commit guidelines.md`)
 - Relatórios produzem documentos em `docs/{projeto}/reports/` no vault sem alterar código
 - Investigações tratam o código do projeto como somente leitura e podem produzir documentos em `docs/{projeto}/investigations/`
 - Experimentos criam ferramentas pequenas na pasta de trabalho atual; testes são opcionais, não usam Git nem escrevem na memória
@@ -268,8 +268,9 @@ $OBSIDIAN_VAULT_PATH/
 ├── guidelines/           # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md           # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md   # Padrões de desenvolvimento
+│   ├── commit guidelines.md # Composição do histórico de commits
 │   ├── IA best practices.md # Boas práticas de uso de IA por agentes
-│   └── card work types.md
+│   └── card work types.md   # Comportamento e ciclo de vida por work_type
 ├── docs/                 # Documentação de projeto (PDFs, specs)
 └── condensed memory/     # Conhecimento em três eixos
     ├── README.md         # Especificação do formato (versionada)
@@ -375,7 +376,7 @@ Os cards de implementação exigem um repositório git para iniciar e revisar. C
 ## Dicas
 
 1. **Use tab completion**: Os nomes dos cards podem ter espaços, use aspas
-2. **Commits incrementais**: `/work-on-card` pode fazer commits automáticos em cards `implementation`; experimentos nunca executam Git
+2. **Commits por unidade lógica**: `/work-on-card` compõe o histórico conforme `guidelines/commit guidelines.md`, somente em cards `implementation`; experimentos nunca executam Git
 3. **Contexto automático**: Todos os comandos carregam todos os arquivos de `guidelines/` e o condensed memory
 4. **Dependências**: Use as propriedades `depends_on` e `dependents` com `[[nome-do-card]]` para referenciar cards relacionados (`guidelines/IA best practices.md` §8)
 5. **Documentação**: Registre descobertas reutilizáveis de implementações/investigações; relatórios e experimentos não geram consolidação de memória
