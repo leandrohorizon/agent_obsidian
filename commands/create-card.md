@@ -61,7 +61,7 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
 
 6. **Criar conteúdo do card usando template:**
    - Selecionar o template pelo tipo:
-     - `implementation`: `templates/card template.md`
+     - `implementation`: `templates/implementation card template.md`
      - `report`: `templates/report card template.md`
      - `investigation`: `templates/investigation card template.md`
      - `experiment`: `templates/experiment card template.md`

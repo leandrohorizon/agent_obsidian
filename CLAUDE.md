@@ -1003,7 +1003,7 @@ If you're unsure which card you were working on:
 │       ├── .gitkeep
 │       └── {area}.md         # Local, not versioned — git, github, shell, vscode
 ├── templates/
-│   ├── card template.md      # Implementation template
+│   ├── implementation card template.md  # Implementation template
 │   ├── report card template.md
 │   ├── investigation card template.md
 │   └── experiment card template.md

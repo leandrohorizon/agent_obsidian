@@ -241,7 +241,7 @@ $OBSIDIAN_VAULT_PATH/
 │   ├── 4.done/           # Cards finalizados
 │   └── 5.archived/       # Cards antigos/cancelados
 ├── templates/
-│   ├── card template.md             # Implementação
+│   ├── implementation card template.md  # Implementação
 │   ├── report card template.md
 │   ├── investigation card template.md
 │   └── experiment card template.md
