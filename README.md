@@ -47,12 +47,15 @@ cd ~/meu-projeto
 
 Cards declaram `work_type: implementation`, `work_type: report`,
 `work_type: investigation` ou `work_type: experiment`. Cards antigos sem o campo
-continuam sendo implementações. Relatórios, investigações e experimentos não
-criam branch, commit ou PR e podem ser concluídos diretamente. Relatórios e
-experimentos nunca consolidam memória; investigações só consolidam após
-confirmação. Relatórios e investigações podem produzir documentos no vault; um
-experimento cria ferramentas pequenas na pasta de trabalho atual, sem executar
-comandos Git, e mantém seus arquivos até a limpeza manual. Consulte
+continuam sendo implementações; um valor fora da lista interrompe o comando sem
+efeito colateral. Cada tipo executa somente as ações da sua allowlist (ver
+[guidelines/card work types.md](guidelines/card%20work%20types.md)). Relatórios,
+investigações e experimentos são concluídos diretamente, sem branch, commit ou
+PR. Relatórios e experimentos nunca consolidam memória; investigações só
+consolidam após confirmação. Relatórios e investigações podem produzir
+documentos no vault; um experimento cria ferramentas pequenas na pasta de
+trabalho atual, sem executar comandos Git, e mantém seus arquivos até a limpeza
+manual. Consulte
 [guidelines/card work types.md](guidelines/card%20work%20types.md).
 
 ## Funcionalidades Principais

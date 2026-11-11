@@ -12,7 +12,7 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
    - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
    - Se não estiver, instruir: `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
    - Ler `guidelines/card work types.md` antes de escolher o fluxo
-   - Inferir `work_type` do pedido quando estiver claro; perguntar apenas se estiver ambíguo
+   - Inferir `work_type` do pedido quando estiver claro; perguntar apenas se estiver ambíguo. Todo card criado grava `work_type` no frontmatter; nunca criar card sem tipo
    - Para `implementation`, verificar se estamos em um repositório git (`git rev-parse --git-dir`)
    - Para `report`, `investigation` e `experiment`, não exigir Git
    - Para `report` e `investigation`, Git não determina estado nem branch

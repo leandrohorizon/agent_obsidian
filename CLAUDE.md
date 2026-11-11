@@ -117,8 +117,9 @@ pr_status: Merged
 ### Card Work Types
 
 `work_type` accepts `implementation`, `report`, `investigation` or `experiment`.
-Older cards without this field keep the implementation workflow; an unknown
-value is an explicit error, not a fallback.
+A card without this field keeps the implementation workflow; an unknown value is
+an explicit error with no side effects. Each type may run only the actions
+listed in its allowlist in `guidelines/card work types.md`.
 
 | Type | Git and code | Deliverable and completion |
 |---|---|---|
