@@ -33,6 +33,8 @@ Carregar todo o contexto necessário. **Com card:** o próprio card, guidelines 
      - `$OBSIDIAN_VAULT_PATH/board/4.done/`
    - Se não encontrar, listar cards disponíveis
    - Identificar estado atual (qual pasta está)
+   - Ler `guidelines/card work types.md`
+   - Card sem `work_type` é `implementation`; valor desconhecido interrompe o carregamento com erro explícito
 
 4. **Carregar guidelines e condensed memory:**
    - Seguir `guidelines/conduct.md` ("Carregamento de `guidelines/` —
@@ -48,54 +50,52 @@ Carregar todo o contexto necessário. **Com card:** o próprio card, guidelines 
    - Se não houver nenhuma das duas formas, pular este passo
 
 6. **Verificar contexto do repositório:**
-   - Executar `git branch --show-current` para verificar branch
-   - Executar `git status --short` para ver alterações pendentes
-   - Executar `git log -1 --oneline` para ver último commit
+   - Para `implementation`, executar `git branch --show-current`, `git status --short` e `git log -1 --oneline`
+   - Para `report` e `investigation`, não exigir Git nem usar branch/commits como contexto do card
+   - Para `experiment`, não executar nenhum comando Git nem apresentar dados de Git
 
-7. **Sincronizar branch e estado (`.agent_obsidian`)** — só para `implementation`:
-   - **Desvios por `work_type`** (frontmatter do card), explícitos porque este
-     passo e o 8 assumem branch de card:
-     - `implementation` ou campo ausente: executar este passo e o 8
-     - `report`, `investigation`, `experiment`: **pular este passo e o 8**. Esses
-       tipos não têm branch de card nem decisão de merge, e `experiment` não roda
-       Git. O passo 6 (leitura do estado) continua valendo
-     - valor desconhecido: avisar e **não** executar este passo nem o 8 — nenhum
-       efeito colateral até o `work_type` ser corrigido
-   - Comparar a branch atual (`git branch --show-current`) com a branch do card
-     (campo `branch:` do frontmatter)
-   - **Se divergirem**, o card está ativo mas o repositório está em outra branch.
-     Perguntar ao usuário antes de trocar:
-     ```
-     O card está na branch `{branch-do-card}`, mas o repositório está em `{branch-atual}`.
-     Deseja mudar para `{branch-do-card}`?
+7. **Sincronizar branch e estado (`.agent_obsidian`):**
+   - Valor desconhecido de `work_type` interrompe o fluxo com erro explícito,
+     conforme o passo 3.
+   - Para `implementation` ou quando `work_type` estiver ausente:
+     - Comparar a branch atual (`git branch --show-current`) com a branch do
+       card (campo `branch:` do frontmatter).
+     - **Se divergirem**, perguntar antes de trocar:
+       ```
+       O card está na branch `{branch-do-card}`, mas o repositório está em `{branch-atual}`.
+       Deseja mudar para `{branch-do-card}`?
 
-     1. Sim — trocar de branch (recomendado)
-     2. Não — continuar em `{branch-atual}`
-     ```
-   - **Aguardar a resposta.** Não trocar de branch sem confirmação
-   - Se o usuário escolher trocar:
-     - Verificar alterações não commitadas: `git status --short`
-     - Se houver, **parar e avisar** — trocar de branch pode perder trabalho ou
-       arrastar alterações para a branch errada. Perguntar o que fazer (commit,
-       stash ou cancelar)
-     - Executar: `git checkout {branch-do-card}`
-   - **Atualizar a branch com o remoto (SEMPRE, após estar na branch do card):**
-     - Executar: `git pull` na branch do card
-     - Se o pull falhar (conflito, sem upstream, sem remote), **parar e reportar**.
-       Não seguir com contexto de uma branch desatualizada ou em conflito
-     - Se não houver remote configurado, avisar e seguir (não há o que puxar)
-   - **Atualizar o `.agent_obsidian`** para refletir o card carregado:
-     - Se o card veio de argumento (não do estado), gravar `current_card` com
-       `name` e `path` do card carregado
-     - Se o `current_card.path` gravado aponta para uma pasta diferente da atual
-       (ex: card foi movido de `2.in_progress/` para `3.in_review/`), corrigir o
-       path para a localização real
-     - Preservar todos os outros campos (`version`, `vault_path`,
-       `guidelines_path`, `condensed_memory_path`)
-   - Se a branch atual já é a do card e o `current_card` já está correto, não
-     alterar nada — apenas reportar que está sincronizado
+       1. Sim — trocar de branch (recomendado)
+       2. Não — continuar em `{branch-atual}`
+       ```
+     - **Aguardar a resposta.** Não trocar de branch sem confirmação.
+     - Se o usuário escolher trocar, verificar alterações não commitadas com
+       `git status --short`. Se houver, parar e perguntar o que fazer (commit,
+       stash ou cancelar); caso contrário, executar
+       `git checkout {branch-do-card}`.
+     - Atualizar a branch com o remoto: executar `git pull` na branch do card.
+       Se falhar (conflito, sem upstream ou sem remote), parar e reportar; não
+       seguir com contexto de uma branch desatualizada ou em conflito. Se não
+       houver remote configurado, avisar e seguir (não há o que puxar).
+     - Atualizar `.agent_obsidian.current_card` para o card carregado. Se veio
+       por argumento, gravar `name` e `path`; se o path aponta para uma pasta
+       diferente da atual (por exemplo, o card foi movido de `2.in_progress/`
+       para `3.in_review/`), corrigir para a localização real. Preservar os
+       outros campos (`version`, `vault_path`, `guidelines_path`,
+       `condensed_memory_path`).
+     - Se a branch já é a do card e `current_card` já está correto, não alterar
+       nada — apenas reportar que está sincronizado.
+   - Para `report`, `investigation` e `experiment`, não comparar branch,
+     perguntar sobre checkout, executar comandos Git nem afirmar que a branch
+     está sincronizada. Atualizar somente `.agent_obsidian.current_card` para o
+     card carregado (nome e path, corrigindo path de card movido) e preservar
+     todos os outros campos. O passo 6 continua valendo, conforme os limites de
+     cada tipo.
 
-8. **Analisar modificações da branch** (só para `implementation`; ver desvio no passo 7):
+8. **Analisar modificações da branch** — somente para `implementation` (ou
+   quando `work_type` estiver ausente). Para `report`, `investigation` e
+   `experiment`, pular este passo; valor desconhecido já foi interrompido no
+   passo 3.
    - Identificar branch base (main, master, ou similar)
    - Listar commits da branch: `git log origin/{base}..HEAD --oneline`
    - Analisar arquivos modificados na branch (commitados):
@@ -113,6 +113,8 @@ Carregar todo o contexto necessário. **Com card:** o próprio card, guidelines 
    - **IMPORTANTE:** Excluir arquivos claramente não relacionados ao card (ex: .obsidian/, outros cards, etc.)
 
 9. **Apresentar resumo do contexto:**
+   - Para `report` e `investigation`, substituir os campos Branch/Pull por `Git: não aplicável a este tipo` e omitir as seções de contexto/modificações da branch.
+   - Para `experiment`, informar `Git: não utilizado conforme o tipo do card` e omitir qualquer seção de branch, pull ou diff.
    ```
    📋 Contexto carregado: {nome-do-card}
 

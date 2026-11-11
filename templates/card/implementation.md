@@ -1,6 +1,7 @@
 ---
 repo:
 branch:
+work_type: implementation
 status:
   - Not Started
 feature:
