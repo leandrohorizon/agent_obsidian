@@ -43,6 +43,21 @@ cd ~/meu-projeto
 # ✅ Consolida conhecimento para tarefas futuras
 ```
 
+## Tipos de trabalho
+
+Cards declaram `work_type: implementation`, `work_type: report`,
+`work_type: investigation` ou `work_type: experiment`. Cards antigos sem o campo
+continuam sendo implementações; um valor fora da lista interrompe o comando sem
+efeito colateral. Cada tipo executa somente as ações da sua allowlist (ver
+[guidelines/card work types.md](guidelines/card%20work%20types.md)). Relatórios,
+investigações e experimentos são concluídos diretamente, sem branch, commit ou
+PR. Relatórios e experimentos nunca consolidam memória; investigações só
+consolidam após confirmação. Relatórios e investigações podem produzir
+documentos no vault; um experimento cria ferramentas pequenas na pasta de
+trabalho atual, sem executar comandos Git, e mantém seus arquivos até a limpeza
+manual. Consulte
+[guidelines/card work types.md](guidelines/card%20work%20types.md).
+
 ## Funcionalidades Principais
 
 ### 🎯 Kanban Board as Code
@@ -55,7 +70,7 @@ Suas tarefas são arquivos markdown fluindo através de estados:
 - **`1.not_started`** — cards refinados, prontos para iniciar
 
 ### 🧠 Consolidação de Conhecimento (dois eixos)
-Cada tarefa completada contribui para uma **condensed memory** que o Claude carrega automaticamente em trabalhos futuros. O conhecimento é particionado em **dois eixos** com responsabilidades disjuntas:
+Implementações concluídas e mergeadas, além de investigações concluídas com confirmação, podem contribuir para uma **condensed memory** que o Claude carrega automaticamente em trabalhos futuros. Relatórios nunca são consolidados. O conhecimento é particionado em **dois eixos** com responsabilidades disjuntas:
 
 - **Memória de projeto** (`condensed memory/projects/{projeto}.md`) — o que é estável e transversal ao repositório: arquitetura, convenções de código, ferramentas, setup, gotchas do stack. **Sem conhecimento de feature.**
 - **Memória de feature** (`condensed memory/features/{feature}.md`) — regra de negócio, fluxo ponta a ponta, contratos entre serviços, decisões e edge cases daquela feature, **atravessando repositórios**.
@@ -131,17 +146,17 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 | Comando                   | Propósito                              | Exemplo                                                 |
 | ------------------------- | -------------------------------------- | ------------------------------------------------------- |
 | `/board-status`           | Mostra estado do board Kanban          | `/board-status`                                         |
-| `/start-card <nome>`      | Inicia trabalho, cria branch           | `/start-card "adicionar feature"`                       |
+| `/start-card <nome>`      | Inicia o card; branch só para implementação | `/start-card "adicionar feature"`                    |
 | `/refine-card <nome>`     | Clarifica cards vagos antes de iniciar | `/refine-card "adicionar feature"`                      |
 | `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
-| `/review-card [nome]`     | Cria PR, move para review              | `/review-card`                                          |
+| `/review-card [nome]`     | Cria PR para implementação              | `/review-card`                                          |
 | `/review-pr <pr>`         | Revisa PR com guidelines e memórias    | `/review-pr 123`                                        |
-| `/complete-card [nome]`   | Finaliza, consolida conhecimento       | `/complete-card`                                        |
-| `/load-context [nome]`    | Carrega contexto, sincroniza branch    | `/load-context`                                         |
-| `/orchestrate-cards [filtro]` | Trabalha em todos os cards de `1.not_started` (PR em draft) | `/orchestrate-cards` |
-| `/condense-memory [nome]` | Consolida conhecimento do card         | `/condense-memory`                                      |
+| `/complete-card [nome]`   | Finaliza; memória depende do tipo       | `/complete-card`                                        |
+| `/load-context [nome]`    | Carrega contexto do card ou do projeto; sincroniza branch só para implementação | `/load-context`                           |
+| `/orchestrate-cards [filtro]` | Orquestra implementações (PR em draft) | `/orchestrate-cards`                              |
+| `/condense-memory [nome]` | Consolida memória conforme tipo         | `/condense-memory`                                      |
 
-**Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido.
+**Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido. Sem card ativo, o `/load-context` roda no modo de projeto: carrega guidelines, memória do projeto, estado do Git (só leitura) e os cards deste repositório em `2.in_progress`/`3.in_review`, sem pedir nome de card e sem alterar o `.agent_obsidian`.
 
 ## Exemplo de Workflow
 
@@ -387,7 +402,7 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 - **[SETUP.md](SETUP.md)** - Instalação e configuração detalhada
 - **[CLAUDE.md](CLAUDE.md)** - Arquitetura completa e referência de comandos
 - **[guidelines/](guidelines/)** - Diretrizes do agente (todos os arquivos são carregados)
-- **[templates/](templates/)** - Template de card
+- **[templates/](templates/)** - Templates de implementação, relatório, investigação e experimento
 - **[Dashboard do board](https://github.com/leandrohorizon/dashboard-agent-obsidian)** - Plugin de Obsidian, em repositório próprio
 
 ## Estrutura do Projeto
@@ -407,11 +422,12 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 │   ├── projects/               # Memória por repositório (.gitkeep)
 │   ├── features/               # Memória por feature (.gitkeep)
 │   └── operational/            # Memória de execução (.gitkeep)
-├── templates/                  # Template de card
+├── templates/                  # Templates de implementação, relatório, investigação e experimento
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md      # Padrões de desenvolvimento
-│   └── IA best practices.md    # Boas práticas de uso de IA por agentes
+│   ├── IA best practices.md    # Boas práticas de uso de IA por agentes
+│   └── card work types.md
 ├── docs/                       # Documentação de projeto (PDFs, specs)
 ├── sync-commands.sh            # Instala comandos no Claude (Linux/macOS)
 ├── sync-commands.ps1           # Instala comandos no Claude (Windows)

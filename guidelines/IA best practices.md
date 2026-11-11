@@ -63,6 +63,12 @@ Card é artefato de execução e cresce durante a vida dele: `### Discussões` e
 | `### Descrição Técnica do que Foi Feito` | incluir — fonte principal para a IA |
 | `### Conhecimento Adquirido pela IA` | incluir |
 
+A tabela acima descreve o card `implementation`. Nos demais tipos, a seção do
+entregável substitui "Descrição Técnica do que Foi Feito": "Documento Produzido"
+(report), "Descobertas e Conclusões" (investigation) ou "Ferramenta e Resultado"
+(experiment). "Conhecimento Adquirido pela IA" só existe em `implementation` e
+`investigation`.
+
 O `pr_url` do frontmatter é a fonte única do PR — cards antigos podem ter uma seção de PRs no corpo, mas ela é redundante e não é mais criada.
 
 **Procedimento:**

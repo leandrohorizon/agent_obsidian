@@ -9,10 +9,14 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
 ## Instruções
 
 1. **Verificar configuração e obter vault path:**
+   - Ler `guidelines/card work types.md` antes de selecionar cards
    - Tentar ler `.agent_obsidian` no diretório atual
    - Se arquivo existe e é válido, usar `vault_path` dele
    - Se não existe ou inválido, usar variável `$OBSIDIAN_VAULT_PATH`
    - Se nenhum dos dois está disponível, instruir: `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
+   - Se um card foi nomeado, verificar seu `work_type` antes de ler ou criar
+     arquivos de memória; se for `experiment`, informar que nunca é consolidado
+     e encerrar sem acessar a memória
 
 2. **Detectar projeto atual:**
    - Obter nome do diretório atual: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
@@ -29,18 +33,24 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
    - Se `<nome-do-card>` foi fornecido:
      - Procurar card específico em `$OBSIDIAN_VAULT_PATH/board/4.done/`
      - Se não encontrado, avisar usuário e listar cards disponíveis
-     - Processar apenas este card
+     - Ler `work_type`: ausente é `implementation`; valor desconhecido deve ser reportado como inválido e não processado
+     - Se for `report`, informar que relatórios nunca são consolidados e não processar
+     - Se for `experiment`, informar que experimentos nunca são consolidados e não processar, mesmo quando nomeados explicitamente
+     - Se for `investigation`, a chamada nomeada explicitamente é a confirmação do usuário para consolidar
+     - Processar apenas este card quando elegível
    - Se não foi fornecido argumento:
      - Listar todos os .md em `$OBSIDIAN_VAULT_PATH/board/4.done/`
-     - Filtrar apenas cards que NÃO foram processados ainda (sem marcação de consolidação)
+     - Filtrar apenas cards de `implementation` (incluindo os legados sem `work_type`) que NÃO foram processados ainda
+     - Não incluir `report`, `investigation` nem `experiment` no processamento em lote; informar quantos foram ignorados por tipo
      - Processar todos os cards não processados
 
 5. **Processar cards selecionados:**
+   - Antes da extração, confirmar que o card não é `report` nem `experiment` e que seu tipo é válido
    - Para cada card, ler:
      - Seção "### Descrição"
      - Seção "### Conhecimento Adquirido pela IA"
      - Seção "### Discussões"
-     - Seção "### Descrição Técnica do que Foi Feito"
+     - Seção do entregável do tipo: "### Descrição Técnica do que Foi Feito" (implementation) ou "### Descobertas e Conclusões" (investigation)
 
 6. **Extrair e processar conhecimento:**
 
@@ -122,6 +132,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
    - Itens classificados como **projeto** → escrever em `condensed memory/projects/{projeto}.md`
    - Itens classificados como **feature** → escrever em `condensed memory/features/{feature}.md`
    - Se o card tem `feature:` no frontmatter → escrever nos dois arquivos (projeto + feature)
+   - Cards `report` e `experiment` nunca geram memória. Cards `investigation` só são processados por chamada com nome explícito, que serve como confirmação do usuário; nunca entram no lote sem nome.
    - Se o card NÃO tem `feature:` → escrever só no de projeto e avisar no output:
      `⚠️ Card sem feature: — conhecimento de feature não roteado. Preencha feature: no frontmatter.`
    - Se `feature:` é uma lista YAML (`feature: [a, b]`) → escrever o recorte pertinente de cada item em cada arquivo de feature correspondente
