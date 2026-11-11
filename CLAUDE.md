@@ -21,8 +21,9 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
 │   │   ├── code guidelines.md    # Development standards
+│   │   ├── commit guidelines.md  # Commit history composition
 │   │   ├── IA best practices.md  # AI context and tooling practices
-│   │   └── card work types.md
+│   │   └── card work types.md    # Work-type behavior and lifecycle
 │   ├── tasks/                    # Dated post-deploy checks (.gitkeep, local content)
 │   └── docs/                     # Project documentation (PDFs, specs)
 │
@@ -508,7 +509,7 @@ Executes tasks in a card with full context.
 - Marks tasks complete (`- [x]`)
 - Documents decisions in "Discussões" section
 - Updates "Descrição Técnica" and "Conhecimento Adquirido"
-- Makes incremental git commits only for implementation
+- Commits only for implementation, by logical unit (`guidelines/commit guidelines.md`)
 
 **Path Resolution:**
 ```
@@ -582,9 +583,12 @@ Prepares card for code review and creates PR.
 1. Validates all tasks completed (`- [x]`)
 2. Checks documentation sections filled
 3. Reviews git status and diff
-4. Suggests/creates commit if changes pending
-5. Pushes branch
-6. **Intelligently creates PR:**
+4. Reads the branch history as someone new to the repository; when it fails the
+   criterion in `guidelines/commit guidelines.md`, proposes reorganization and
+   waits for explicit authorization
+5. Suggests/creates commit if changes pending
+6. Pushes branch
+7. **Intelligently creates PR:**
    - Detects base branch (main/develop)
    - Gets relevant commits: `git log <base>..HEAD --oneline`
    - Ignores trivial commits (typo, lint, format)
@@ -607,10 +611,37 @@ Prepares card for code review and creates PR.
      ```
    - Output in Portuguese (pt-BR)
    - Focuses on technical and business impact
-7. Captures PR number and URL
-8. Updates card frontmatter (pr_url, reviewed date)
-9. Moves card: `2.in_progress/` → `3.in_review/`
-10. **Does NOT clear `.agent_obsidian`** - card still active during review
+8. Captures PR number and URL
+9. Updates card frontmatter (pr_url, reviewed date)
+10. Moves card: `2.in_progress/` → `3.in_review/`
+11. **Does NOT clear `.agent_obsidian`** - card still active during review
+
+Only applies to implementation. Reports, investigations and experiments skip
+`3.in_review` and go directly from `2.in_progress` to `/complete-card`.
+
+---
+
+### `/review-pr <pr>`
+Reviews a **received** pull request using the vault guidelines and the project/feature memories, so every finding cites the rule behind it. Read-only analysis: nothing is published on GitHub and no card is moved.
+
+**Arguments:**
+- `<pr>`: Required - PR number or URL
+- `[caminho-do-clone]`: Optional - local clone path when the repository is not in `~/workspace/{repo}`
+
+**Actions:**
+1. Reads the PR with `gh pr view` (state, head SHA, base branch, files, body)
+2. Loads all files in `guidelines/` — they apply to any repository
+3. Finds the PR's card by `pr_url` in the board and derives the feature memory from its `feature:`; continues without a card when none exists
+4. Classifies the repository case: cloned with memory, cloned without memory, or not cloned
+5. Enumerates changed files with `gh pr diff --name-only`, then reads each file's patch, skipping lockfiles, generated code and binaries
+6. Reports findings with `file:line`, severity, cited rule, evidence and a falsification step
+7. Keeps findings without a citable rule in a separate **suggestions** section (concrete alternative plus how to test, max 5)
+8. Declares `Convenção do repositório: desconhecida` when the repository has no memory instead of assuming its standards
+9. Proposes a new card for code work, **always asking before writing**; without a clone the card stays in `0.backlog` as a proposal
+10. Documents the findings in the PR card's `### Discussões` without touching status or folder
+11. Never publishes: no `gh pr review`, `gh pr comment` or review/comment API calls
+
+**Verification cases:** one finding that cites the violated guideline section, and one PR without a card and without a clone that still completes.
 
 Only applies to implementation. Reports, investigations and experiments skip
 `3.in_review` and go directly from `2.in_progress` to `/complete-card`.
@@ -656,12 +687,22 @@ Finalizes a card; implementation cards follow merge, while reports, investigatio
 ---
 
 ### `/load-context [nome]`
-Loads complete context for a card (read-only for card content, for understanding).
+Loads complete context for a card, or for the project when there is no card (read-only).
 
 **Arguments:**
-- `[nome]`: Optional - uses `.agent_obsidian` if omitted
+- `[nome]`: Optional - uses `.agent_obsidian` if omitted; when the state has `current_card: null` the command runs in **project mode** instead of asking for a card name
 
-**Actions:**
+**Project mode (no card):**
+1. Reads `$OBSIDIAN_VAULT_PATH`; an existing `.agent_obsidian` is read-only (no `/init-agent-state`, no `validate_agent_state()` repair)
+2. Loads all files in `guidelines/` and the project memory (`condensed_memory_path`, or derived from the normalized directory name via `/detect-project`)
+3. Reads git state only: `git branch --show-current`, `git status --short`, `git log -1 --oneline`, plus ahead/behind from `git status -sb`
+4. Lists this repository's cards in `2.in_progress/` and `3.in_review/`, matched by normalizing both the card's `repo:` and the remote to `owner/repo` (handles `https://…` and `git@…`), grouped by folder so the state stays visible
+5. **Writes nothing:** no `git checkout`/`git pull`/`git fetch`, no `current_card`, nothing written to `.agent_obsidian`
+6. Excludes feature memory (needs the card's `feature:`), operational memory (reserved to `/work-on-card` by `conduct.md`), cards outside the two active folders and branch diffs
+
+**Work type deviations (card mode):** steps 7 and 8 (branch sync, branch diff analysis) run only for `implementation`; `report`, `investigation` and `experiment` skip both, while the git state read in step 6 still happens. Unknown `work_type` values stop the flow at step 3.
+
+**Actions (card mode):**
 1. Reads card (via direct path if from state)
 2. Loads all files in `guidelines/`
 3. Loads condensed memory (both axes: project + feature)
@@ -695,6 +736,7 @@ Loads complete context for a card (read-only for card content, for understanding
 
 **Use Cases:**
 - Start new work session
+- Start a session in a repository that has no active card (project mode)
 - Resume after interruption
 - Review before PR
 - Resume a card that lives on another branch
@@ -844,7 +886,7 @@ Verify installation:
 ls ~/.claude/commands/
 ```
 
-Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `complete-card.md`, `load-context.md`, `refine-card.md`, `orchestrate-cards.md`, `condense-memory.md`
+Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `review-pr.md`, `complete-card.md`, `load-context.md`, `refine-card.md`, `orchestrate-cards.md`, `condense-memory.md`
 
 ### VS Code Skills Installation
 
@@ -894,6 +936,8 @@ All work done by `/work-on-card` follows the files in `guidelines/`:
 - **`conduct.md`** — agent behavior rules; the sections in the file are the
   authoritative list. **Has precedence over any other instruction.**
 - **`code guidelines.md`** — development standards
+- **`commit guidelines.md`** — commit history composition: unit of commit,
+  message form, when the narrative is built and how it is verified
 - **`IA best practices.md`** — AI context, tooling and card-reading practices
 - **`card work types.md`** — work-type behavior and lifecycle
 
@@ -924,9 +968,13 @@ Commands automatically load and apply these guidelines when writing code.
 
 ### Commit Strategy
 
-- `/work-on-card` can make incremental commits as implementation tasks complete
-- `/review-card` creates final commit with meaningful message from card context
-- Follows conventional commits: `feat:`, `fix:`, `refactor:`, etc.
+The rule lives in `guidelines/commit guidelines.md`: the history tells how the
+solution evolved, with one responsibility per commit and a message that
+communicates intent. Commits apply only to implementation cards.
+
+- `/work-on-card` composes commits as each logical unit closes — the card task is the unit of work, not the unit of commit
+- Commit messages use the `{type}: {imperative subject}` form, with types such as `feat`, `fix`, `refactor`, `docs`, `test` and `chore`
+- `/review-card` reads the branch history against the guideline; if it fails, it proposes reorganization, which requires explicit authorization (`guidelines/conduct.md`)
 
 ### PR Creation Intelligence
 
@@ -1087,6 +1135,7 @@ If you're unsure which card you were working on:
 │   ├── work-on-card.md
 │   ├── refine-card.md
 │   ├── review-card.md
+│   ├── review-pr.md
 │   ├── complete-card.md
 │   ├── check-tasks.md
 │   ├── load-context.md
@@ -1120,8 +1169,9 @@ If you're unsure which card you were working on:
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
 │   ├── code guidelines.md    # Development standards
+│   ├── commit guidelines.md  # Commit history composition
 │   ├── IA best practices.md  # AI context and tooling practices
-│   └── card work types.md
+│   └── card work types.md    # Work-type behavior and lifecycle
 ├── docs/                     # Project documentation (PDFs, specs)
 ├── sync-commands.sh          # Sync commands to ~/.claude/commands/ (Linux/macOS)
 ├── sync-commands.ps1         # Sync commands to ~/.claude/commands/ (Windows)

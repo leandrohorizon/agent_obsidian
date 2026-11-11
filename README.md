@@ -156,12 +156,13 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 | `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
 | `/review-card [nome]`     | Cria PR para implementação              | `/review-card`                                          |
 | `/complete-card [nome]`   | Finaliza; memória e verificação dependem do tipo | `/complete-card`                                 |
-| `/load-context [nome]`    | Carrega contexto; sincroniza branch só para implementação | `/load-context`                           |
+| `/review-pr <pr>`         | Revisa PR com guidelines e memórias    | `/review-pr 123`                                        |
+| `/load-context [nome]`    | Carrega contexto do card ou do projeto; sincroniza branch só para implementação | `/load-context`                           |
 | `/check-tasks`            | Executa verificações pós-deploy vencidas de `tasks/` | `/check-tasks`                            |
 | `/orchestrate-cards [filtro]` | Orquestra implementações (PR em draft) | `/orchestrate-cards`                              |
 | `/condense-memory [nome]` | Consolida memória conforme tipo         | `/condense-memory`                                      |
 
-**Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido.
+**Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido. Sem card ativo, o `/load-context` roda no modo de projeto: carrega guidelines, memória do projeto, estado do Git (só leitura) e os cards deste repositório em `2.in_progress`/`3.in_review`, sem pedir nome de card e sem alterar o `.agent_obsidian`.
 
 ## Exemplo de Workflow
 
@@ -459,8 +460,9 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md      # Padrões de desenvolvimento
+│   ├── commit guidelines.md    # Composição do histórico de commits
 │   ├── IA best practices.md    # Boas práticas de uso de IA por agentes
-│   └── card work types.md
+│   └── card work types.md      # Comportamento e ciclo de vida por work_type
 ├── docs/                       # Documentação de projeto (PDFs, specs)
 ├── sync-commands.sh            # Instala comandos no Claude (Linux/macOS)
 ├── sync-commands.ps1           # Instala comandos no Claude (Windows)

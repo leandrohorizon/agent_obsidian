@@ -44,17 +44,24 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
       - Executar `git status` para ver alterações
       - Executar `git diff` para revisar mudanças
 
-   b) **Criar commit (se necessário):**
+   b) **Ler o histórico como quem acabou de entrar:**
+      - Executar `git log <base>..HEAD --stat`, com `<base>` na branch default
+        do repositório (`main`/`master`), e ler a sequência de commits
+      - Aplicar o critério de verificação de `guidelines/commit guidelines.md`
+      - Se o histórico reprovar, apontar os commits e **propor** a reorganização;
+        executar só com autorização explícita do usuário (`guidelines/conduct.md`)
+
+   c) **Criar commit (se necessário):**
       - Se houver alterações não commitadas, sugerir commit
       - Usar descrição do card para criar mensagem de commit clara
-      - Seguir convenção: `feat: descrição` ou `fix: descrição`
+      - Seguir `guidelines/commit guidelines.md`
       - Perguntar ao usuário se quer commitar automaticamente
 
-   c) **Push da branch:**
+   d) **Push da branch:**
       - Verificar se a branch foi enviada: `git branch -r`
       - Se não, sugerir: `git push -u origin <branch-name>`
 
-   d) **Criar Pull Request com descrição inteligente:**
+   e) **Criar Pull Request com descrição inteligente:**
 
       **Passo 1: Detectar branch base**
       - A base é a branch default do repositório (`main` ou `master`)
