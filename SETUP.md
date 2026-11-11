@@ -131,7 +131,7 @@ Trabalha nas tarefas do card, com contexto completo (guidelines + condensed memo
 - Executa tarefas pendentes `- [ ]`
 - Marca tarefas como completas `- [x]`
 - Documenta decisões e conhecimento no card
-- Faz commits incrementais
+- Faz commits por unidade lógica (`guidelines/commit guidelines.md`)
 
 ### `/review-card <nome>`
 Prepara card para revisão, move para "in_review" e auxilia na criação de PR.
@@ -233,6 +233,7 @@ $OBSIDIAN_VAULT_PATH/
 ├── guidelines/           # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md           # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md   # Padrões de desenvolvimento
+│   ├── commit guidelines.md # Composição do histórico de commits
 │   └── IA best practices.md # Boas práticas de uso de IA por agentes
 ├── docs/                 # Documentação de projeto (PDFs, specs)
 └── condensed memory/     # Conhecimento em três eixos
@@ -339,7 +340,7 @@ Os comandos `/start-card`, `/work-on-card` e `/review-card` precisam ser executa
 ## Dicas
 
 1. **Use tab completion**: Os nomes dos cards podem ter espaços, use aspas
-2. **Commits incrementais**: `/work-on-card` pode fazer commits automáticos
+2. **Commits por unidade lógica**: `/work-on-card` compõe o histórico conforme `guidelines/commit guidelines.md`
 3. **Contexto automático**: Todos os comandos carregam todos os arquivos de `guidelines/` e o condensed memory
 4. **Dependências**: Use as propriedades `depends_on` e `dependents` com `[[nome-do-card]]` para referenciar cards relacionados (`guidelines/IA best practices.md` §8)
 5. **Documentação**: Sempre preencha "Conhecimento Adquirido pela IA" para melhorar o condensed memory

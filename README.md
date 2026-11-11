@@ -410,6 +410,7 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md      # Padrões de desenvolvimento
+│   ├── commit guidelines.md    # Composição do histórico de commits
 │   └── IA best practices.md    # Boas práticas de uso de IA por agentes
 ├── docs/                       # Documentação de projeto (PDFs, specs)
 ├── sync-commands.sh            # Instala comandos no Claude (Linux/macOS)

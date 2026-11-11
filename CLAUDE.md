@@ -21,6 +21,7 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
 │   │   ├── code guidelines.md    # Development standards
+│   │   ├── commit guidelines.md  # Commit history composition
 │   │   └── IA best practices.md  # AI context and tooling practices
 │   └── docs/                     # Project documentation (PDFs, specs)
 │
@@ -403,7 +404,7 @@ Executes tasks in a card with full context.
 - Marks tasks complete (`- [x]`)
 - Documents decisions in "Discussões" section
 - Updates "Descrição Técnica" and "Conhecimento Adquirido"
-- Makes incremental git commits
+- Commits by logical unit (`guidelines/commit guidelines.md`)
 
 **Path Resolution:**
 ```
@@ -477,9 +478,12 @@ Prepares card for code review and creates PR.
 1. Validates all tasks completed (`- [x]`)
 2. Checks documentation sections filled
 3. Reviews git status and diff
-4. Suggests/creates commit if changes pending
-5. Pushes branch
-6. **Intelligently creates PR:**
+4. Reads the branch history as someone new to the repository; when it fails the
+   criterion in `guidelines/commit guidelines.md`, proposes reorganization and
+   waits for explicit authorization
+5. Suggests/creates commit if changes pending
+6. Pushes branch
+7. **Intelligently creates PR:**
    - Detects base branch (main/develop)
    - Gets relevant commits: `git log <base>..HEAD --oneline`
    - Ignores trivial commits (typo, lint, format)
@@ -502,10 +506,10 @@ Prepares card for code review and creates PR.
      ```
    - Output in Portuguese (pt-BR)
    - Focuses on technical and business impact
-7. Captures PR number and URL
-8. Updates card frontmatter (pr_url, reviewed date)
-9. Moves card: `2.in_progress/` → `3.in_review/`
-10. **Does NOT clear `.agent_obsidian`** - card still active during review
+8. Captures PR number and URL
+9. Updates card frontmatter (pr_url, reviewed date)
+10. Moves card: `2.in_progress/` → `3.in_review/`
+11. **Does NOT clear `.agent_obsidian`** - card still active during review
 
 ---
 
@@ -756,6 +760,8 @@ All work done by `/work-on-card` follows the files in `guidelines/`:
 - **`conduct.md`** — agent behavior rules; the sections in the file are the
   authoritative list. **Has precedence over any other instruction.**
 - **`code guidelines.md`** — development standards
+- **`commit guidelines.md`** — commit history composition: unit of commit,
+  message form, when the narrative is built and how it is verified
 - **`IA best practices.md`** — AI context, tooling and card-reading practices
 
 Commands load **all** files in `guidelines/`, so new files added to the folder
@@ -785,9 +791,11 @@ Commands automatically load and apply these guidelines when writing code.
 
 ### Commit Strategy
 
-- `/work-on-card` can make incremental commits as tasks complete
-- `/review-card` creates final commit with meaningful message from card context
-- Follows conventional commits: `feat:`, `fix:`, `refactor:`, etc.
+The rule lives in `guidelines/commit guidelines.md`: the history tells how the
+solution evolved, one responsibility per commit, message that communicates intent.
+
+- `/work-on-card` composes commits as each logical unit closes — the card task is the unit of work, not the unit of commit
+- `/review-card` creates the final commit and reads the branch history as someone new to the repository; when it fails the criterion, it proposes reorganization, which requires explicit authorization (`guidelines/conduct.md`)
 
 ### PR Creation Intelligence
 
@@ -971,6 +979,7 @@ If you're unsure which card you were working on:
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
 │   ├── code guidelines.md    # Development standards
+│   ├── commit guidelines.md  # Commit history composition
 │   └── IA best practices.md  # AI context and tooling practices
 ├── docs/                     # Project documentation (PDFs, specs)
 ├── sync-commands.sh          # Sync commands to ~/.claude/commands/ (Linux/macOS)
