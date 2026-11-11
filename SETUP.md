@@ -241,10 +241,11 @@ $OBSIDIAN_VAULT_PATH/
 │   ├── 4.done/           # Cards finalizados
 │   └── 5.archived/       # Cards antigos/cancelados
 ├── templates/
-│   ├── implementation card template.md  # Implementação
-│   ├── report card template.md
-│   ├── investigation card template.md
-│   └── experiment card template.md
+│   └── card/
+│       ├── implementation.md
+│       ├── report.md
+│       ├── investigation.md
+│       └── experiment.md
 ├── guidelines/           # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md           # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md   # Padrões de desenvolvimento

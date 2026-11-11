@@ -1003,10 +1003,11 @@ If you're unsure which card you were working on:
 │       ├── .gitkeep
 │       └── {area}.md         # Local, not versioned — git, github, shell, vscode
 ├── templates/
-│   ├── implementation card template.md  # Implementation template
-│   ├── report card template.md
-│   ├── investigation card template.md
-│   └── experiment card template.md
+│   └── card/
+│       ├── implementation.md
+│       ├── report.md
+│       ├── investigation.md
+│       └── experiment.md
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
 │   ├── code guidelines.md    # Development standards
