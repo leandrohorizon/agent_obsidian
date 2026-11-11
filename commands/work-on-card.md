@@ -119,7 +119,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
      - Executar a tarefa (ler código, fazer alterações, rodar testes, etc.)
      - Marcar checkbox como completo `- [x]` no card
      - Atualizar seção "Discussões" com decisões tomadas
-     - Fazer commits git incrementais se apropriado
+     - Commitar conforme `guidelines/commit guidelines.md`
 
 7. **Documentar o trabalho no card:**
    - Atualizar seção "### Descrição Técnica do que Foi Feito"

@@ -69,10 +69,12 @@ Para cada card em `1.not_started/`, executar a sequência completa de trabalho �
         - Executa TODAS as tarefas pendentes do card
         - Marca tarefas como concluídas, documenta decisões em "Discussões",
           preenche "Descrição Técnica" e "Conhecimento Adquirido"
-        - Faz commits incrementais seguindo conventional commits
+        - Commita conforme `guidelines/commit guidelines.md`
 
      3. /review-card "{nome-do-card}"
         - Valida que todas as tarefas estão concluídas
+        - Lê o histórico da branch e **não** reorganiza: reescrever histórico
+          está fora da autorização do lote (`guidelines/commit guidelines.md`)
         - Cria o commit final, faz push da branch
         - Cria o Pull Request **EM DRAFT** (ver regra abaixo)
         - Move o card de 2.in_progress → 3.in_review
