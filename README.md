@@ -45,13 +45,14 @@ cd ~/meu-projeto
 
 ## Tipos de trabalho
 
-Cards declaram `work_type: implementation`, `work_type: report` ou
-`work_type: investigation`. Cards antigos sem o campo continuam sendo
-implementações. Relatórios e investigações não criam branch, commit ou PR e
-podem ser concluídos diretamente; relatórios nunca consolidam memória, e
-investigações só consolidam após confirmação. Seus documentos ficam no vault em
-`docs/{projeto}/reports/` ou, opcionalmente, em
-`docs/{projeto}/investigations/`. Consulte
+Cards declaram `work_type: implementation`, `work_type: report`,
+`work_type: investigation` ou `work_type: experiment`. Cards antigos sem o campo
+continuam sendo implementações. Relatórios, investigações e experimentos não
+criam branch, commit ou PR e podem ser concluídos diretamente. Relatórios e
+experimentos nunca consolidam memória; investigações só consolidam após
+confirmação. Relatórios e investigações podem produzir documentos no vault; um
+experimento cria ferramentas pequenas na pasta de trabalho atual, sem executar
+comandos Git, e mantém seus arquivos até a limpeza manual. Consulte
 [guidelines/card work types.md](guidelines/card%20work%20types.md).
 
 ## Funcionalidades Principais
@@ -397,7 +398,7 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 - **[SETUP.md](SETUP.md)** - Instalação e configuração detalhada
 - **[CLAUDE.md](CLAUDE.md)** - Arquitetura completa e referência de comandos
 - **[guidelines/](guidelines/)** - Diretrizes do agente (todos os arquivos são carregados)
-- **[templates/](templates/)** - Templates de implementação, relatório e investigação
+- **[templates/](templates/)** - Templates de implementação, relatório, investigação e experimento
 - **[Dashboard do board](https://github.com/leandrohorizon/dashboard-agent-obsidian)** - Plugin de Obsidian, em repositório próprio
 
 ## Estrutura do Projeto
@@ -417,7 +418,7 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 │   ├── projects/               # Memória por repositório (.gitkeep)
 │   ├── features/               # Memória por feature (.gitkeep)
 │   └── operational/            # Memória de execução (.gitkeep)
-├── templates/                  # Templates de implementação, relatório e investigação
+├── templates/                  # Templates de implementação, relatório, investigação e experimento
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md      # Padrões de desenvolvimento

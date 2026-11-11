@@ -63,6 +63,9 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
       - Usar `grep`, `find` e `Read` para explorar o código mencionado
 
 4. **Validar/preencher `feature:` no frontmatter:**
+   - Para `experiment`, manter `feature:` vazio e não sugerir arquivos de
+     memória; esse tipo nunca contribui com conhecimento para a memória
+   - Para os demais tipos, seguir as instruções abaixo:
    - Ler o campo `feature:` do frontmatter do card (via `parse_frontmatter`)
    - Se ausente ou vazio:
      - Listar os arquivos `.md` existentes em `$OBSIDIAN_VAULT_PATH/condensed memory/features/`

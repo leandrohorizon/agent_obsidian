@@ -96,6 +96,7 @@ board/
 
 Reports and investigations skip Git setup and review: `/start-card` moves them
 to `2.in_progress`, then `/complete-card` moves them directly to `4.done`.
+Experiments never run Git commands and follow the same direct completion path.
 
 **Card Metadata (YAML Frontmatter):**
 ```yaml
@@ -115,20 +116,22 @@ pr_status: Merged
 
 ### Card Work Types
 
-`work_type` accepts `implementation`, `report` or `investigation`. Older cards
-without this field keep the implementation workflow; an unknown value is an
-explicit error, not a fallback.
+`work_type` accepts `implementation`, `report`, `investigation` or `experiment`.
+Older cards without this field keep the implementation workflow; an unknown
+value is an explicit error, not a fallback.
 
 | Type | Git and code | Deliverable and completion |
 |---|---|---|
 | `implementation` | Existing branch, commit and PR flow | Code changes; finish through review and merge; memory consolidation remains automatic |
 | `report` | No branch, commit or project-code changes | Required report in `docs/{project}/reports/` in the central vault; complete directly from `2.in_progress` to `4.done`; never consolidate memory |
 | `investigation` | No branch, commit or project-code changes | Findings and references in the card; optional document in `docs/{project}/investigations/`; complete directly; ask before memory consolidation |
+| `experiment` | Never run Git commands | Small tools in the current work folder; tests optional; complete directly; never consolidate memory |
 
 `{project}` is the normalized project directory name. A discovery that requires
 code creates a separate related `implementation` card. `3.in_review` and
 `/orchestrate-cards` remain for implementation. The full contract is in
 `guidelines/card work types.md`.
+Experiment files remain in the current folder until manually removed.
 
 ### Card Structure
 
@@ -391,7 +394,7 @@ Initiates work on a card.
 4. For implementation cards, detects base branch (`main`/`master`)
 5. For implementation cards, **asks the user** whether to switch to the base branch before creating the card branch (skipped when already on the base)
 6. For implementation cards, **always runs `git pull`** on the base branch — aborts if it fails
-7. Creates git branch `feature/card-name` only for implementation; report and investigation do not use Git branches
+7. Creates git branch `feature/card-name` only for implementation; report and investigation do not use Git branches; experiment does not run Git commands
 8. Updates card frontmatter (repo, branch, status, started date)
 9. Moves card: `1.not_started/` → `2.in_progress/`
 10. Updates `.agent_obsidian` with current_card
@@ -529,19 +532,19 @@ Prepares card for code review and creates PR.
 9. Moves card: `2.in_progress/` → `3.in_review/`
 10. **Does NOT clear `.agent_obsidian`** - card still active during review
 
-Only applies to implementation. Reports and investigations skip `3.in_review`
-and go directly from `2.in_progress` to `/complete-card`.
+Only applies to implementation. Reports, investigations and experiments skip
+`3.in_review` and go directly from `2.in_progress` to `/complete-card`.
 
 ---
 
 ### `/complete-card [nome]`
-Finalizes a card; implementation cards follow merge, while reports and investigations can finish directly.
+Finalizes a card; implementation cards follow merge, while reports, investigations and experiments can finish directly.
 
 **Arguments:**
 - `[nome]`: Optional - uses `.agent_obsidian` if omitted
 
 **Actions:**
-1. Finds implementation cards in `3.in_review/`; reports and investigations can be completed from `2.in_progress/`
+1. Finds implementation cards in `3.in_review/`; reports, investigations and experiments can be completed from `2.in_progress/`
 2. Validates:
    - All tasks completed
    - "Descrição Técnica" filled
@@ -561,7 +564,7 @@ Finalizes a card; implementation cards follow merge, while reports and investiga
    - Runs `git checkout {default}` then `git pull` (aborts on failure)
    - Deletes the card branch with `git branch -d` — never `-D`; if git refuses because of unmerged commits, stops and reports
    - Does **not** delete the remote branch — only prints the cleanup command, since deleting a remote branch is destructive and requires an explicit request
-7. Automatically consolidates implementation memory; never consolidates reports; asks before consolidating investigation findings
+7. Automatically consolidates implementation memory; never consolidates reports or experiments; asks before consolidating investigation findings
 
 ---
 
@@ -615,7 +618,7 @@ Loads complete context for a card (read-only for card content, for understanding
 Works on **all** cards in `1.not_started/` at once, one subagent per card, opening each PR as a **draft**.
 
 Processes only implementation cards (including legacy cards without
-`work_type`); reports and investigations are skipped and listed in the result.
+`work_type`); reports, investigations and experiments are skipped and listed in the result.
 
 **Arguments:**
 - `[filtro]`: Optional - partial name or list of cards. If omitted, processes all cards in `1.not_started/`.
@@ -639,8 +642,8 @@ Processes only implementation cards (including legacy cards without
 ### `/condense-memory [nome-do-card]`
 Consolidates knowledge from completed cards into condensed memory.
 
-Reports are never consolidated. Investigations are excluded from batch runs and
-are processed only when named explicitly.
+Reports and experiments are never consolidated. Investigations are excluded from
+batch runs and are processed only when named explicitly.
 
 **Arguments:**
 - `[nome-do-card]`: Optional - specific card in `4.done/`. If omitted, processes all unprocessed cards.
@@ -810,7 +813,7 @@ Commands automatically load and apply these guidelines when writing code.
 ### Branch Management
 
 - For implementation, `/start-card` asks whether to switch to the base branch (`main`/`master`), then **always pulls** before creating the branch
-- `/start-card` creates `feature/card-name` only for implementation; reports and investigations do not use branches
+- `/start-card` creates `feature/card-name` only for implementation; reports and investigations do not use branches, and experiments do not run Git commands
 - Branch name stored in card frontmatter
 - `/review-card` validates branch, creates commit and pushes only for implementation
 - `/complete-card` returns to the default branch and deletes the local card branch only for implementation
@@ -1001,7 +1004,8 @@ If you're unsure which card you were working on:
 ├── templates/
 │   ├── card template.md      # Implementation template
 │   ├── report card template.md
-│   └── investigation card template.md
+│   ├── investigation card template.md
+│   └── experiment card template.md
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
 │   ├── code guidelines.md    # Development standards

@@ -25,12 +25,14 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Ler `guidelines/card work types.md`
    - Card sem `work_type` é `implementation`; valor desconhecido interrompe sem mover o card ou alterar estado
    - Verificar se o PR foi merged somente para `implementation`, se houver PR
-   - `report` e `investigation` podem ser concluídos diretamente de `2.in_progress`, sem PR
+   - `report`, `investigation` e `experiment` podem ser concluídos diretamente de `2.in_progress`, sem PR
+   - Para `experiment`, não executar nenhum comando Git
 
 4. **Validar completude:**
    - Para `implementation`: todas as tarefas, descrição técnica, conhecimento adquirido e PR (`pr_url`) conforme o fluxo existente
    - Para `report`: todas as tarefas concluídas, documento presente em `docs/{projeto}/reports/` no vault e caminho registrado na descrição técnica
    - Para `investigation`: todas as tarefas concluídas; descobertas, conclusões e referências registradas no card; documento em `docs/{projeto}/investigations/` é opcional
+   - Para `experiment`: todas as tarefas concluídas; ferramenta e resultado presentes na pasta atual; caminho relativo e instruções de uso registrados na descrição técnica
    - ✅ Seção "Discussões" documentada? (leitura sob demanda)
 
 5. **Completar documentação:**
@@ -50,7 +52,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
 
 7. **Mover o card:**
    - `implementation`: mover de `3.in_review/` para `4.done/`
-   - `report` e `investigation`: mover de `2.in_progress/` para `4.done/`
+   - `report`, `investigation` e `experiment`: mover de `2.in_progress/` para `4.done/`
 
 8. **Limpar .agent_obsidian:**
    - Ler `.agent_obsidian` do diretório atual (se existir)
@@ -59,7 +61,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Escrever de volta usando Write tool preservando estrutura completa
 
 9. **Voltar para a branch default e apagar a branch do card:**
-   - Aplicável somente a `implementation`. Para `report` e `investigation`, não executar checkout, pull ou exclusão de branch.
+   - Aplicável somente a `implementation`. Para `report`, `investigation` e `experiment`, não executar nenhum comando Git.
    - Detectar a branch default do repositório (`main`/`master`), preferindo `main` quando ambas existirem
    - Ler a branch do card no frontmatter (`branch:`)
    - Verificar alterações não commitadas: `git status --short`
@@ -78,6 +80,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - `implementation`: manter o fluxo atual e executar `/condense-memory "{nome-do-card}"` automaticamente
    - `report`: não chamar `/condense-memory`
    - `investigation`: se houver conhecimento potencialmente reutilizável, perguntar se o usuário confirma a consolidação. Só após resposta afirmativa executar `/condense-memory "{nome-do-card}"`; resposta negativa conclui o card sem memória
+   - `experiment`: nunca chamar `/condense-memory`, mesmo após pedido explícito; conhecimento, resultados e referências permanecem somente no card
 
 11. **Confirmar:**
    ```
@@ -99,7 +102,9 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    ```
    - Usar o resumo de branch e memória acima somente para `implementation`
    - Para `report` e `investigation`, informar o caminho dos documentos no vault e que nenhum Git foi executado; memória de relatório: não aplicável; investigação: indicar se o usuário confirmou ou recusou a consolidação
+   - Para `experiment`, informar que o card foi concluído sem Git ou consolidação de memória e que os artefatos continuam na pasta atual até limpeza manual
 
 ## Notas Importantes
 - Não delete informações ao mover o card, preserve todo o histórico
 - Para relatórios e investigações, informar que os documentos no vault são alterações locais e não foram commitados
+- Para experimentos, não apagar os artefatos ao concluir; a limpeza é manual

@@ -48,10 +48,11 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
 6. **Verificar contexto do repositório:**
    - Para `implementation`, executar `git branch --show-current`, `git status --short` e `git log -1 --oneline`
    - Para `report` e `investigation`, não exigir Git nem usar branch/commits como contexto do card
+   - Para `experiment`, não executar nenhum comando Git nem apresentar dados de Git
 
 7. **Sincronizar branch e estado (`.agent_obsidian`):**
-   - Aplicável somente a `implementation`; para `report` e `investigation`, não comparar branch, perguntar sobre checkout, executar checkout/pull ou afirmar que a branch está sincronizada
-   - Atualizar `.agent_obsidian.current_card` para o card carregado, preservando todos os outros campos, também para `report` e `investigation`
+   - Aplicável somente a `implementation`; para `report`, `investigation` e `experiment`, não comparar branch, perguntar sobre checkout, executar comandos Git ou afirmar que a branch está sincronizada
+   - Atualizar `.agent_obsidian.current_card` para o card carregado, preservando todos os outros campos, também para `report`, `investigation` e `experiment`
    - Comparar a branch atual (`git branch --show-current`) com a branch do card
      (campo `branch:` do frontmatter)
    - **Se divergirem**, o card está ativo mas o repositório está em outra branch.
@@ -106,6 +107,7 @@ Carregar todo o contexto necessário de um card, incluindo o próprio card, guid
 
 9. **Apresentar resumo do contexto:**
    - Para `report` e `investigation`, substituir os campos Branch/Pull por `Git: não aplicável a este tipo` e omitir as seções de contexto/modificações da branch.
+   - Para `experiment`, informar `Git: não utilizado conforme o tipo do card` e omitir qualquer seção de branch, pull ou diff.
    ```
    📋 Contexto carregado: {nome-do-card}
 

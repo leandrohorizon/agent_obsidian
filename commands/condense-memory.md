@@ -14,6 +14,9 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
    - Se arquivo existe e é válido, usar `vault_path` dele
    - Se não existe ou inválido, usar variável `$OBSIDIAN_VAULT_PATH`
    - Se nenhum dos dois está disponível, instruir: `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
+   - Se um card foi nomeado, verificar seu `work_type` antes de ler ou criar
+     arquivos de memória; se for `experiment`, informar que nunca é consolidado
+     e encerrar sem acessar a memória
 
 2. **Detectar projeto atual:**
    - Obter nome do diretório atual: `basename $(pwd) | tr '[:upper:]' '[:lower:]' | tr '-' '_'`
@@ -32,16 +35,17 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
      - Se não encontrado, avisar usuário e listar cards disponíveis
      - Ler `work_type`: ausente é `implementation`; valor desconhecido deve ser reportado como inválido e não processado
      - Se for `report`, informar que relatórios nunca são consolidados e não processar
+     - Se for `experiment`, informar que experimentos nunca são consolidados e não processar, mesmo quando nomeados explicitamente
      - Se for `investigation`, a chamada nomeada explicitamente é a confirmação do usuário para consolidar
      - Processar apenas este card quando elegível
    - Se não foi fornecido argumento:
      - Listar todos os .md em `$OBSIDIAN_VAULT_PATH/board/4.done/`
      - Filtrar apenas cards de `implementation` (incluindo os legados sem `work_type`) que NÃO foram processados ainda
-     - Não incluir `report` nem `investigation` no processamento em lote; informar quantos foram ignorados por tipo
+     - Não incluir `report`, `investigation` nem `experiment` no processamento em lote; informar quantos foram ignorados por tipo
      - Processar todos os cards não processados
 
 5. **Processar cards selecionados:**
-   - Antes da extração, confirmar que o card não é `report` e que seu tipo é válido
+   - Antes da extração, confirmar que o card não é `report` nem `experiment` e que seu tipo é válido
    - Para cada card, ler:
      - Seção "### Descrição"
      - Seção "### Conhecimento Adquirido pela IA"
@@ -128,7 +132,7 @@ Processar cards em "4.done" (todos ou um específico), extrair conhecimento rele
    - Itens classificados como **projeto** → escrever em `condensed memory/projects/{projeto}.md`
    - Itens classificados como **feature** → escrever em `condensed memory/features/{feature}.md`
    - Se o card tem `feature:` no frontmatter → escrever nos dois arquivos (projeto + feature)
-   - Cards `report` nunca geram memória. Cards `investigation` só são processados por chamada com nome explícito, que serve como confirmação do usuário; nunca entram no lote sem nome.
+   - Cards `report` e `experiment` nunca geram memória. Cards `investigation` só são processados por chamada com nome explícito, que serve como confirmação do usuário; nunca entram no lote sem nome.
    - Se o card NÃO tem `feature:` → escrever só no de projeto e avisar no output:
      `⚠️ Card sem feature: — conhecimento de feature não roteado. Preencha feature: no frontmatter.`
    - Se `feature:` é uma lista YAML (`feature: [a, b]`) → escrever o recorte pertinente de cada item em cada arquivo de feature correspondente

@@ -24,7 +24,8 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
    - Ler `guidelines/card work types.md`
    - Card sem `work_type` é `implementation`; valor desconhecido interrompe o fluxo com erro explícito
-   - Para `report` e `investigation`, não criar commit/push/PR nem mover para `3.in_review`; informar que esses tipos vão diretamente para `/complete-card`
+   - Para `report`, `investigation` e `experiment`, não criar commit/push/PR nem mover para `3.in_review`; informar que esses tipos vão diretamente para `/complete-card`
+   - Para `experiment`, não executar nenhum comando Git
    - Só após confirmar `implementation`, verificar o repositório Git e se há alterações para revisar
    - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]` — as tarefas
      concluídas são leitura sob demanda, então lê-las aqui é o caso de uso previsto

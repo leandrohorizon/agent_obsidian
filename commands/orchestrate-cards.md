@@ -10,7 +10,6 @@ Executar em lote somente cards de implementação em `1.not_started/`, usando um
 
 1. **Verificar configuração:**
    - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
-   - Verificar se estamos em um repositório git
    - Ler `guidelines/card work types.md` para selecionar somente implementações
    - Ler `.agent_obsidian` (criar/validar via `validate_agent_state()` se necessário)
    - Se `current_card` não for null, **avisar** que já existe um card ativo neste
@@ -21,9 +20,9 @@ Executar em lote somente cards de implementação em `1.not_started/`, usando um
    - Listar todos os arquivos `.md` em `$OBSIDIAN_VAULT_PATH/board/1.not_started/`
    - Se `[filtro]` foi fornecido, restringir a lista aos cards que casam com o filtro
    - Ler `work_type` de cada candidato; ausente significa `implementation`
-   - Processar apenas `implementation`; excluir `report` e `investigation` e informar quais foram ignorados
+   - Processar apenas `implementation`; excluir `report`, `investigation` e `experiment` e informar quais foram ignorados
    - Reportar tipos desconhecidos como inválidos e não processá-los
-   - Se não houver cards de implementação elegíveis, informar os ignorados e encerrar
+   - Se não houver cards de implementação elegíveis, informar os ignorados e encerrar sem exigir repositório Git
    - **Apresentar a lista ao usuário e pedir confirmação** antes de prosseguir:
      ```
      Vou trabalhar nos seguintes cards (em paralelo, um subagente por card):
@@ -54,6 +53,9 @@ Executar em lote somente cards de implementação em `1.not_started/`, usando um
      antes) e para avisar quem será afetado por uma mudança
 
 4. **Executar um subagente por card (em paralelo):**
+   - Depois da confirmação da lista, verificar que o diretório atual é um
+     repositório Git; essa verificação só ocorre quando há cards de implementação
+     elegíveis para executar
    - Para cada card, disparar um subagente com contexto isolado
    - O prompt do subagente deve instruir a sequência completa:
 
@@ -133,7 +135,8 @@ Executar em lote somente cards de implementação em `1.not_started/`, usando um
 /orchestrate-cards
 ```
 Processa todos os cards em `1.not_started/` em paralelo, cada um com PR em draft.
-Cards `report` e `investigation` são ignorados e informados no resultado; use `/work-on-card` e `/complete-card` individualmente para esses tipos.
+Cards `report`, `investigation` e `experiment` são ignorados e informados no
+resultado; use `/work-on-card` e `/complete-card` individualmente para esses tipos.
 
 ### Trabalhar em um subconjunto
 ```

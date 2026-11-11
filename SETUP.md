@@ -111,7 +111,8 @@ cd ~/meu-projeto
 - Move card de `1.not_started/` → `2.in_progress/`
 - Para implementação, detecta repositório Git, pergunta sobre a branch base, faz `git pull` e cria `feature/nome-do-card`
 - Para relatório e investigação, não troca branch, faz pull ou cria branch; mantém `branch:` vazio
-- Atualiza card com informações do repositório
+- Para experimento, não executa nenhum comando Git e mantém `repo:` e `branch:` vazios
+- Atualiza o frontmatter conforme o tipo de trabalho
 
 ### `/work-on-card <nome>`
 Trabalha nas tarefas do card, com contexto completo (guidelines + condensed memory + dependências).
@@ -132,10 +133,11 @@ Trabalha nas tarefas do card, com contexto completo (guidelines + condensed memo
 - Faz commits incrementais em cards de implementação
 - Relatórios produzem documentos em `docs/{projeto}/reports/` no vault sem alterar código
 - Investigações tratam o código do projeto como somente leitura e podem produzir documentos em `docs/{projeto}/investigations/`
+- Experimentos criam ferramentas pequenas na pasta de trabalho atual; testes são opcionais, não usam Git nem escrevem na memória
 
 ### `/review-card <nome>`
 Prepara card para revisão, move para "in_review" e auxilia na criação de PR.
-Aplica-se somente a cards de implementação; relatórios e investigações são concluídos diretamente.
+Aplica-se somente a cards de implementação; relatórios, investigações e experimentos são concluídos diretamente.
 
 **Uso:**
 ```
@@ -163,12 +165,12 @@ Finaliza um card, movendo para "done" e garantindo documentação completa.
 - Valida completude do card
 - Para implementação, verifica se PR foi merged
 - Adiciona timestamps de conclusão
-- Move implementação de `3.in_review/` e relatório/investigação de `2.in_progress/` para `4.done/`
+- Move implementação de `3.in_review/` e relatório/investigação/experimento de `2.in_progress/` para `4.done/`
 - Só para implementação, volta para a branch default, faz pull e tenta apagar a branch local
-- Consolida memória automaticamente para implementação; nunca para relatório; pede confirmação para investigação
+- Consolida memória automaticamente para implementação; nunca para relatório ou experimento; pede confirmação para investigação
 
 ### `/condense-memory`
-Consolida implementações elegíveis em `4.done`; relatórios nunca são incluídos e investigações precisam ser nomeadas explicitamente.
+Consolida implementações elegíveis em `4.done`; relatórios e experimentos nunca são incluídos e investigações precisam ser nomeadas explicitamente.
 
 **Uso:**
 ```
@@ -176,7 +178,7 @@ Consolida implementações elegíveis em `4.done`; relatórios nunca são inclu�
 ```
 
 **O que faz:**
-- Processa implementações pendentes em `4.done/`; não consolida relatórios
+- Processa implementações pendentes em `4.done/`; não consolida relatórios nem experimentos
 - Investigações só são processadas quando nomeadas explicitamente
 - Extrai conhecimento das seções:
   - "Conhecimento Adquirido pela IA"
@@ -198,6 +200,14 @@ Crie o card com `work_type: report` ou `work_type: investigation` e inicie com
 Relatórios ficam em `docs/{projeto}/reports/`; documentos de investigação são
 opcionais em `docs/{projeto}/investigations/`, ambos no vault. A investigação
 só é consolidada em memória após confirmação; relatórios nunca são consolidados.
+
+### Experimento com ferramenta isolada
+
+Crie o card com `work_type: experiment`, entre na pasta de trabalho do
+experimento e use `/start-card`. O fluxo não executa nenhum comando Git. Crie e
+valide a ferramenta nessa pasta; testes automatizados são opcionais. Use
+`/complete-card` para concluir diretamente em `4.done`. Os arquivos permanecem
+na pasta até limpeza manual e nunca são enviados para condensed memory.
 
 ```bash
 # 1. Ver o que tem para fazer
@@ -233,7 +243,8 @@ $OBSIDIAN_VAULT_PATH/
 ├── templates/
 │   ├── card template.md             # Implementação
 │   ├── report card template.md
-│   └── investigation card template.md
+│   ├── investigation card template.md
+│   └── experiment card template.md
 ├── guidelines/           # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md           # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md   # Padrões de desenvolvimento
@@ -339,15 +350,15 @@ Se estiver vazio, verifique se adicionou ao arquivo correto (~/.zshrc ou ~/.bash
 - O card pode estar em outro estágio do board
 
 ### Erro: "Não está em um repositório git"
-Os cards de implementação exigem um repositório git para iniciar e revisar. Cards `report` e `investigation` não exigem Git.
+Os cards de implementação exigem um repositório git para iniciar e revisar. Cards `report` e `investigation` não exigem Git; `experiment` não executa nenhum comando Git.
 
 ## Dicas
 
 1. **Use tab completion**: Os nomes dos cards podem ter espaços, use aspas
-2. **Commits incrementais**: `/work-on-card` pode fazer commits automáticos
+2. **Commits incrementais**: `/work-on-card` pode fazer commits automáticos em cards `implementation`; experimentos nunca executam Git
 3. **Contexto automático**: Todos os comandos carregam todos os arquivos de `guidelines/` e o condensed memory
 4. **Dependências**: Use as propriedades `depends_on` e `dependents` com `[[nome-do-card]]` para referenciar cards relacionados (`guidelines/IA best practices.md` §8)
-5. **Documentação**: Registre descobertas reutilizáveis de implementações/investigações; relatório não gera consolidação de memória
+5. **Documentação**: Registre descobertas reutilizáveis de implementações/investigações; relatórios e experimentos não geram consolidação de memória
 
 ## Dashboard (opcional)
 

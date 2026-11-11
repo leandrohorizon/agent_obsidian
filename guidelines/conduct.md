@@ -134,7 +134,9 @@ quando parece incompleta, temporária ou fora do padrão.
   do par `falhou` → `funcionou` (comando, saída, ordem) se perde se o registro
   esperar o merge. As regras acima continuam valendo integralmente para
   `condensed memory/projects/` e `condensed memory/features/`, incluindo a
-  exceção explícita de investigação concluída e confirmada.
+  exceção explícita de investigação concluída e confirmada. **Cards
+  `experiment` não escrevem em nenhum eixo de memória, incluindo
+  `condensed memory/operational/`.**
 
 ## Leitura de arquivos
 
