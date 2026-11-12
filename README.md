@@ -129,12 +129,14 @@ Cards começam vagos? Use `/refine-card` para:
    source ~/.zshrc
    ```
 
-2. **Sincronizar comandos:**
+2. **Sincronizar comandos e skills:**
    ```bash
    ./sync-commands.sh
    ```
    No Windows, use `.\sync-commands.ps1`.
-   Isso instala os slash commands globalmente no Claude Code.
+   Isso instala os slash commands no Claude Code e as skills do VS Code Copilot
+   em `~/.copilot/skills/`. Para sincronizar somente as skills do VS Code, use
+   `./sync-commands.sh vscode` ou `.\sync-commands.ps1 vscode`.
 
 3. **Verificar:**
    ```bash

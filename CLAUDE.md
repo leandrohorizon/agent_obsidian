@@ -879,7 +879,7 @@ On Windows, use `.\sync-commands.ps1` instead.
 This script:
 - Copies all `commands/*.md` to `~/.claude/commands/`
 - Makes them available as slash commands globally in Claude Code
-- Generates VS Code skills in `~/.agent_obsidian/skills/` (structure below)
+- Generates VS Code Copilot skills in `~/.copilot/skills/` (structure below)
 
 Verify installation:
 ```bash
@@ -890,10 +890,11 @@ Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card
 
 ### VS Code Skills Installation
 
-Skills are installed in `~/.agent_obsidian/skills/` with the correct VS Code structure:
+Skills are installed in `~/.copilot/skills/`, the native personal skills
+location for VS Code Copilot:
 
 ```
-~/.agent_obsidian/skills/
+~/.copilot/skills/
 ├── board-status/
 │   └── SKILL.md
 ├── start-card/
@@ -915,7 +916,10 @@ description: Skill do Agent Obsidian para gerenciar o board Kanban em Obsidian.
 If the `name` doesn't match the folder name, VS Code may silently ignore the skill.
 
 The `sync-commands.sh` (Linux/macOS) and `sync-commands.ps1` (Windows) scripts
-automatically generate these skills from `commands/*.md`.
+automatically generate these skills from `commands/*.md`. Run the scripts with
+the `vscode` argument to sync only VS Code Copilot skills. Copilot discovers
+skills from this native location; `chat.agentSkillsLocations` custom paths are
+not loaded by Copilot harness sessions.
 
 ### Git & GitHub CLI
 
