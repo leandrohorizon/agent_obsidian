@@ -38,10 +38,30 @@ cd ~/meu-projeto
 
 # Completar após merge
 /complete-card
+# ✅ Verifica pós-deploy antes de concluir (quando o projeto tem deploy)
 # ✅ Move para done
 # ✅ Volta para a branch default e apaga a branch do card
 # ✅ Consolida conhecimento para tarefas futuras
+
+# Verificações com prazo, depois do deploy
+/check-tasks
+# ✅ Executa as verificações vencidas de tasks/
 ```
+
+## Tipos de trabalho
+
+Cards declaram `work_type: implementation`, `work_type: report`,
+`work_type: investigation` ou `work_type: experiment`. Cards antigos sem o campo
+continuam sendo implementações; um valor fora da lista interrompe o comando sem
+efeito colateral. Cada tipo executa somente as ações da sua allowlist (ver
+[guidelines/card work types.md](guidelines/card%20work%20types.md)). Relatórios,
+investigações e experimentos são concluídos diretamente, sem branch, commit ou
+PR. Relatórios e experimentos nunca consolidam memória; investigações só
+consolidam após confirmação. Relatórios e investigações podem produzir
+documentos no vault; um experimento cria ferramentas pequenas na pasta de
+trabalho atual, sem executar comandos Git, e mantém seus arquivos até a limpeza
+manual. Consulte
+[guidelines/card work types.md](guidelines/card%20work%20types.md).
 
 ## Funcionalidades Principais
 
@@ -55,7 +75,7 @@ Suas tarefas são arquivos markdown fluindo através de estados:
 - **`1.not_started`** — cards refinados, prontos para iniciar
 
 ### 🧠 Consolidação de Conhecimento (dois eixos)
-Cada tarefa completada contribui para uma **condensed memory** que o Claude carrega automaticamente em trabalhos futuros. O conhecimento é particionado em **dois eixos** com responsabilidades disjuntas:
+Implementações concluídas e mergeadas, além de investigações concluídas com confirmação, podem contribuir para uma **condensed memory** que o Claude carrega automaticamente em trabalhos futuros. Relatórios nunca são consolidados. O conhecimento é particionado em **dois eixos** com responsabilidades disjuntas:
 
 - **Memória de projeto** (`condensed memory/projects/{projeto}.md`) — o que é estável e transversal ao repositório: arquitetura, convenções de código, ferramentas, setup, gotchas do stack. **Sem conhecimento de feature.**
 - **Memória de feature** (`condensed memory/features/{feature}.md`) — regra de negócio, fluxo ponta a ponta, contratos entre serviços, decisões e edge cases daquela feature, **atravessando repositórios**.
@@ -133,16 +153,18 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 | Comando                   | Propósito                              | Exemplo                                                 |
 | ------------------------- | -------------------------------------- | ------------------------------------------------------- |
 | `/board-status`           | Mostra estado do board Kanban          | `/board-status`                                         |
-| `/start-card <nome>`      | Inicia trabalho, cria branch           | `/start-card "adicionar feature"`                       |
+| `/start-card <nome>`      | Inicia o card; branch só para implementação | `/start-card "adicionar feature"`                    |
 | `/refine-card <nome>`     | Clarifica cards vagos antes de iniciar | `/refine-card "adicionar feature"`                      |
 | `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
-| `/review-card [nome]`     | Cria PR, move para review              | `/review-card`                                          |
-| `/complete-card [nome]`   | Finaliza, consolida conhecimento       | `/complete-card`                                        |
-| `/load-context [nome]`    | Carrega contexto, sincroniza branch    | `/load-context`                                         |
-| `/orchestrate-cards [filtro]` | Trabalha em todos os cards de `1.not_started` (PR em draft) | `/orchestrate-cards` |
-| `/condense-memory [nome]` | Consolida conhecimento do card         | `/condense-memory`                                      |
+| `/review-card [nome]`     | Cria PR para implementação              | `/review-card`                                          |
+| `/complete-card [nome]`   | Finaliza; memória e verificação dependem do tipo | `/complete-card`                                 |
+| `/review-pr <pr>`         | Revisa PR com guidelines e memórias    | `/review-pr 123`                                        |
+| `/load-context [nome]`    | Carrega contexto do card ou do projeto; sincroniza branch só para implementação | `/load-context`                           |
+| `/check-tasks`            | Executa verificações pós-deploy vencidas de `tasks/` | `/check-tasks`                            |
+| `/orchestrate-cards [filtro]` | Orquestra implementações (PR em draft) | `/orchestrate-cards`                              |
+| `/condense-memory [nome]` | Consolida memória conforme tipo         | `/condense-memory`                                      |
 
-**Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido.
+**Nota:** Comandos com `[nome]` (opcional) usam o card ativo do `.agent_obsidian` se omitido. Sem card ativo, o `/load-context` roda no modo de projeto: carrega guidelines, memória do projeto, estado do Git (só leitura) e os cards deste repositório em `2.in_progress`/`3.in_review`, sem pedir nome de card e sem alterar o `.agent_obsidian`.
 
 ## Exemplo de Workflow
 
@@ -176,9 +198,16 @@ cd ~/projeto-calculadora
 # Depois do merge do PR
 /complete-card
 # Move para: board/4.done/
+# Verifica pós-deploy: espera o deploy com janela limitada, roda o que é imediato e
+# grava o que tem prazo em tasks/ (não conclui se o deploy não tiver rodado)
 # Volta para a branch default e apaga a branch do card
 # Roteia conhecimento para: condensed memory/projects/calculadora.md e condensed memory/features/{feature}.md
 # Limpa current card no .agent_obsidian
+
+# Verificações com prazo, dias depois
+/check-tasks
+# Lista todas as vencidas de tasks/ (data ≤ hoje) e executa as confirmadas
+# Sugere card de correção quando uma falha
 
 # Iniciar próxima feature
 /start-card "modo científico"
@@ -233,6 +262,26 @@ Dependências ficam no frontmatter (`depends_on` e `dependents`), não em seçã
 o Obsidian as trata como links nativos e o plugin consegue lê-las sem parsear
 markdown. Cards criados antes dessa convenção usam as seções `### Dependências` /
 `### Dependentes` e continuam funcionando por fallback.
+
+### Verificação pós-deploy
+
+Card de implementação cujo projeto tem deploy **e** cuja mudança é observável em
+execução ganha a seção `### Verificação Pós-Deploy`, **fora** de `### Tarefas`
+(verificação pode falhar sem que o card deixe de estar concluído). Cada linha
+declara onde olhar, o que se espera ver, a janela de observação e o critério de
+falha — e aponta para a memória que já registra a consulta, em vez de duplicá-la.
+
+A verificação tem dois tempos:
+
+- **Imediata** (log depois do deploy, uptime, healthcheck, estado no banco) roda
+  dentro do `/complete-card`, antes do `4.done`;
+- **Com prazo** ("conferir daqui a 24h") vira arquivo em `tasks/`, na raiz do
+  vault, e é executada depois pelo `/check-tasks`.
+
+Falha não bloqueia a conclusão: sugere card de correção e entra na memória
+consolidada. Se a janela de espera pelo deploy fechar sem deploy, o card **não**
+é concluído e o comando pede para ser chamado de novo. `tasks/` fica fora do
+board de propósito: é fila de verificação com data, não estado de card.
 
 ## Formato da Condensed Memory
 
@@ -388,7 +437,7 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 - **[SETUP.md](SETUP.md)** - Instalação e configuração detalhada
 - **[CLAUDE.md](CLAUDE.md)** - Arquitetura completa e referência de comandos
 - **[guidelines/](guidelines/)** - Diretrizes do agente (todos os arquivos são carregados)
-- **[templates/](templates/)** - Template de card
+- **[templates/](templates/)** - Templates de implementação, relatório, investigação e experimento
 - **[Dashboard do board](https://github.com/leandrohorizon/dashboard-agent-obsidian)** - Plugin de Obsidian, em repositório próprio
 
 ## Estrutura do Projeto
@@ -402,17 +451,20 @@ artefato instalado, local como qualquer outro plugin do Obsidian.
 │   ├── 3.in_review/
 │   ├── 4.done/
 │   └── 5.archived/
+├── tasks/                      # Verificações pós-deploy com prazo (fila, fora do board)
 ├── commands/                   # Definições dos slash commands
 ├── condensed memory/           # Bases de conhecimento em três eixos
 │   ├── README.md               # Especificação do formato (versionada)
 │   ├── projects/               # Memória por repositório (.gitkeep)
 │   ├── features/               # Memória por feature (.gitkeep)
 │   └── operational/            # Memória de execução (.gitkeep)
-├── templates/                  # Template de card
+├── templates/                  # Templates de card (implementação, relatório, investigação, experimento) e de verificação em `tasks/`
 ├── guidelines/                 # Diretrizes do agente (todos os arquivos são carregados)
 │   ├── conduct.md              # Regras de conduta do agente (precedência)
 │   ├── code guidelines.md      # Padrões de desenvolvimento
-│   └── IA best practices.md    # Boas práticas de uso de IA por agentes
+│   ├── commit guidelines.md    # Composição do histórico de commits
+│   ├── IA best practices.md    # Boas práticas de uso de IA por agentes
+│   └── card work types.md      # Comportamento e ciclo de vida por work_type
 ├── docs/                       # Documentação de projeto (PDFs, specs)
 ├── sync-commands.sh            # Instala comandos no Claude (Linux/macOS)
 ├── sync-commands.ps1           # Instala comandos no Claude (Windows)

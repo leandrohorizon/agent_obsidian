@@ -38,3 +38,9 @@
 !board/
 !board/*/
 !board/**/.gitkeep
+
+# Fila de verificações pós-deploy com prazo. O conteúdo é dado de execução
+# (ambiente, consultas, resultado), então é local como os cards; a pasta existe
+# no clone via .gitkeep.
+!tasks/
+!tasks/**/.gitkeep

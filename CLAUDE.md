@@ -21,7 +21,10 @@ This system uses a **distributed state architecture** with centralized knowledge
 │   ├── guidelines/               # Agent directives (all files loaded)
 │   │   ├── conduct.md            # Agent behavior rules (precedence)
 │   │   ├── code guidelines.md    # Development standards
-│   │   └── IA best practices.md  # AI context and tooling practices
+│   │   ├── commit guidelines.md  # Commit history composition
+│   │   ├── IA best practices.md  # AI context and tooling practices
+│   │   └── card work types.md    # Work-type behavior and lifecycle
+│   ├── tasks/                    # Dated post-deploy checks (.gitkeep, local content)
 │   └── docs/                     # Project documentation (PDFs, specs)
 │
 ├── project-example/           # Project 1
@@ -93,11 +96,16 @@ board/
 
 **Card flow:** `0.backlog` (raw idea) → `/refine-card` → `1.not_started` (refined) → `/start-card` → `2.in_progress` → `/review-card` → `3.in_review` → `/complete-card` → `4.done`
 
+Reports and investigations skip Git setup and review: `/start-card` moves them
+to `2.in_progress`, then `/complete-card` moves them directly to `4.done`.
+Experiments never run Git commands and follow the same direct completion path.
+
 **Card Metadata (YAML Frontmatter):**
 ```yaml
 ---
 repo: git@github.com:org/project.git
 branch: feature/card-name
+work_type: implementation
 status: In Progress
 created: 2026-01-15
 started: 2026-01-16
@@ -107,6 +115,31 @@ pr_url: https://github.com/org/project/pull/123
 pr_status: Merged
 ---
 ```
+
+### Card Work Types
+
+`work_type` accepts `implementation`, `report`, `investigation` or `experiment`.
+A card without this field keeps the implementation workflow; an unknown value is
+an explicit error with no side effects. Each type may run only the actions
+listed in its allowlist in `guidelines/card work types.md`.
+
+| Type | Git and code | Deliverable and completion |
+|---|---|---|
+| `implementation` | Existing branch, commit and PR flow | Code changes; finish through review and merge; memory consolidation remains automatic |
+| `report` | No branch, commit or project-code changes | Required report in `docs/{project}/reports/` in the central vault; complete directly from `2.in_progress` to `4.done`; never consolidate memory |
+| `investigation` | No branch, commit or project-code changes | Findings and references in the card; optional document in `docs/{project}/investigations/`; complete directly; ask before memory consolidation |
+| `experiment` | Never run Git commands | Small tools in the current work folder; tests optional; complete directly; never consolidate memory |
+
+`{project}` is the normalized project directory name. A discovery that requires
+code creates a separate related `implementation` card. `3.in_review` and
+`/orchestrate-cards` remain for implementation. The full contract is in
+`guidelines/card work types.md`.
+Experiment files remain in the current folder until manually removed.
+
+Implementation cards whose project has a deploy **and** whose change is
+observable at runtime also go through post-deploy verification inside
+`/complete-card` (see "Post-Deploy Verification"). The other types never verify
+the environment.
 
 ### Card Structure
 
@@ -145,6 +178,70 @@ Technical details of the implementation
 Business rules, patterns identified, gotchas, insights
 (This section feeds into condensed memory)
 ```
+
+### Post-Deploy Verification
+
+A card can carry checks that only make sense **after the solution is deployed**:
+logs, database state, metrics, real behavior. They live in
+`### Verificação Pós-Deploy` in the card, **outside** `### Tarefas`, because
+`/complete-card` requires every task to be `- [x]` and a verification may
+legitimately fail without the card being unfinished.
+
+**Two combined tests decide whether the section applies.** Both must hold:
+
+1. **The project has a deploy** — evidence in the repository
+   (`.github/workflows/*deploy*.yml`, `docker-compose*.yml`, `Procfile`,
+   `post-receive` hook) or in project/feature memory.
+2. **The change is observable at runtime** — something changes in a log, endpoint
+   response, database state, schedule or resource usage. A behavior-preserving
+   refactor, documentation or typo fails this test.
+
+When either test fails, the section stays empty and `/complete-card` skips it.
+
+Each row has four columns: where to look / what is expected / observation window /
+failure criterion. The **query itself is not duplicated**: the card points to the
+memory that already records it (e.g. `condensed memory/features/deploy-n8n.md`,
+"Validação de memória pós-deploy (três sinais)" and "Retenção de imagens e rollback").
+
+**Two clocks, not one:**
+
+| Kind | Where it runs | When |
+|---|---|---|
+| Immediate — log right after deploy, uptime, healthcheck, database state | inside `/complete-card`, before `4.done` | same session |
+| With a deadline — "check in 24h" | file in `tasks/`, read back by `/check-tasks` | later session |
+
+A failure **never blocks** completion: it suggests a correction card and goes into
+"Conhecimento Adquirido pela IA", which is what `/condense-memory` reads. There is
+no "awaiting verification" state on the board — verification is synchronous inside
+`/complete-card`, and only the deadline leaves the card.
+
+Waiting for the deploy has a bounded window. If the window closes without a deploy,
+`/complete-card` **does not complete**: no frontmatter update, no move, no state
+clear, no Git, no memory — the user calls it again later. Merge and deploy are not
+the same event, so the merge timestamp proves nothing.
+
+**Reading the environment:** invoking `/complete-card` **is** the explicit request
+required by `conduct.md` §Ambientes, limited to (a) read-only queries, (b) only the
+ones declared in the card section, (c) anything outside the list or that writes
+stops and asks. `/check-tasks` follows the same rule.
+
+**The four paths:**
+
+| Case | Expected behavior |
+|---|---|
+| Card without deploy, or change not observable | No new step: the section is skipped and the reason appears in the summary |
+| Immediate verification fails | Card completes; correction card suggested; failure recorded in "Conhecimento Adquirido" |
+| Verification with a deadline | File written to `tasks/`; card completes; automation offered, never created silently |
+| Deploy has not run when the window closes | Card is **not** completed; the command stops and asks the user to call it again |
+
+**`tasks/` is outside the board on purpose.** It is a queue of dated checks, not
+card state. Content is local, like the cards: `.gitignore` keeps only
+`tasks/.gitkeep`. File format: `templates/tasks/verificacao-pos-deploy.md` (origin
+card, repo, environment, queries, failure criterion, due date, status).
+
+**Never in the checklist:** cleanup of flags or compatibility code (implementation
+work that belongs to the original card), running the test suite (validates code,
+not the environment), running the deploy, and any query without a verifiable source.
 
 ### Knowledge Consolidation System
 
@@ -318,12 +415,21 @@ cd ~/workspace/project-example
 # 5. Complete the card after PR merge
 /complete-card
 # → Validates documentation complete
+# → Verifies post-deploy checks before moving: waits for the deploy in a bounded
+#   window (stops without completing if it has not run), runs immediate checks,
+#   writes deadline checks to tasks/, records outcomes in "Conhecimento Adquirido"
 # → Moves card: 3.in_review → 4.done
 # → Updates frontmatter (status: Done, pr_status: Merged)
 # → Clears current_card in .agent_obsidian (sets to null)
 # → Automatically calls /condense-memory to consolidate knowledge
 
-# 6. Knowledge automatically available for future tasks
+# 6. Dated post-deploy checks come back later
+/check-tasks
+# → Lists every pending check in tasks/ whose due date is today or past
+# → Runs the ones the user confirms and records the outcome in the file
+# → Suggests a correction card when a check fails
+
+# 7. Knowledge automatically available for future tasks
 /work-on-card "add scientific mode"
 # → Loads condensed memory with learnings from previous card
 ```
@@ -366,10 +472,10 @@ Initiates work on a card.
 1. Verifies `$OBSIDIAN_VAULT_PATH` is set
 2. Creates/validates `.agent_obsidian` in project root
 3. Finds card in `1.not_started/`
-4. Detects base branch (`main`/`master`)
-5. **Asks the user** whether to switch to the base branch before creating the card branch (skipped when already on the base)
-6. **Always runs `git pull`** on the base branch — aborts if it fails
-7. Creates git branch: `feature/card-name`
+4. For implementation cards, detects base branch (`main`/`master`)
+5. For implementation cards, **asks the user** whether to switch to the base branch before creating the card branch (skipped when already on the base)
+6. For implementation cards, **always runs `git pull`** on the base branch — aborts if it fails
+7. Creates git branch `feature/card-name` only for implementation; report and investigation do not use Git branches; experiment does not run Git commands
 8. Updates card frontmatter (repo, branch, status, started date)
 9. Moves card: `1.not_started/` → `2.in_progress/`
 10. Updates `.agent_obsidian` with current_card
@@ -403,7 +509,7 @@ Executes tasks in a card with full context.
 - Marks tasks complete (`- [x]`)
 - Documents decisions in "Discussões" section
 - Updates "Descrição Técnica" and "Conhecimento Adquirido"
-- Makes incremental git commits
+- Commits only for implementation, by logical unit (`guidelines/commit guidelines.md`)
 
 **Path Resolution:**
 ```
@@ -477,9 +583,12 @@ Prepares card for code review and creates PR.
 1. Validates all tasks completed (`- [x]`)
 2. Checks documentation sections filled
 3. Reviews git status and diff
-4. Suggests/creates commit if changes pending
-5. Pushes branch
-6. **Intelligently creates PR:**
+4. Reads the branch history as someone new to the repository; when it fails the
+   criterion in `guidelines/commit guidelines.md`, proposes reorganization and
+   waits for explicit authorization
+5. Suggests/creates commit if changes pending
+6. Pushes branch
+7. **Intelligently creates PR:**
    - Detects base branch (main/develop)
    - Gets relevant commits: `git log <base>..HEAD --oneline`
    - Ignores trivial commits (typo, lint, format)
@@ -502,51 +611,98 @@ Prepares card for code review and creates PR.
      ```
    - Output in Portuguese (pt-BR)
    - Focuses on technical and business impact
-7. Captures PR number and URL
-8. Updates card frontmatter (pr_url, reviewed date)
-9. Moves card: `2.in_progress/` → `3.in_review/`
-10. **Does NOT clear `.agent_obsidian`** - card still active during review
+8. Captures PR number and URL
+9. Updates card frontmatter (pr_url, reviewed date)
+10. Moves card: `2.in_progress/` → `3.in_review/`
+11. **Does NOT clear `.agent_obsidian`** - card still active during review
+
+Only applies to implementation. Reports, investigations and experiments skip
+`3.in_review` and go directly from `2.in_progress` to `/complete-card`.
+
+---
+
+### `/review-pr <pr>`
+Reviews a **received** pull request using the vault guidelines and the project/feature memories, so every finding cites the rule behind it. Read-only analysis: nothing is published on GitHub and no card is moved.
+
+**Arguments:**
+- `<pr>`: Required - PR number or URL
+- `[caminho-do-clone]`: Optional - local clone path when the repository is not in `~/workspace/{repo}`
+
+**Actions:**
+1. Reads the PR with `gh pr view` (state, head SHA, base branch, files, body)
+2. Loads all files in `guidelines/` — they apply to any repository
+3. Finds the PR's card by `pr_url` in the board and derives the feature memory from its `feature:`; continues without a card when none exists
+4. Classifies the repository case: cloned with memory, cloned without memory, or not cloned
+5. Enumerates changed files with `gh pr diff --name-only`, then reads each file's patch, skipping lockfiles, generated code and binaries
+6. Reports findings with `file:line`, severity, cited rule, evidence and a falsification step
+7. Keeps findings without a citable rule in a separate **suggestions** section (concrete alternative plus how to test, max 5)
+8. Declares `Convenção do repositório: desconhecida` when the repository has no memory instead of assuming its standards
+9. Proposes a new card for code work, **always asking before writing**; without a clone the card stays in `0.backlog` as a proposal
+10. Documents the findings in the PR card's `### Discussões` without touching status or folder
+11. Never publishes: no `gh pr review`, `gh pr comment` or review/comment API calls
+
+**Verification cases:** one finding that cites the violated guideline section, and one PR without a card and without a clone that still completes.
+
+Only applies to implementation. Reports, investigations and experiments skip
+`3.in_review` and go directly from `2.in_progress` to `/complete-card`.
 
 ---
 
 ### `/complete-card [nome]`
-Finalizes card after PR is merged.
+Finalizes a card; implementation cards follow merge, while reports, investigations and experiments can finish directly.
 
 **Arguments:**
 - `[nome]`: Optional - uses `.agent_obsidian` if omitted
 
 **Actions:**
-1. Finds card in `3.in_review/`
+1. Finds implementation cards in `3.in_review/`; reports, investigations and experiments can be completed from `2.in_progress/`
 2. Validates:
-   - All tasks completed
+   - All tasks in `### Tarefas` completed (the `### Verificação Pós-Deploy` section is not part of this validation)
    - "Descrição Técnica" filled
    - "Conhecimento Adquirido" filled
    - PR merged (if applicable)
-3. Updates frontmatter:
+3. For implementation, **verifies post-deploy checks before moving** (see "Post-Deploy Verification"):
+   - Applies the two combined tests (project has deploy **and** change observable); if either fails, skips with the reason in the summary
+   - Waits for the deploy inside a bounded window — if it closes without a deploy, **stops without completing** and asks the user to call it again
+   - Runs immediate checks; writes deadline checks to `tasks/`
+   - Records each outcome in the section and in "Conhecimento Adquirido pela IA"
+   - On failure, suggests a correction card and continues completion regardless of the answer
+   - Offers the VS Code local automation that calls `/check-tasks`; never creates it silently
+4. Updates frontmatter:
    ```yaml
    status: Done
    completed: YYYY-MM-DD
    pr_status: Merged
    ```
-4. Moves card: `3.in_review/` → `4.done/`
-5. **Clears `.agent_obsidian`:** Sets `current_card: null`
-6. **Returns to the default branch and deletes the card branch:**
+5. Moves implementation `3.in_review/` cards and non-code `2.in_progress/` cards to `4.done/`
+6. **Clears `.agent_obsidian`:** Sets `current_card: null`
+7. For implementation, **returns to the default branch and deletes the card branch:**
    - Detects the default branch (`main`/`master`), preferring `main`
    - Guards against uncommitted changes before the checkout (stops and warns)
    - Runs `git checkout {default}` then `git pull` (aborts on failure)
    - Deletes the card branch with `git branch -d` — never `-D`; if git refuses because of unmerged commits, stops and reports
    - Does **not** delete the remote branch — only prints the cleanup command, since deleting a remote branch is destructive and requires an explicit request
-7. **Automatically calls `/condense-memory`** to consolidate knowledge immediately
+8. Automatically consolidates implementation memory; never consolidates reports or experiments; asks before consolidating investigation findings
 
 ---
 
 ### `/load-context [nome]`
-Loads complete context for a card (read-only for card content, for understanding).
+Loads complete context for a card, or for the project when there is no card (read-only).
 
 **Arguments:**
-- `[nome]`: Optional - uses `.agent_obsidian` if omitted
+- `[nome]`: Optional - uses `.agent_obsidian` if omitted; when the state has `current_card: null` the command runs in **project mode** instead of asking for a card name
 
-**Actions:**
+**Project mode (no card):**
+1. Reads `$OBSIDIAN_VAULT_PATH`; an existing `.agent_obsidian` is read-only (no `/init-agent-state`, no `validate_agent_state()` repair)
+2. Loads all files in `guidelines/` and the project memory (`condensed_memory_path`, or derived from the normalized directory name via `/detect-project`)
+3. Reads git state only: `git branch --show-current`, `git status --short`, `git log -1 --oneline`, plus ahead/behind from `git status -sb`
+4. Lists this repository's cards in `2.in_progress/` and `3.in_review/`, matched by normalizing both the card's `repo:` and the remote to `owner/repo` (handles `https://…` and `git@…`), grouped by folder so the state stays visible
+5. **Writes nothing:** no `git checkout`/`git pull`/`git fetch`, no `current_card`, nothing written to `.agent_obsidian`
+6. Excludes feature memory (needs the card's `feature:`), operational memory (reserved to `/work-on-card` by `conduct.md`), cards outside the two active folders and branch diffs
+
+**Work type deviations (card mode):** steps 7 and 8 (branch sync, branch diff analysis) run only for `implementation`; `report`, `investigation` and `experiment` skip both, while the git state read in step 6 still happens. Unknown `work_type` values stop the flow at step 3.
+
+**Actions (card mode):**
 1. Reads card (via direct path if from state)
 2. Loads all files in `guidelines/`
 3. Loads condensed memory (both axes: project + feature)
@@ -580,6 +736,7 @@ Loads complete context for a card (read-only for card content, for understanding
 
 **Use Cases:**
 - Start new work session
+- Start a session in a repository that has no active card (project mode)
 - Resume after interruption
 - Review before PR
 - Resume a card that lives on another branch
@@ -588,6 +745,9 @@ Loads complete context for a card (read-only for card content, for understanding
 
 ### `/orchestrate-cards [filtro]`
 Works on **all** cards in `1.not_started/` at once, one subagent per card, opening each PR as a **draft**.
+
+Processes only implementation cards (including legacy cards without
+`work_type`); reports, investigations and experiments are skipped and listed in the result.
 
 **Arguments:**
 - `[filtro]`: Optional - partial name or list of cards. If omitted, processes all cards in `1.not_started/`.
@@ -611,6 +771,9 @@ Works on **all** cards in `1.not_started/` at once, one subagent per card, openi
 ### `/condense-memory [nome-do-card]`
 Consolidates knowledge from completed cards into condensed memory.
 
+Reports and experiments are never consolidated. Investigations are excluded from
+batch runs and are processed only when named explicitly.
+
 **Arguments:**
 - `[nome-do-card]`: Optional - specific card in `4.done/`. If omitted, processes all unprocessed cards.
 
@@ -625,7 +788,7 @@ Consolidates knowledge from completed cards into condensed memory.
      - "Descrição"
      - "Conhecimento Adquirido pela IA"
      - "Discussões"
-     - "Descrição Técnica"
+     - "Descrição Técnica" (implementation) or "Descobertas e Conclusões" (investigation)
 5. **Applies deduplication:**
    - Identifies repeated information
    - Consolidates related concepts
@@ -657,6 +820,23 @@ Consolidates knowledge from completed cards into condensed memory.
 - **Highlight Decisions:** Always use `**Decisão:**` or `**Rationale:**`
 - **Be Compact:** Group related info, avoid verbosity
 - **Source Once:** List processed cards in header, not per item
+
+---
+
+### `/check-tasks`
+Executes the dated post-deploy checks queued in `tasks/`.
+
+**Arguments:**
+- None. It always works from the `tasks/` queue — no card name, no `current_card`.
+
+**Actions:**
+1. Resolves the vault (`$OBSIDIAN_VAULT_PATH`, else `vault_path` from `.agent_obsidian`); never relies on `current_card`, so it behaves the same under a manual call, a VS Code local automation or an external cron
+2. Lists `tasks/*.md` and selects every **pending** check whose due date is **today or past** — catch-up by definition, so an execution lost while the machine was off is recovered on the next run
+3. Shows the queue and asks which checks to run; confirmation comes from the user or from the authorization recorded when the automation was created, and without either it only lists
+4. Runs the confirmed checks — read-only queries only, only the ones declared in the file, following the pointer in `memoria_consultas`
+5. Records the outcome in the file itself (`status: verificado | falhou | inconclusivo`, `verificado_em`, `### Resultado`) and keeps the file in `tasks/` as history
+6. On failure, suggests a correction card (`/create-card` only after confirmation)
+7. Never writes to `board/` or to condensed memory
 
 ---
 
@@ -706,7 +886,7 @@ Verify installation:
 ls ~/.claude/commands/
 ```
 
-Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `complete-card.md`, `load-context.md`, `refine-card.md`, `orchestrate-cards.md`, `condense-memory.md`
+Should show: `board-status.md`, `start-card.md`, `work-on-card.md`, `review-card.md`, `review-pr.md`, `complete-card.md`, `load-context.md`, `refine-card.md`, `orchestrate-cards.md`, `condense-memory.md`
 
 ### VS Code Skills Installation
 
@@ -760,7 +940,10 @@ All work done by `/work-on-card` follows the files in `guidelines/`:
 - **`conduct.md`** — agent behavior rules; the sections in the file are the
   authoritative list. **Has precedence over any other instruction.**
 - **`code guidelines.md`** — development standards
+- **`commit guidelines.md`** — commit history composition: unit of commit,
+  message form, when the narrative is built and how it is verified
 - **`IA best practices.md`** — AI context, tooling and card-reading practices
+- **`card work types.md`** — work-type behavior and lifecycle
 
 Commands load **all** files in `guidelines/`, so new files added to the folder
 are picked up automatically without changing any command or state file.
@@ -781,17 +964,21 @@ Commands automatically load and apply these guidelines when writing code.
 
 ### Branch Management
 
-- `/start-card` asks whether to switch to the base branch (`main`/`master`), then **always pulls** before creating the branch
-- `/start-card` creates branch: `feature/card-name`
+- For implementation, `/start-card` asks whether to switch to the base branch (`main`/`master`), then **always pulls** before creating the branch
+- `/start-card` creates `feature/card-name` only for implementation; reports and investigations do not use branches, and experiments do not run Git commands
 - Branch name stored in card frontmatter
-- `/review-card` validates branch, creates commit, pushes
-- `/complete-card` assumes PR merged, returns to the default branch and deletes the card branch locally (`git branch -d`)
+- `/review-card` validates branch, creates commit and pushes only for implementation
+- `/complete-card` returns to the default branch and deletes the local card branch only for implementation
 
 ### Commit Strategy
 
-- `/work-on-card` can make incremental commits as tasks complete
-- `/review-card` creates final commit with meaningful message from card context
-- Follows conventional commits: `feat:`, `fix:`, `refactor:`, etc.
+The rule lives in `guidelines/commit guidelines.md`: the history tells how the
+solution evolved, with one responsibility per commit and a message that
+communicates intent. Commits apply only to implementation cards.
+
+- `/work-on-card` composes commits as each logical unit closes — the card task is the unit of work, not the unit of commit
+- Commit messages use the `{type}: {imperative subject}` form, with types such as `feat`, `fix`, `refactor`, `docs`, `test` and `chore`
+- `/review-card` reads the branch history against the guideline; if it fails, it proposes reorganization, which requires explicit authorization (`guidelines/conduct.md`)
 
 ### PR Creation Intelligence
 
@@ -952,10 +1139,15 @@ If you're unsure which card you were working on:
 │   ├── work-on-card.md
 │   ├── refine-card.md
 │   ├── review-card.md
+│   ├── review-pr.md
 │   ├── complete-card.md
+│   ├── check-tasks.md
 │   ├── load-context.md
 │   ├── orchestrate-cards.md
 │   └── condense-memory.md
+├── tasks/                    # Dated post-deploy checks (queue, outside the board)
+│   ├── .gitkeep
+│   └── {card}-{YYYY-MM-DD}.md # Local, not versioned
 ├── condensed memory/         # Knowledge bases in three axes
 │   ├── README.md             # Format spec for the three axes (versioned)
 │   ├── projects/             # Per-repository memory (stable, transversal)
@@ -971,11 +1163,19 @@ If you're unsure which card you were working on:
 │       ├── .gitkeep
 │       └── {area}.md         # Local, not versioned — git, github, shell, vscode
 ├── templates/
-│   └── card template.md      # Template for new cards
+│   ├── card/
+│   │   ├── implementation.md
+│   │   ├── report.md
+│   │   ├── investigation.md
+│   │   └── experiment.md
+│   └── tasks/
+│       └── verificacao-pos-deploy.md   # Format of a queued post-deploy check
 ├── guidelines/               # Agent directives (all files loaded)
 │   ├── conduct.md            # Agent behavior rules (precedence)
 │   ├── code guidelines.md    # Development standards
-│   └── IA best practices.md  # AI context and tooling practices
+│   ├── commit guidelines.md  # Commit history composition
+│   ├── IA best practices.md  # AI context and tooling practices
+│   └── card work types.md    # Work-type behavior and lifecycle
 ├── docs/                     # Project documentation (PDFs, specs)
 ├── sync-commands.sh          # Sync commands to ~/.claude/commands/ (Linux/macOS)
 ├── sync-commands.ps1         # Sync commands to ~/.claude/commands/ (Windows)
@@ -989,6 +1189,7 @@ If you're unsure which card you were working on:
 - Uses Obsidian as a Kanban board (folders = states)
 - Integrates with Claude Code via custom slash commands
 - Tracks state per project via `.agent_obsidian` files
+- Verifies post-deploy behavior inside `/complete-card`, with deadline checks queued in `tasks/` for `/check-tasks`
 - Consolidates knowledge via condensed memory (three axes: project, feature, operational)
 - Automates git workflow (branches, commits, PRs)
 - Builds long-term memory through completed cards

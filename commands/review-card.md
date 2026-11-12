@@ -10,8 +10,6 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
 
 1. **Verificar configuração:**
    - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
-   - Verificar se estamos em um repositório git
-   - Verificar que há alterações para commitar
 
 2. **Determinar qual card revisar:**
    - Se `<nome-do-card>` foi fornecido como argumento, usar ele e buscar normalmente
@@ -24,8 +22,15 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
    - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
    - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
+   - Ler `guidelines/card work types.md`
+   - Card sem `work_type` é `implementation`; valor desconhecido interrompe o fluxo com erro explícito
+   - Para `report`, `investigation` e `experiment`, não criar commit/push/PR nem mover para `3.in_review`; informar que esses tipos vão diretamente para `/complete-card`
+   - Para `experiment`, não executar nenhum comando Git
+   - Só após confirmar `implementation`, verificar o repositório Git e se há alterações para revisar
    - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]` — as tarefas
-     concluídas são leitura sob demanda, então lê-las aqui é o caso de uso previsto
+     concluídas são leitura sob demanda, então lê-las aqui é o caso de uso previsto.
+     A seção `### Verificação Pós-Deploy` não entra nesta checagem: ela é executada
+     pelo `/complete-card` e pode falhar sem que o card deixe de estar concluído
    - Se houver tarefas pendentes, avisar o usuário
 
 4. **Revisar o trabalho:**
@@ -39,17 +44,24 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
       - Executar `git status` para ver alterações
       - Executar `git diff` para revisar mudanças
 
-   b) **Criar commit (se necessário):**
+   b) **Ler o histórico como quem acabou de entrar:**
+      - Executar `git log <base>..HEAD --stat`, com `<base>` na branch default
+        do repositório (`main`/`master`), e ler a sequência de commits
+      - Aplicar o critério de verificação de `guidelines/commit guidelines.md`
+      - Se o histórico reprovar, apontar os commits e **propor** a reorganização;
+        executar só com autorização explícita do usuário (`guidelines/conduct.md`)
+
+   c) **Criar commit (se necessário):**
       - Se houver alterações não commitadas, sugerir commit
       - Usar descrição do card para criar mensagem de commit clara
-      - Seguir convenção: `feat: descrição` ou `fix: descrição`
+      - Seguir `guidelines/commit guidelines.md`
       - Perguntar ao usuário se quer commitar automaticamente
 
-   c) **Push da branch:**
+   d) **Push da branch:**
       - Verificar se a branch foi enviada: `git branch -r`
       - Se não, sugerir: `git push -u origin <branch-name>`
 
-   d) **Criar Pull Request com descrição inteligente:**
+   e) **Criar Pull Request com descrição inteligente:**
 
       **Passo 1: Detectar branch base**
       - A base é a branch default do repositório (`main` ou `master`)
