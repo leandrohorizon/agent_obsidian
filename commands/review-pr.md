@@ -1,7 +1,7 @@
 Você é um assistente que revisa Pull Requests usando as guidelines do vault e as memórias do projeto.
 
 ## Tarefa
-Revisar um PR recebido — de trabalho próprio ou de terceiro — e devolver achados com arquivo, linha, severidade e a **regra citada** que sustenta cada um. O comando é análise sem efeito de estado: não publica nada no GitHub, não move card e não escreve em condensed memory.
+Revisar um PR recebido — de trabalho próprio ou de terceiro — devolver achados com arquivo, linha, severidade e a **regra citada** que sustenta cada um e manter o card do PR sincronizado com o ciclo de vida dele: todo PR tem um card no board, atualizado automaticamente e roteado para a memória quando mergeado.
 
 ## Argumentos
 - `<pr>`: (Obrigatório) Número ou URL do PR a revisar
@@ -20,21 +20,25 @@ Revisar um PR recebido — de trabalho próprio ou de terceiro — e devolver ac
    - Obter o vault: ler `.agent_obsidian` do diretório atual, se existir e for válido; senão usar `$OBSIDIAN_VAULT_PATH`; senão instruir `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
    - Verificar `gh auth status`
    - Resolver `<pr>`: se for URL, extrair `{owner}/{repo}` e o número; se for número, usar o repositório do diretório atual (`git remote get-url origin`)
-   - Executar: `gh pr view <n> --json number,title,url,state,isDraft,author,headRefName,headRefOid,baseRefName,files,body`
-   - Se `state` não for `OPEN`, revisar o diff normalmente e avisar no resultado que o PR está fechado ou mergeado
+   - Executar: `gh pr view <n> --json number,title,url,state,isDraft,author,headRefName,headRefOid,baseRefName,mergedAt,files,body`
+   - Classificar o estado do PR: `OPEN` (aberto), `DRAFT` (`state: OPEN` com `isDraft: true`), `CLOSED` sem `mergedAt` (fechado sem merge) e `MERGED` (`state: MERGED` ou `mergedAt` presente). Revisar o diff em qualquer estado e registrar o estado no resultado
 
 2. **Carregar as guidelines do vault:**
    - Seguir `guidelines/conduct.md` §"Carregamento de `guidelines/` — profundidade"
    - Reportar no resultado quais arquivos foram lidos
    - Aplicar essas guidelines a qualquer PR, inclusive de repositório desconhecido
 
-3. **Identificar o card do PR e a memória de feature:**
-   - Procurar no board o card cujo frontmatter `pr_url` aponta para este PR: `grep -rl "pull/<n>" "{vault}/board"` e confirmar o campo `pr_url`
+3. **Localizar ou criar o card do PR (todo PR tem um card):**
+   - Procurar no board o card cujo frontmatter `pr_url` aponta para este PR: `grep -rl "pull/<n>" "{vault}/board"` e confirmar o campo `pr_url` completo — `pull/<n>` pode casar PR de outro repositório, então validar a URL inteira. Procurar também na seção legada de PRs do corpo quando o frontmatter não tiver `pr_url`
    - Se mais de um card apontar para o mesmo PR, **parar e perguntar** qual vale
-   - Se houver card:
-     - ler pela leitura enxuta (`guidelines/IA best practices.md` §6) e usar `repo:`, `feature:` e `### Descrição` como fonte de intenção do autor
-     - derivar a memória de feature do `feature:` com `get_feature_memory_path()` (`commands/lib/common.sh`), carregando-a só se o campo e o arquivo existirem
-   - Se não houver card: seguir sem ele, declarar no resultado "card do PR: não identificado" e não tentar adivinhar feature nem intenção
+   - Se houver card: ler pela leitura enxuta (`guidelines/IA best practices.md` §6) e usar `repo:`, `feature:`, `pr_author` e `### Descrição` como fonte de intenção do autor; derivar a memória de feature do `feature:` com `get_feature_memory_path()` (`commands/lib/common.sh`), carregando-a só se o campo e o arquivo existirem
+   - Se não houver card, **criar um card** `work_type: implementation` a partir de `templates/card/implementation.md`, mesmo que a revisão não encontre problema:
+     - preencher `repo:` com a URL do repositório do PR e `work_type: implementation`
+     - preencher `pr_url:` com a URL do PR e `pr_author:` com `author.login` do `gh pr view`
+     - preencher `feature:` — listar os `.md` existentes em `condensed memory/features/` (ignorar `.gitkeep`) e sugerir a feature mais próxima, aceitando feature nova quando não houver correspondência
+     - montar `### Tarefas` conforme `guidelines/IA best practices.md` §7: registrar comportamento e teste a **escrever**, não passo já garantido pelo fluxo
+     - destino: `0.backlog/` quando não houver clone em `~/workspace/{repo}`; `1.not_started/` quando houver clone (o estado é sincronizado no passo 8)
+   - Se o card existir, atualizá-lo em vez de criar outro: registrar/atualizar `pr_author` (fonte: `author.login`) e preservar os demais campos e o estado atual
 
 4. **Classificar o caso do repositório:**
 
@@ -52,7 +56,7 @@ Revisar um PR recebido — de trabalho próprio ou de terceiro — e devolver ac
    | Repo não clonado | nenhum clone encontrado | `gh pr view`, `gh pr diff`, `gh api` — só o que a API oferece | achado restrito ao diff e às guidelines do vault; convenção **desconhecida** |
 
    - Declarar o caso escolhido no resultado, nomeando os arquivos de memória carregados (ou a ausência deles)
-   - **Nunca clonar neste passo.** O clone só acontece no passo 8, quando a revisão originar trabalho de código
+   - **Nunca clonar neste passo.** O clone só é criado quando o usuário confirmar trabalho de código, em `~/workspace/{repo}`, para que `/start-card` e a memória de projeto funcionem
 
 5. **Recortar o contexto do diff:**
    - Executar: `gh pr diff <n> --name-only`
@@ -112,30 +116,27 @@ Revisar um PR recebido — de trabalho próprio ou de terceiro — e devolver ac
    - Máximo de 5 sugestões, ordenadas por impacto; o que não couber é descartado, não resumido
    - Item sem alternativa concreta ou sem teste possível é descartado em silêncio
 
-8. **Gerar card novo, sempre com confirmação:**
+8. **Sincronizar o card com o estado do PR:**
+   - `OPEN` (sem `isDraft`): mover o card para `3.in_review/` e registrar `status: In Review` — vale para PRs próprios e recebidos. Seguir `guidelines/conduct.md` §Movimentação de cards: exatamente um arquivo no destino, nenhuma cópia na origem, frontmatter atualizado
+   - `DRAFT` (`isDraft: true`): não mover para `3.in_review/`; registrar no card que o PR está em draft e aguardar
+   - `CLOSED` sem `mergedAt` (fechado sem merge): mover o card para `5.archived/` e registrar `pr_status: Closed`
+   - `MERGED` (`state: MERGED` ou `mergedAt` presente): registrar `pr_status: Merged` e encaminhar para o fluxo de conclusão (passo 9)
+   - PR reaberto após fechado: reavaliar pelo estado atual; se o card estava em `5.archived/`, devolvê-lo à pasta correspondente ao novo `state`
+   - Card em `0.backlog/` sem clone: atualizar `pr_url`, `pr_author`, `pr_status` e o registro da revisão, mas **não** mover para `3.in_review/` nem `5.archived/` — pastas de andamento exigem repositório Git local; registrar a limitação no resultado
+   - Se o card movido for o `current_card` ativo de outro projeto, corrigir o `current_card.path` do `.agent_obsidian` do projeto dono após mover
 
-   Condições para propor card: a revisão encontrou trabalho de código — correção pedida e aceita, melhoria aceita, ou problema real sem dono.
+9. **PR mergeado — alimentar a memória:**
+   - Após confirmar o merge (`mergedAt` presente), seguir o fluxo de `/complete-card` para o card do PR: ele valida, move para `4.done/`, limpa `current_card` (só se apontar para este card), volta à branch default, apaga a branch do card e chama `/condense-memory`
+   - A consolidação roteia para a memória de projeto (`condensed memory/projects/{repo}.md`) e, quando o card declarar `feature:`, para a memória de feature; card sem `feature:` consolida só no eixo de projeto — pular o eixo de feature quando vazio
+   - Consolidar apenas conhecimento duradouro e reutilizável, sem duplicações; nunca registrar conclusão ou aprendizado como definitivo antes do merge
+   - `/complete-card` roda no diretório do clone; sem clone, registrar o resultado no card e informar que a conclusão aguarda o clone
 
-   - Apresentar a proposta ao usuário e **esperar a resposta**. Sem confirmação, nada é gravado no vault (`guidelines/conduct.md` §Ações destrutivas ou irreversíveis)
-   - Aprovada a criação:
-     - usar `{vault}/templates/card template.md` como base, como o `/create-card` faz
-     - preencher `repo:` com a URL do repositório do PR, `work_type: implementation` (contrato em `guidelines/card work types.md`; se o arquivo não existir no vault, manter `implementation` e registrar a ausência no resultado) e `feature:` com o slug sugerido — listando os arquivos existentes em `condensed memory/features/` e aceitando feature nova quando não houver correspondência
-     - declarar `depends_on` com o card do PR revisado, quando ele existir
-     - montar `### Tarefas` conforme `guidelines/IA best practices.md` §7: registrar comportamento a implementar e teste a **escrever**, não passo já garantido pelo fluxo
-   - Destino:
-     - clone existente em `~/workspace/{repo}` → `board/1.not_started/`
-     - sem clone → `board/0.backlog/` como proposta; `/start-card` exige repositório Git local, então o card só avança depois do clone
-   - **Não converter o card revisado nem movê-lo de pasta.** Card que descobre trabalho de código gera card novo, como no precedente de `investigation`
-   - Um card por problema agrupável; não abrir um card por achado
-   - O clone só é criado quando o usuário confirmar o trabalho de código: `git clone <url> ~/workspace/{repo}`, para que o nome da memória de projeto (`basename` do diretório) saia igual ao nome do repositório
+10. **Documentar a revisão no card do PR:**
+   - Acrescentar entrada em `### Discussões` com data, o caso do repositório, `pr_author`, o estado do PR e a contagem de achados por severidade, com o resumo de cada achado e a regra citada
+   - O card sempre existe (passo 3); não há mais o caso "sem card"
+   - Se o card estiver em `4.done/` ou `5.archived/` e o PR for reaberto, não editá-lo: registrar os achados só no resultado e avisar o usuário
 
-9. **Documentar no card do PR:**
-   - Se houver card identificado no passo 3, acrescentar entrada em `### Discussões` com data, o caso do repositório, a contagem de achados por severidade e o resumo de cada achado com a regra citada
-   - Não alterar `status`, `reviewed`, `pr_url` nem mover o card: revisar não é etapa do ciclo do card
-   - Se o card estiver em `4.done/` ou `5.archived/`, não editá-lo: registrar os achados só no resultado e avisar o usuário
-   - Se não houver card, registrar apenas no resultado apresentado ao usuário e dizer que não havia card para documentar
-
-10. **Entregar o resultado, sem publicar nada:**
+11. **Entregar o resultado, sem publicar nada:**
 
     **Proibido publicar no GitHub:** nada de `gh pr review`, `gh pr comment`, `gh pr edit`, nem `gh api` em `.../reviews` ou `.../comments`. Consultar o PR é leitura; os achados vão para o usuário e para o card.
 
@@ -144,7 +145,9 @@ Revisar um PR recebido — de trabalho próprio ou de terceiro — e devolver ac
 
     **Repositório:** {owner}/{repo}
     **Caso:** repo clonado com memória | repo clonado sem memória | repo não clonado
-    **Card do PR:** {nome do card} | não identificado
+    **Card do PR:** {nome do card} — criado | atualizado
+    **Dono do PR (pr_author):** {author.login}
+    **Estado do PR:** OPEN | DRAFT | CLOSED sem merge | MERGED
     **Memórias carregadas:** {projeto}, {feature} | nenhuma
     **Guidelines carregadas:** {lista}
     **Arquivos revisados:** {n} de {total} | ignorados: {lista com motivo}
@@ -156,16 +159,16 @@ Revisar um PR recebido — de trabalho próprio ou de terceiro — e devolver ac
     {sugestões no formato do passo 7, ou "nenhuma"}
 
     ### Limitações desta revisão
-    - {convenção do repositório desconhecida, arquivo ignorado, hunk não lido, PR fechado, ...}
+    - {convenção do repositório desconhecida, arquivo ignorado, hunk não lido, card sem clone não movido, ...}
 
     ### Próximos passos
-    - {card criado, card proposto aguardando clone, correções esperadas do autor, nada a fazer}
+    - {card criado/atualizado, sincronização de estado aplicada, correções esperadas do autor, /complete-card pendente após merge}
     ```
 
-11. **Confirmar o que não foi feito:**
-    - Nada foi publicado no PR
-    - Nenhum card foi movido
-    - Nenhuma condensed memory foi escrita — consolidação é do `/complete-card`, depois do merge (`guidelines/conduct.md` §Condensed memory)
+12. **Confirmar o que não foi feito:**
+    - Nada foi publicado no PR — a leitura do estado (`gh pr view`/`gh pr diff`/`gh api`) não emite review, comentário nem mudança
+    - Nenhuma condensed memory foi escrita antes do merge — a consolidação é do `/complete-card`, depois do merge (`guidelines/conduct.md` §Condensed memory)
+    - O card foi movido/arquivado apenas conforme o estado do PR (passo 8); nenhum outro card foi tocado
 
 ## Casos de verificação
 
@@ -190,19 +193,53 @@ Saída esperada:
 
 O achado só é válido com a citação da seção — "comentário desnecessário" sem `§Comentários` seria sugestão, não achado.
 
-### Caso 2 — PR sem card não quebra o comando
+### Caso 2 — PR sem card e sem clone cria card no backlog
 
 Entrada: URL de PR de repositório que não está clonado e não tem card no board.
 
 Saída esperada:
-- `Card do PR: não identificado` e `Memórias carregadas: nenhuma`
-- caso `repo não clonado`, com achados restritos ao diff e às guidelines do vault
-- todo achado com `Convenção do repositório: desconhecida`
-- nenhuma tentativa de leitura de memória de feature, nenhum clone, nenhuma escrita em card
-- resultado entregue ao usuário com a limitação declarada
+- card criado em `0.backlog/` com `repo:`, `pr_url:` e `pr_author:` preenchidos, `work_type: implementation`
+- caso `repo não clonado`, com achados restritos ao diff e às guidelines do vault; todo achado com `Convenção do repositório: desconhecida`
+- nenhum clone executado; card não movido para `3.in_review/` nem `5.archived/` (sem repositório Git local)
+- resultado entregue com a limitação declarada
+
+### Caso 3 — PR aberto move o card para `3.in_review`
+
+Entrada: PR `OPEN` (sem `isDraft`) com card no board em `1.not_started/`.
+
+Saída esperada:
+- card movido para `3.in_review/` com `status: In Review` (exatamente um arquivo, sem cópia na origem)
+- `pr_author` e `pr_url` registrados no frontmatter
+
+### Caso 4 — PR fechado sem merge arquiva o card
+
+Entrada: PR `CLOSED` sem `mergedAt`.
+
+Saída esperada:
+- card movido para `5.archived/` com `pr_status: Closed`
+- nenhuma consolidação de memória
+
+### Caso 5 — PR mergeado encaminha para conclusão
+
+Entrada: PR `MERGED` (ou `CLOSED` com `mergedAt` presente).
+
+Saída esperada:
+- `pr_status: Merged` no card
+- card encaminhado para o fluxo de `/complete-card` (que chama `/condense-memory`)
+- memória consolidada só depois do merge; card sem `feature:` consolida apenas no eixo de projeto
+
+### Caso 6 — card sem `feature:` não quebra o roteamento
+
+Entrada: PR mergeado cujo card não declara `feature:`.
+
+Saída esperada:
+- consolidação roteada apenas para `condensed memory/projects/{repo}.md`
+- nenhuma tentativa de escrever `condensed memory/features/` sem campo
 
 ## Notas Importantes
 - Revisar não é aprovar: o comando não emite `approve` nem `request changes` em lugar nenhum
-- `gh` só é usado para leitura (`pr view`, `pr diff`, `api` em conteúdo de arquivo)
+- `gh` só é usado para leitura (`pr view`, `pr diff`, `api` em conteúdo de arquivo); nunca para abrir, fechar, mergear, comentar ou revisar
 - Sem memória, o que falta não é regra, é a decisão daquele repositório — declarar a lacuna em vez de preenchê-la por suposição
-- O primeiro card concluído em um repositório cria a memória dele via `/condense-memory`; a revisão só abre o caminho, não consolida
+- A invocação de `/review-pr` é o pedido explícito dos seus efeitos no board (criar/atualizar/mover o card do PR), como o `/review-card` é o pedido de commit/push — o GitHub permanece somente leitura
+- O primeiro card concluído em um repositório cria a memória dele via `/condense-memory`; a revisão abre o caminho, a consolidação só acontece depois do merge
+- Card sem clone não é movido para pastas de andamento; a conclusão pós-merge aguarda o clone
