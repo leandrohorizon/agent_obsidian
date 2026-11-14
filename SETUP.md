@@ -155,7 +155,7 @@ Aplica-se somente a cards de implementação; relatórios, investigações e exp
 - Move card de `2.in_progress/` → `3.in_review/`
 
 ### `/review-pr <pr>`
-Revisa um PR recebido usando as guidelines do vault e as memórias do projeto, citando a regra por trás de cada achado.
+Revisa um PR recebido usando as guidelines do vault e as memórias do projeto, citando a regra por trás de cada achado — e mantém um card do board sincronizado com o ciclo de vida do PR.
 
 **Uso:**
 ```
@@ -166,11 +166,11 @@ Revisa um PR recebido usando as guidelines do vault e as memórias do projeto, c
 **O que faz:**
 - Lê o PR com `gh pr view` e recorta o diff com `gh pr diff --name-only`, lendo arquivo por arquivo
 - Carrega todos os arquivos de `guidelines/` e a memória do repositório, quando existir
-- Identifica o card do PR pelo `pr_url` do board e a memória de feature pelo `feature:` do card
+- Garante um card para o PR: localiza pelo `pr_url` ou cria (`work_type: implementation`), registrando `pr_author` (autor) e `feature:`
 - Entrega achados com arquivo, linha, severidade e a regra citada; sugestão sem regra fica em seção separada
 - Declara convenção desconhecida quando o repositório não tem memória e revisa só pela API quando não há clone
-- Propõe card novo para trabalho de código, sempre com confirmação antes de gravar no vault
-- **Não publica nada no PR** e não move card
+- Sincroniza o card com o estado do PR: aberto → `3.in_review`; draft não move; fechado sem merge → `5.archived`; mergeado → encaminha para `/complete-card`
+- **Não publica nada no PR** — GitHub é somente leitura
 
 ### `/complete-card <nome>`
 Finaliza um card, movendo para "done" e garantindo documentação completa.

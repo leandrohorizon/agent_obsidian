@@ -156,7 +156,7 @@ Pronto! Os comandos criam arquivos de estado automaticamente conforme necessári
 | `/work-on-card [nome]`    | Executa tarefas com contexto completo  | `/work-on-card`                                         |
 | `/review-card [nome]`     | Cria PR para implementação              | `/review-card`                                          |
 | `/complete-card [nome]`   | Finaliza; memória e verificação dependem do tipo | `/complete-card`                                 |
-| `/review-pr <pr>`         | Revisa PR com guidelines e memórias    | `/review-pr 123`                                        |
+| `/review-pr <pr>`         | Revisa PR com guidelines e memórias; sincroniza o card com o estado do PR | `/review-pr 123`               |
 | `/load-context [nome]`    | Carrega contexto do card ou do projeto; sincroniza branch só para implementação | `/load-context`                           |
 | `/check-tasks`            | Executa verificações pós-deploy vencidas de `tasks/` | `/check-tasks`                            |
 | `/orchestrate-cards [filtro]` | Orquestra implementações (PR em draft) | `/orchestrate-cards`                              |
