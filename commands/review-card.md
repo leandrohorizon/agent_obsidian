@@ -143,7 +143,22 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
    - Preservar a subpasta de projeto e verificar o resultado:
      `guidelines/conduct.md` §Movimentação de cards no board
 
-8. **Confirmar:**
+8. **Limpar a worktree (modo orquestrado):**
+   - Aplicável somente quando o trabalho rodou em `git worktree`, preparada pelo
+     `/orchestrate-cards`. Identificação: no diretório atual, `.git` é um
+     **arquivo** e não um diretório (`git rev-parse --git-dir` ≠ `.git`). Em
+     trabalho normal fora do lote, o diretório atual é o repositório e este passo
+     não roda
+   - Remover `<worktree>/.agent_obsidian`, criado pelo `/start-card` dentro da
+     worktree: é untracked e impede a remoção limpa
+   - Executar, **do repositório principal** (o caminho vem no prompt do
+     subagente): `git -C {repo-principal} worktree remove {worktree}`
+     - Recusa por arquivo não commitado → **não forçar** com `--force`: reportar
+       o que sobrou e deixar a decisão com o usuário (`guidelines/conduct.md`)
+   - A branch `feature/{nome-do-card}` **não** é apagada aqui: o `/complete-card`
+     roda depois, no repositório principal, e é ele quem apaga após o merge
+
+9. **Confirmar:**
    ```
    ✅ Card movido para revisão!
 

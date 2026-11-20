@@ -130,6 +130,177 @@ get_feature_memory_path() {
 }
 
 # ============================================================================
+# parse_frontmatter_list()
+# ============================================================================
+# Extrai os itens de um campo de LISTA do frontmatter YAML, um por linha.
+#
+# parse_frontmatter() casa só a linha "campo: valor" e devolve vazio quando o
+# valor vem nas linhas seguintes — todo card com depends_on em lista YAML
+# pareceria sem dependência. Esta função é a correta para depends_on,
+# dependents e feature.
+#
+# Args:
+#   $1: Path do arquivo markdown
+#   $2: Nome do campo a extrair
+#
+# Output: um item por linha, na ordem do arquivo. Wikilink é reduzido ao alvo
+#         ([[a|b]] → a) e aspas são removidas.
+# Return: 0 se o campo existe, 1 se o arquivo não existe ou o campo não existe
+#
+# Formas aceitas (guidelines/IA best practices.md §8):
+#   depends_on:
+#     - "[[card-a]]"
+#     - card-b
+#   depends_on: "[[card-a]]"
+#   depends_on: [card-a, card-b]
+#
+# Exemplo:
+#   parse_frontmatter_list "card.md" "depends_on"
+# ============================================================================
+parse_frontmatter_list() {
+  local file="$1"
+  local field="$2"
+
+  if [[ ! -f "$file" ]]; then
+    return 1
+  fi
+
+  awk -v field="$field" '
+    function trim(s) { gsub(/^[[:space:]]+/, "", s); gsub(/[[:space:]]+$/, "", s); return s }
+    function unquote(s) {
+      while (s ~ /^["\047]/) { sub(/^./, "", s) }
+      while (s ~ /["\047]$/) { sub(/.$/, "", s) }
+      return trim(s)
+    }
+    function item(raw,   s) {
+      s = unquote(trim(raw))
+      if (match(s, /\[\[[^]]+\]\]/)) {
+        s = substr(s, RSTART + 2, RLENGTH - 4)
+        sub(/\|.*$/, "", s)
+      }
+      s = trim(s)
+      if (s != "") { print s }
+    }
+    BEGIN { in_fm = 0; state = 0; found = 0 }
+    /^---[[:space:]]*$/ {
+      if (!in_fm) { in_fm = 1; next }
+      exit
+    }
+    !in_fm { next }
+    state == 0 && $0 ~ ("^" field ":") {
+      found = 1
+      line = $0
+      sub("^" field ":[[:space:]]*", "", line)
+      if (line ~ /^\[/) {
+        gsub(/^\[/, "", line)
+        gsub(/\][[:space:]]*$/, "", line)
+        n = split(line, parts, ",")
+        for (i = 1; i <= n; i++) { item(parts[i]) }
+        state = 2
+      } else if (trim(line) != "") {
+        item(line)
+        state = 2
+      } else {
+        state = 1
+      }
+      next
+    }
+    state == 1 {
+      if ($0 ~ /^[[:space:]]*-[[:space:]]*/) {
+        line = $0
+        sub(/^[[:space:]]*-[[:space:]]*/, "", line)
+        item(line)
+        next
+      }
+      exit
+    }
+    END { exit(found ? 0 : 1) }
+  ' "$file"
+}
+
+# ============================================================================
+# list_board_cards()
+# ============================================================================
+# Lista os cards de uma pasta de estado do board, recursivamente.
+#
+# Os cards vivem em subpastas de projeto: board/1.not_started/{projeto}/card.md.
+# Listagem não recursiva devolve zero cards num board organizado por projeto.
+#
+# Args:
+#   $1: Estado (0.backlog, 1.not_started, 2.in_progress, 3.in_review, 4.done,
+#       5.archived). Omitido ou vazio → todos os estados.
+#
+# Output: um path absoluto por linha, em ordem alfabética
+# Return: 0 se a pasta existe, 1 se OBSIDIAN_VAULT_PATH falta ou a pasta não existe
+#
+# Exemplo:
+#   list_board_cards "1.not_started"
+# ============================================================================
+list_board_cards() {
+  local state="${1:-}"
+  local vault="${OBSIDIAN_VAULT_PATH:-}"
+
+  if [[ -z "$vault" ]]; then
+    echo "❌ OBSIDIAN_VAULT_PATH não está definido" >&2
+    return 1
+  fi
+
+  local base="${vault}/board"
+  if [[ -n "$state" ]]; then
+    base="${base}/${state}"
+  fi
+
+  if [[ ! -d "$base" ]]; then
+    return 1
+  fi
+
+  find "$base" -type f -name '*.md' | LC_ALL=C sort
+}
+
+# ============================================================================
+# normalize_repo_slug()
+# ============================================================================
+# Normaliza a URL de um remote git para "host/owner/repo", comparável entre
+# cards e clones locais.
+#
+# Necessário porque o card guarda a URL do remote (git@ ou https) e o clone
+# local responde com outra forma da mesma URL: comparar as strings cruas nunca
+# casa.
+#
+# Args:
+#   $1: URL do remote (git@github.com:org/repo.git, https://github.com/org/repo, …)
+#        ou "Local (sem remote configurado)"
+#
+# Output: "host/owner/repo" em minúsculas, sem ".git", sem credenciais
+# Return: 0 se a entrada tem forma de URL, 1 se está vazia ou não tem host
+#
+# Exemplo:
+#   normalize_repo_slug "git@github.com:leandrohorizon/third-hand.git"
+#   → github.com/leandrohorizon/third-hand
+# ============================================================================
+normalize_repo_slug() {
+  local url="${1:-}"
+
+  url="$(printf '%s' "$url" | tr -d '[:space:]')"
+  [[ -z "$url" ]] && return 1
+
+  url="${url%.git}"
+  url="${url%/}"
+  url="${url#git+}"
+  url="${url#ssh://}"
+  url="${url#https://}"
+  url="${url#http://}"
+  url="${url#git://}"
+  url="${url#git@}"
+  url="${url#*@}"
+  url="${url/://}"
+
+  [[ "$url" == */*/* ]] || return 1
+
+  printf '%s\n' "$url" | tr '[:upper:]' '[:lower:]'
+}
+
+# ============================================================================
 # parse_frontmatter()
 # ============================================================================
 # Extrai campos do frontmatter YAML de um arquivo markdown
@@ -286,6 +457,9 @@ EOF
 # ============================================================================
 export -f validate_agent_state
 export -f parse_frontmatter
+export -f parse_frontmatter_list
+export -f list_board_cards
+export -f normalize_repo_slug
 export -f update_frontmatter
 export -f get_git_info
 export -f get_feature_memory_path

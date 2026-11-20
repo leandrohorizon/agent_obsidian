@@ -46,8 +46,13 @@ Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o flux
    - Para `report` e `investigation`, não exigir repositório Git nem consultar branches; obter a URL do repositório somente se disponível e manter `branch:` vazio
    - Para `experiment` e `epic`, não executar nenhum comando Git e manter `repo:` e `branch:` vazios
 
-6. **Perguntar ao usuário sobre a branch base (SEMPRE, antes de criar a branch):**
+6. **Perguntar ao usuário sobre a branch base (antes de criar a branch):**
    - Aplicável somente a `implementation`
+   - **A branch do card já existe e já é a atual?** Se `git branch --show-current`
+     já é `feature/{slug-do-card}` — caso do `/orchestrate-cards`, que cria a
+     worktree e a branch antes de despachar o subagente — **não perguntar nada e
+     pular os passos 6, 7 e 8**. Não há usuário para responder dentro de um
+     subagente, e a branch já foi criada a partir da base atualizada
    - Se a branch atual **não** é a base (`main`/`master`), perguntar:
      ```
      Você está na branch `{branch-atual}`.
@@ -65,8 +70,9 @@ Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o flux
        prosseguir (commit, stash ou cancelar)
      - Executar: `git checkout {base}`
 
-7. **Fazer pull da branch base (SEMPRE, sem exceção):**
-   - Aplicável somente a `implementation`
+7. **Fazer pull da branch base (sempre que este passo rodar):**
+   - Aplicável somente a `implementation`, e pulado quando o passo 6 detectou que
+     a branch do card já existe
    - Executar: `git pull` na branch base
    - **Sempre rodar**, mesmo que o usuário tenha escolhido continuar na branch
      atual — a branch de trabalho precisa estar atualizada com o remoto antes de

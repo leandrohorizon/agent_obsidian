@@ -57,10 +57,12 @@ aplicativo instalado. As listas deste arquivo são **exemplos, não a lista fech
   **Exceção:** os comandos `/work-on-card`, `/review-card` e `/orchestrate-cards`
   são o pedido explícito de commit — o fluxo deles inclui commits incrementais e
   push da branch.
-  - No caso do `/orchestrate-cards`, a autorização vem da **confirmação da lista
-    de cards** (passo 2 do comando). Sem essa confirmação, o comando não roda e
-    nada é commitado. A confirmação cobre **apenas** os cards listados: card que
-    não estava na lista não é tocado.
+  - No caso do `/orchestrate-cards`, a autorização vem da **confirmação do plano
+    da onda** (o dry-run do passo 7 do comando). Sem essa confirmação, o comando
+    não roda e nada é commitado. A confirmação cobre **apenas** os cards
+    listados: card que não estava na lista não é tocado.
+  - No modo épico a confirmação é **por onda**: confirmar a onda N não autoriza a
+    onda N+1, que precisa de confirmação própria.
   - A autorização cobre commit, push e abertura de PR **em draft**. Não cobre
     merge, nem promover o draft para "ready for review", nem apagar branch.
 - **Nunca commitar o `.agent_obsidian`.**
