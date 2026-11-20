@@ -88,6 +88,13 @@ quando parece incompleta, temporária ou fora do padrão.
 
 ## Movimentação de cards no board
 
+- **O card mantém a subpasta de projeto ao mudar de estado.** O caminho relativo
+  à pasta de estado é preservado: `1.not_started/{projeto}/card.md` →
+  `2.in_progress/{projeto}/card.md`. Card que está na raiz da pasta de estado
+  continua na raiz. Criar a subpasta de destino quando ela não existir.
+- **A busca de card por nome é recursiva.** Cards vivem em subpastas de projeto;
+  procurar só na raiz da pasta de estado não encontra card nenhum num board
+  organizado por projeto. Vale para toda busca por nome em pasta de estado.
 - **Nunca considerar o movimento concluído sem verificar o resultado:** deve
   existir **exatamente um** arquivo do card, no destino e com o frontmatter
   atualizado. Remova qualquer cópia na pasta de origem.

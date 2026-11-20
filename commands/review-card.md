@@ -20,7 +20,9 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
 
 3. **Ler e validar o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
-   - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
+   - Se foi passado nome, procurar **recursivamente** em
+     `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` e, se não achar, nas demais
+     pastas de estado (`guidelines/conduct.md` §Movimentação de cards no board)
    - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
    - Ler `guidelines/card work types.md`
    - Card sem `work_type` é `implementation`; valor desconhecido interrompe o fluxo com erro explícito
@@ -138,6 +140,8 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
 7. **Mover o card:**
    - Mover arquivo de `$OBSIDIAN_VAULT_PATH/board/2.in_progress/card.md`
    - Para: `$OBSIDIAN_VAULT_PATH/board/3.in_review/card.md`
+   - Preservar a subpasta de projeto e verificar o resultado:
+     `guidelines/conduct.md` §Movimentação de cards no board
 
 8. **Confirmar:**
    ```

@@ -21,9 +21,10 @@ Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o flux
    - Usar esse valor para todas as operações
 
 3. **Encontrar o card:**
-   - Procurar em `{vault_path}/board/1.not_started/{nome}.md`
-   - Se não encontrar em 1.not_started, verificar outras pastas
-     (`0.backlog/`, `2.in_progress/`, `3.in_review/`)
+   - Procurar o card **recursivamente** nas pastas de estado, na ordem:
+     `1.not_started/`, `0.backlog/`, `2.in_progress/`, `3.in_review/`
+     (`guidelines/conduct.md` §Movimentação de cards no board — a busca por nome
+     é recursiva porque cards vivem em subpastas de projeto)
    - Se o card estiver em `0.backlog/`, avisar que ele ainda não foi refinado e
      sugerir rodar `/refine-card` antes de iniciar (não bloquear se o usuário
      insistir)
@@ -90,6 +91,8 @@ Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o flux
    - Mover de `{vault_path}/board/{pasta-origem}/card.md`
    - Para `{vault_path}/board/2.in_progress/card.md`
    - `{pasta-origem}` normalmente é `1.not_started`, mas pode ser `0.backlog`
+   - Preservar a subpasta de projeto e verificar o resultado:
+     `guidelines/conduct.md` §Movimentação de cards no board
 
 11. **Atualizar .agent_obsidian:**
    - Ler arquivo atual

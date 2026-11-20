@@ -25,7 +25,9 @@ Carregar todo o contexto necessário. **Com card:** o próprio card, guidelines 
 
 3. **Ler o card pela leitura enxuta** (`guidelines/IA best practices.md` §6):
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
-   - Se foi passado nome, procurar em todas as pastas do board na seguinte ordem:
+   - Se foi passado nome, procurar em todas as pastas do board na seguinte ordem,
+     **recursivamente** em cada uma (`guidelines/conduct.md` §Movimentação de
+     cards no board — cards vivem em subpastas de projeto):
      - `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` (prioridade)
      - `$OBSIDIAN_VAULT_PATH/board/3.in_review/`
      - `$OBSIDIAN_VAULT_PATH/board/1.not_started/`

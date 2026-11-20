@@ -20,7 +20,9 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
 
 3. **Ler e validar o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
-   - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/3.in_review/` e `2.in_progress/`
+   - Se foi passado nome, procurar **recursivamente** em
+     `$OBSIDIAN_VAULT_PATH/board/3.in_review/` e `2.in_progress/`
+     (`guidelines/conduct.md` §Movimentação de cards no board)
    - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
    - Ler `guidelines/card work types.md`
    - Card sem `work_type` é `implementation`; valor desconhecido interrompe sem mover o card ou alterar estado
@@ -76,6 +78,8 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
 8. **Mover o card:**
    - `implementation`: mover de `3.in_review/` para `4.done/`
    - `report`, `investigation` e `experiment`: mover de `2.in_progress/` para `4.done/`
+   - Preservar a subpasta de projeto e verificar o resultado:
+     `guidelines/conduct.md` §Movimentação de cards no board
 
 9. **Limpar .agent_obsidian:**
    - Ler `.agent_obsidian` do diretório atual (se existir)
