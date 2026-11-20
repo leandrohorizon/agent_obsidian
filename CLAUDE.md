@@ -622,26 +622,26 @@ Only applies to implementation. Reports, investigations and experiments skip
 ---
 
 ### `/review-pr <pr>`
-Reviews a **received** pull request using the vault guidelines and the project/feature memories, so every finding cites the rule behind it. Read-only analysis: nothing is published on GitHub and no card is moved.
+Reviews a **received** pull request using the vault guidelines and the project/feature memories, so every finding cites the rule behind it — and keeps a board card synchronized with the PR lifecycle. GitHub remains read-only.
 
 **Arguments:**
 - `<pr>`: Required - PR number or URL
 - `[caminho-do-clone]`: Optional - local clone path when the repository is not in `~/workspace/{repo}`
 
 **Actions:**
-1. Reads the PR with `gh pr view` (state, head SHA, base branch, files, body)
+1. Reads the PR with `gh pr view` (state, `isDraft`, `mergedAt`, author, head SHA, base branch, files, body)
 2. Loads all files in `guidelines/` — they apply to any repository
-3. Finds the PR's card by `pr_url` in the board and derives the feature memory from its `feature:`; continues without a card when none exists
+3. Locates the PR's card by `pr_url` (frontmatter or legacy PR section) or creates one — every PR has an `implementation` card, with `pr_author` and `feature:` filled
 4. Classifies the repository case: cloned with memory, cloned without memory, or not cloned
 5. Enumerates changed files with `gh pr diff --name-only`, then reads each file's patch, skipping lockfiles, generated code and binaries
 6. Reports findings with `file:line`, severity, cited rule, evidence and a falsification step
 7. Keeps findings without a citable rule in a separate **suggestions** section (concrete alternative plus how to test, max 5)
-8. Declares `Convenção do repositório: desconhecida` when the repository has no memory instead of assuming its standards
-9. Proposes a new card for code work, **always asking before writing**; without a clone the card stays in `0.backlog` as a proposal
-10. Documents the findings in the PR card's `### Discussões` without touching status or folder
+8. Syncs the card with the PR state: `OPEN` → `3.in_review`; draft → not moved; `CLOSED` without merge → `5.archived`; `MERGED` → routes to `/complete-card`
+9. On merge, routes knowledge to `/complete-card` → `/condense-memory` (project + feature memory; feature skipped when empty)
+10. Documents the review in the card's `### Discussões` without publishing anything
 11. Never publishes: no `gh pr review`, `gh pr comment` or review/comment API calls
 
-**Verification cases:** one finding that cites the violated guideline section, and one PR without a card and without a clone that still completes.
+**Verification cases:** findings citing the violated guideline, PR without card and without clone creating a backlog card, open/closed/merged state sync, and card without `feature:`.
 
 Only applies to implementation. Reports, investigations and experiments skip
 `3.in_review` and go directly from `2.in_progress` to `/complete-card`.
