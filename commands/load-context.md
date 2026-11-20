@@ -55,9 +55,10 @@ Carregar todo o contexto necessário. **Com card:** o próprio card, guidelines 
    - Para `implementation`, executar `git branch --show-current`, `git status --short` e `git log -1 --oneline`
    - Para `report` e `investigation`, não exigir Git nem usar branch/commits como contexto do card
    - Para `experiment`, não executar nenhum comando Git nem apresentar dados de Git
+   - Para `epic`, não executar nenhum comando Git: o card reporta `Git: não aplicável` e o contexto útil são os cards filhos
 
 7. **Sincronizar branch e estado (`.agent_obsidian`):**
-   - Aplicável somente a `implementation`; para `report`, `investigation` e `experiment`, não comparar branch, perguntar sobre checkout, executar comandos Git ou afirmar que a branch está sincronizada
+   - Aplicável somente a `implementation`; para `report`, `investigation`, `experiment` e `epic`, não comparar branch, perguntar sobre checkout, executar comandos Git ou afirmar que a branch está sincronizada
    - Valor desconhecido de `work_type` interrompe o fluxo com erro explícito, conforme o passo 3
    - Atualizar `.agent_obsidian.current_card` para o card carregado, preservando todos os outros campos, também para `report`, `investigation` e `experiment`
    - Comparar a branch atual (`git branch --show-current`) com a branch do card
@@ -96,7 +97,7 @@ Carregar todo o contexto necessário. **Com card:** o próprio card, guidelines 
      cada tipo.
 
 8. **Analisar modificações da branch:**
-   - Aplicável somente a `implementation` (ou quando `work_type` estiver ausente); para `report`, `investigation` e `experiment`, pular este passo. Valor desconhecido interrompeu o fluxo no passo 3.
+   - Aplicável somente a `implementation` (ou quando `work_type` estiver ausente); para `report`, `investigation`, `experiment` e `epic`, pular este passo. Valor desconhecido interrompeu o fluxo no passo 3.
    - Identificar branch base (main, master, ou similar)
    - Listar commits da branch: `git log origin/{base}..HEAD --oneline`
    - Analisar arquivos modificados na branch (commitados):
@@ -360,7 +361,7 @@ ativo no estado, o comportamento é o dos passos 1 a 9.
 - No modo sem card o comando também **não escreve no repositório**: nenhum
   `git checkout`, `git pull` ou `git fetch`, e o `.agent_obsidian` sai intocado
 - Os passos 7 e 8 (sincronizar branch, analisar modificações) rodam só para
-  `implementation`; `report`, `investigation`, `experiment` e `work_type`
+  `implementation`; `report`, `investigation`, `experiment`, `epic` e `work_type`
   desconhecido pulam os dois
 
 ### Análise de Modificações da Branch

@@ -27,18 +27,20 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Ler `guidelines/card work types.md`
    - Card sem `work_type` é `implementation`; valor desconhecido interrompe sem mover o card ou alterar estado
    - Verificar se o PR foi merged somente para `implementation`, se houver PR
-   - `report`, `investigation` e `experiment` podem ser concluídos diretamente de `2.in_progress`, sem PR
-   - Para `experiment`, não executar nenhum comando Git
+   - São carregadas as guidelines e o contexto de card conforme `guidelines/conduct.md`
+   - `report`, `investigation`, `experiment` e `epic` podem ser concluídos diretamente de `2.in_progress`, sem PR
+   - Para `experiment` e `epic`, não executar nenhum comando Git
 
 4. **Validar completude:**
    - Para `implementation`: todas as tarefas **da seção `### Tarefas`** (a seção `### Verificação Pós-Deploy` não entra nesta validação — verificação pode falhar sem que o card deixe de estar concluído), "Descrição Técnica do que Foi Feito", "Conhecimento Adquirido pela IA" e PR (`pr_url`) conforme o fluxo existente
    - Para `report`: todas as tarefas concluídas, documento presente em `docs/{projeto}/reports/` no vault e caminho registrado em "Documento Produzido"
    - Para `investigation`: todas as tarefas concluídas; descobertas, conclusões e referências registradas em "Descobertas e Conclusões" e "Referências"; documento em `docs/{projeto}/investigations/` é opcional
    - Para `experiment`: todas as tarefas concluídas; ferramenta e resultado presentes na pasta atual; caminho relativo e instruções de uso registrados em "Ferramenta e Resultado"
+   - Para `epic`: todas as tarefas concluídas e **todos os cards das ondas em `4.done`**. Card de onda ainda em `1.not_started`, `2.in_progress` ou `3.in_review` impede a conclusão — o épico é o último a fechar
    - ✅ Seção "Discussões" documentada? (leitura sob demanda)
 
 5. **Verificar pós-deploy (antes de mover para `4.done`):**
-   - Aplicável somente a `implementation`. `report`, `investigation` e `experiment` pulam este passo
+   - Aplicável somente a `implementation`. `report`, `investigation`, `experiment` e `epic` pulam este passo
    - **Dois testes combinados** decidem se a seção vale. Os dois precisam ser verdadeiros:
      - **Teste 1 — o projeto tem deploy:** existe evidência no repositório (`.github/workflows/*deploy*.yml`, `docker-compose*.yml`, `Procfile`, hook `post-receive`) ou na memória (`condensed memory/projects/{projeto}.md` e `condensed memory/features/{feature}.md` descrevendo deploy)
      - **Teste 2 — a mudança é observável em execução:** algo muda em log, resposta de endpoint, estado de banco, agendamento ou consumo de recurso. Refactor sem mudança de comportamento, documentação e typo **não** passam
@@ -77,7 +79,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
 
 8. **Mover o card:**
    - `implementation`: mover de `3.in_review/` para `4.done/`
-   - `report`, `investigation` e `experiment`: mover de `2.in_progress/` para `4.done/`
+   - `report`, `investigation`, `experiment` e `epic`: mover de `2.in_progress/` para `4.done/`
    - Preservar a subpasta de projeto e verificar o resultado:
      `guidelines/conduct.md` §Movimentação de cards no board
 
@@ -88,7 +90,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Escrever de volta usando Write tool preservando estrutura completa
 
 10. **Voltar para a branch default e apagar a branch do card:**
-   - Aplicável somente a `implementation`. Para `report`, `investigation` e `experiment`, não executar nenhum comando Git.
+   - Aplicável somente a `implementation`. Para `report`, `investigation`, `experiment` e `epic`, não executar nenhum comando Git.
    - Detectar a branch default do repositório (`main`/`master`), preferindo `main` quando ambas existirem
    - Ler a branch do card no frontmatter (`branch:`)
    - Verificar alterações não commitadas: `git status --short`
@@ -107,7 +109,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - `implementation`: manter o fluxo atual e executar `/condense-memory "{nome-do-card}"` automaticamente
    - `report`: não chamar `/condense-memory`
    - `investigation`: se houver conhecimento potencialmente reutilizável, perguntar se o usuário confirma a consolidação. Só após resposta afirmativa executar `/condense-memory "{nome-do-card}"`; resposta negativa conclui o card sem memória
-   - `experiment`: nunca chamar `/condense-memory`, mesmo após pedido explícito; conhecimento, resultados e referências permanecem somente no card
+   - `experiment` e `epic`: nunca chamar `/condense-memory`, mesmo após pedido explícito; conhecimento, resultados e referências permanecem somente no card
 
 12. **Confirmar:**
    ```
@@ -132,6 +134,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Sempre informar o desfecho da verificação pós-deploy para `implementation`: quando não se aplica, dizer qual dos dois testes falhou; quando tem item falhando, repetir a sugestão de card de correção; quando a janela de deploy fechou, dizer que o card **não** foi concluído e que a chamada deve ser repetida
    - Para `report` e `investigation`, informar o caminho dos documentos no vault e que nenhum Git foi executado; memória de relatório: não aplicável; investigação: indicar se o usuário confirmou ou recusou a consolidação
    - Para `experiment`, informar que o card foi concluído sem Git ou consolidação de memória e que os artefatos continuam na pasta atual até limpeza manual
+   - Para `epic`, informar quantos cards filhos foram concluídos, que nenhum Git foi executado e que a coordenação terminou
 
 ## Notas Importantes
 - Não delete informações ao mover o card, preserve todo o histórico

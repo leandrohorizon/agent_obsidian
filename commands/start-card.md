@@ -35,6 +35,7 @@ Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o flux
    - Ler `guidelines/card work types.md`
    - Se `work_type` estiver ausente, tratar como `implementation`
    - Se `work_type` tiver valor inválido, interromper sem mover o card nem alterar o Git
+   - `epic` é válido: move para `2.in_progress` como os tipos sem Git, sem branch
    - Mostrar resumo breve ao usuário
 
 5. **Detectar informações git:**
@@ -43,7 +44,7 @@ Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o flux
      - Se ambas existirem, preferir `main`
      - Se nenhuma existir, usar a branch atual como base e avisar
    - Para `report` e `investigation`, não exigir repositório Git nem consultar branches; obter a URL do repositório somente se disponível e manter `branch:` vazio
-   - Para `experiment`, não executar nenhum comando Git e manter `repo:` e `branch:` vazios
+   - Para `experiment` e `epic`, não executar nenhum comando Git e manter `repo:` e `branch:` vazios
 
 6. **Perguntar ao usuário sobre a branch base (SEMPRE, antes de criar a branch):**
    - Aplicável somente a `implementation`
@@ -81,7 +82,7 @@ Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o flux
 
 9. **Atualizar frontmatter do card:**
    - Adicionar ou atualizar campos:
-     - `repo: {url-do-repo}` para `implementation`, `report` e `investigation`; manter vazio para `experiment`
+     - `repo: {url-do-repo}` para `implementation`, `report` e `investigation`; manter vazio para `experiment` e `epic`
      - `branch: feature/nome-do-card` para `implementation`; manter vazio para os demais tipos
      - Não alterar `work_type`
      - `status: In Progress`
@@ -110,6 +111,7 @@ Iniciar o trabalho em um card, movendo-o para "2.in_progress" e aplicando o flux
    - Para `implementation`, informar branch base e branch criada como abaixo.
    - Para `report` e `investigation`, omitir as linhas de branch base/branch criada; confirmar que não houve checkout, pull ou criação de branch e informar o destino esperado dos documentos (`docs/{projeto}/reports/` ou `docs/{projeto}/investigations/`).
    - Para `experiment`, omitir dados de repositório e branch; confirmar que nenhum comando Git foi executado e que a pasta atual será usada para criar e manter a ferramenta até limpeza manual.
+   - Para `epic`, omitir dados de repositório e branch; confirmar que nenhum comando Git foi executado e que o trabalho é criar e manter os cards filhos e a seção `## Ondas`.
    ```
    ✅ Card iniciado!
 

@@ -28,6 +28,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    - Para `implementation`, verificar que está em repositório Git e confirmar a branch do card
    - Para `report` e `investigation`, não exigir Git, trocar branch ou fazer pull
    - Para `experiment`, não executar nenhum comando Git; a pasta atual é o espaço de trabalho do experimento
+   - Para `epic`, não exigir Git, não trocar branch e não fazer pull: o trabalho é manter os cards filhos e a seção `## Ondas` do próprio épico
 
 4. **Carregar contexto completo:**
 
@@ -129,6 +130,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
      - `report`: não alterar código do projeto; produzir o documento solicitado em `docs/{projeto}/reports/` dentro do vault e registrar o caminho no card
      - `investigation`: tratar o código do projeto como somente leitura; registrar evidências, conclusões, incertezas e referências no card; documento opcional em `docs/{projeto}/investigations/` dentro do vault
      - `experiment`: criar ferramentas pequenas somente na pasta de trabalho atual; não executar Git, alterar outro projeto ou escrever na condensed memory; testes são opcionais e, quando úteis, devem ser locais e seguros; registrar caminho relativo, instruções de uso e resultado observado no card
+     - `epic`: criar e atualizar os cards filhos (escopo, tarefas, `depends_on`/`dependents`) e manter `## Ondas` coerente com eles; não alterar código de projeto, não executar Git e não escrever em memória
      - Se uma investigação identificar trabalho de implementação, criar um card relacionado com `work_type: implementation`; não converter este card nem alterar código
      - Marcar checkbox como completo `- [x]` no card
      - Atualizar seção "Discussões" com decisões tomadas
@@ -139,6 +141,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
    - `report`: preencher "### Documento Produzido" (caminho) e "### Fontes e Referências"
    - `investigation`: preencher "### Descobertas e Conclusões", "### Referências" e "### Conhecimento Adquirido pela IA"
    - `experiment`: preencher "### Ferramenta e Resultado" (como usar, caminhos relativos e resultado observado)
+   - `epic`: não há seção de entregável. O resultado do épico é o board: cards filhos criados e `## Ondas` preenchida. Registrar em "Discussões" as decisões de escopo e de ordem
    - Registrar decisões em "### Discussões"
 
 8. **Seguir as guidelines:**
@@ -152,6 +155,7 @@ Trabalhar em um card do board Obsidian, lendo o contexto completo (card + guidel
 9. **Validar o resultado:**
    - Para `report` e `investigation`, não executar testes/lint nem modificar código do projeto
    - Para `experiment`, testes automatizados são opcionais; quando forem úteis, validar apenas a ferramenta criada com execução local segura. Não executar comandos Git, testes do projeto hospedeiro ou lint fora da pasta do experimento
+   - Para `epic`, não há código: não rodar testes nem lint. Validar o board — cada card filho existe, tem `work_type` válido, aponta para o épico em `depends_on` e aparece em `## Ondas`
    - Para `implementation`, obter a lista de arquivos alterados: `git status --porcelain` e `git diff --name-only`
    - As regras de escopo de suíte e lint abaixo aplicam-se somente a `implementation`:
    - **Avaliar o tamanho da suíte** antes de decidir o escopo (ex: `ls **/*_spec.rb | wc -l`, `find . -name "*.test.*" | wc -l`)
