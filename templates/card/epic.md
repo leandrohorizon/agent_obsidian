@@ -32,8 +32,9 @@ dependents:
 > - Cada card entra como um wikilink por linha (`- [[card]]`), sem texto solto.
 > - Onda 0 é implícita: o próprio épico. Não a escreva.
 > - Visões parciais dos mesmos cards ("trilhos") ficam **fora** desta região, em heading próprio, para não serem lidas como onda.
-> - Só entra card que existe em `1.not_started`, `2.in_progress`, `3.in_review` ou `4.done`, com `work_type: implementation` e este épico em `depends_on`.
-> - Todo card que declara este épico em `dependents` precisa aparecer em alguma onda, e vice-versa: divergência entre as duas listas aborta a execução.
+> - Só entra card que existe em `1.not_started`, `2.in_progress`, `3.in_review` ou `4.done`, com `work_type: implementation` e listado em `dependents` deste épico.
+> - O `dependents` do épico é a mão autoritativa: todo card listado nele precisa aparecer em alguma onda, e todo card das ondas precisa estar nele. Divergência aborta a execução.
+> - `depends_on` do filho apontando para o épico é opcional — quando existe, é parentesco, não dependência de execução.
 > - Seção ausente, vazia ou sem nenhum card → a ordem é derivada dos `depends_on` dos filhos.
 >
 > Exemplo de onda preenchida (ilustrativo, dentro do blockquote de propósito):

@@ -61,10 +61,11 @@ Comum aos dois: o épico **não é executado** (ele é a fonte da ordem), um sub
        `2.in_progress`, `3.in_review` ou `4.done` — card em `0.backlog` ou
        `5.archived` é divergência
      - todo card das ondas tem `work_type: implementation`
-     - todo card das ondas tem o épico em `depends_on`, e o épico tem o card em
-       `dependents`: as duas mãos precisam bater
-     - o conjunto das ondas é igual a `dependents` do épico — filho fora das ondas
-       e card em onda que não é filho são divergências
+     - a mão autoritativa é o `dependents` do épico: o conjunto das ondas precisa
+       ser **igual** a ele. Filho fora das ondas e card em onda que não é filho
+       são divergências
+     - `depends_on` do filho apontando para o épico é opcional: quando existe, é
+       parentesco e não conta como dependência de execução
      - nenhum card em duas ondas
      - nenhuma dependência interna na **mesma** onda (rodaria em paralelo) nem em
        onda **posterior** (inverteria a ordem)

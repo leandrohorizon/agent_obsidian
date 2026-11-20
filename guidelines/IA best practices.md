@@ -147,9 +147,15 @@ devolve vazio quando o valor vem nas linhas seguintes. Use
 linha já reduzido ao alvo do wikilink.
 
 **O link com o épico é parentesco, não dependência de execução.** O card filho
-declara o épico em `depends_on` para que a correlação apareça nas duas mãos, mas
-o épico não é pré-requisito do filho: ele é o contrário — só conclui quando os
-filhos concluem. Tratar esse link como dependência comum cria ciclo (o filho
+pode declarar o épico em `depends_on` para a correlação aparecer nas duas mãos,
+mas o épico não é pré-requisito do filho: ele é o contrário — só conclui quando
+os filhos concluem. Tratar esse link como dependência comum cria ciclo (o filho
 espera o épico, que espera o filho) e nenhum dos dois roda. Quem monta ordem de
 execução ignora o link que aponta para card `work_type: epic` e usa as ondas do
 épico.
+
+**A mão autoritativa do épico é o `dependents` dele**, não o `depends_on` de cada
+filho. Um épico tem muitos filhos e manter N cards atualizados é onde a
+divergência nasce; a lista no próprio épico tem um lugar só para corrigir.
+`depends_on` do filho apontando para o épico é opcional e, quando ausente, não é
+erro.
