@@ -69,6 +69,11 @@ entregável substitui "Descrição Técnica do que Foi Feito": "Documento Produz
 (experiment). "Conhecimento Adquirido pela IA" só existe em `implementation` e
 `investigation`.
 
+**Card `epic` tem um recorte próprio.** O `/orchestrate-cards` lê **apenas** a
+seção de ondas (`## Ondas`) do épico — Descrição, Tarefas e Discussões são do
+trabalho normal de quem cria e mantém os filhos. Ler o épico inteiro para saber a
+ordem de execução é o mesmo desperdício que §6 elimina nos outros tipos.
+
 O `pr_url` do frontmatter é a fonte única do PR — cards antigos podem ter uma seção de PRs no corpo, mas ela é redundante e não é mais criada.
 
 **Procedimento:**
@@ -134,3 +139,17 @@ avisar e não criar propriedade vazia.
 **Ruído a ignorar:** dentro das seções antigas, o blockquote do template (`>`) e
 a prosa ("— o que ele fornece", "dependências externas") não são dependência de
 card. Só `[[link]]` que resolve para card do board conta.
+
+**Leitura de campo de lista:** `depends_on` e `dependents` são listas YAML. Não
+use `parse_frontmatter()` para lê-las — ele casa só a linha `campo: valor` e
+devolve vazio quando o valor vem nas linhas seguintes. Use
+`parse_frontmatter_list()` (`commands/lib/common.sh`), que devolve um item por
+linha já reduzido ao alvo do wikilink.
+
+**O link com o épico é parentesco, não dependência de execução.** O card filho
+declara o épico em `depends_on` para que a correlação apareça nas duas mãos, mas
+o épico não é pré-requisito do filho: ele é o contrário — só conclui quando os
+filhos concluem. Tratar esse link como dependência comum cria ciclo (o filho
+espera o épico, que espera o filho) e nenhum dos dois roda. Quem monta ordem de
+execução ignora o link que aponta para card `work_type: epic` e usa as ondas do
+épico.
