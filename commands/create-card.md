@@ -12,11 +12,11 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
    - Verificar se `$OBSIDIAN_VAULT_PATH` está definida
    - Se não estiver, instruir: `export OBSIDIAN_VAULT_PATH="/caminho/para/vault"`
    - Ler `guidelines/card work types.md` antes de escolher o fluxo
-   - Inferir `work_type` do pedido quando estiver claro; perguntar apenas se estiver ambíguo. Todo card criado grava `work_type` no frontmatter; nunca criar card sem tipo
+   - Inferir `work_type` do pedido quando estiver claro; perguntar apenas se estiver ambíguo. Todo card criado grava `work_type` no frontmatter; nunca criar card sem tipo. Os valores válidos são `implementation`, `report`, `investigation`, `experiment` e `epic` — `epic` é o card que coordena cards filhos e mantém a ordem deles em ondas, sem código
    - Para `implementation`, verificar se estamos em um repositório git (`git rev-parse --git-dir`)
-   - Para `report`, `investigation` e `experiment`, não exigir Git
+   - Para `report`, `investigation`, `experiment` e `epic`, não exigir Git
    - Para `report` e `investigation`, Git não determina estado nem branch
-   - Para `experiment`, não executar nenhum comando Git
+   - Para `experiment` e `epic`, não executar nenhum comando Git
 
 2. **Determinar estado do card:**
 
@@ -37,10 +37,10 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
       - **Exceção:** se o usuário pedir explicitamente para criar no backlog
         (card ainda não refinado ou não priorizado), usar `0.backlog`
 
-   Para `report`, `investigation` e `experiment`:
+   Para `report`, `investigation`, `experiment` e `epic`:
    - Usar `1.not_started` por padrão ou `0.backlog` se o usuário pedir
      explicitamente uma ideia ainda não refinada. Não consultar PR, commits nem
-     branch para esses tipos; para `experiment`, não executar comandos Git.
+     branch para esses tipos; para `experiment` e `epic`, não executar comandos Git.
 
 3. **Determinar diretório de destino:**
    - `0.backlog` → `$OBSIDIAN_VAULT_PATH/board/0.backlog/`
@@ -57,6 +57,7 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
    - Para `implementation`, obter URL (`git remote get-url origin 2>/dev/null`) e branch atual (`git branch --show-current`)
    - Para `report` e `investigation`, consultar o remote somente se disponível e deixar `branch:` vazio
    - Para `experiment`, não consultar o remote ou qualquer dado Git; deixar `repo:` e `branch:` vazios
+   - Para `epic`, não consultar o remote nem dados Git; deixar `repo:` e `branch:` vazios — o épico não altera repositório
    - Data atual: `date +%Y-%m-%d`
 
 6. **Criar conteúdo do card usando template:**
@@ -65,6 +66,7 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
      - `report`: `templates/card/report.md`
      - `investigation`: `templates/card/investigation.md`
      - `experiment`: `templates/card/experiment.md`
+     - `epic`: `templates/card/epic.md`
    - Preencher os placeholders do frontmatter com os valores coletados:
      ```yaml
      ---
@@ -80,11 +82,11 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
      completed: {YYYY-MM-DD se done}
      ---
      ```
-   - Para `implementation`, `report` e `investigation`, **sugerir a feature:** listar os arquivos `.md` existentes em
+   - Para `implementation`, `report`, `investigation` e `epic`, **sugerir a feature:** listar os arquivos `.md` existentes em
      `$OBSIDIAN_VAULT_PATH/condensed memory/features/` (sem extensão; ignorar
      `.gitkeep`) e sugerir ao usuário a feature mais próxima do card. Se não
      houver correspondência, aceitar uma nova feature (slug lowercase com hífens).
-   - Para esses três tipos, preencher `feature:` com o slug escolhido (ou deixar
+   - Para esses quatro tipos, preencher `feature:` com o slug escolhido (ou deixar
      vazio se o usuário não definir). Para `experiment`, não sugerir feature e
      manter `feature:` vazio.
    - **Tarefas:** registrar o trabalho da tarefa, não passo já garantido pelo
@@ -97,6 +99,9 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
      `docs/{projeto}/investigations/`, conforme o template.
    - Para `experiment`, ferramentas e resultados ficam na pasta de trabalho
      atual e são mantidos após a conclusão; não devem ser enviados para memória.
+   - Para `epic`, as tarefas são de coordenação: criar os cards filhos com
+     escopo, registrar `depends_on`/`dependents` e preencher `## Ondas` com a
+     ordem de execução. O formato da seção está no próprio template.
 
 7. **Criar o arquivo:**
    - Salvar em: `$OBSIDIAN_VAULT_PATH/board/{estado-detectado}/{nome-do-card}.md`
@@ -121,7 +126,8 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
    - Use /work-on-card "{nome-do-card}" para trabalhar nas tarefas
    - Preencha a seção "Descrição" com detalhes da tarefa
    ```
-   Para `report`, `investigation` e `experiment`, omitir linhas de branch/PR.
+   Para `report`, `investigation`, `experiment` e `epic`, omitir linhas de
+   branch/PR.
 
 ## Notas Importantes
 - O frontmatter YAML substitui a antiga seção "## Repositório"
@@ -134,3 +140,6 @@ Criar um card com template e estado apropriados ao `work_type`; consultar Git so
   os documentos são salvos no vault, não no repositório do projeto
 - Para `experiment`, não executar Git; as ferramentas são criadas na pasta de
   trabalho atual e permanecem lá até limpeza manual, sem consolidação de memória
+- Para `epic`, não executar Git: `repo:`/`branch:` vazios e as tarefas são de
+  coordenação dos filhos. Um épico em `1.not_started` é a entrada de
+  `/orchestrate-cards "<nome-do-épico>"`

@@ -57,10 +57,12 @@ aplicativo instalado. As listas deste arquivo são **exemplos, não a lista fech
   **Exceção:** os comandos `/work-on-card`, `/review-card` e `/orchestrate-cards`
   são o pedido explícito de commit — o fluxo deles inclui commits incrementais e
   push da branch.
-  - No caso do `/orchestrate-cards`, a autorização vem da **confirmação da lista
-    de cards** (passo 2 do comando). Sem essa confirmação, o comando não roda e
-    nada é commitado. A confirmação cobre **apenas** os cards listados: card que
-    não estava na lista não é tocado.
+  - No caso do `/orchestrate-cards`, a autorização vem da **confirmação do plano
+    da onda** (o dry-run do passo 7 do comando). Sem essa confirmação, o comando
+    não roda e nada é commitado. A confirmação cobre **apenas** os cards
+    listados: card que não estava na lista não é tocado.
+  - No modo épico a confirmação é **por onda**: confirmar a onda N não autoriza a
+    onda N+1, que precisa de confirmação própria.
   - A autorização cobre commit, push e abertura de PR **em draft**. Não cobre
     merge, nem promover o draft para "ready for review", nem apagar branch.
 - **Nunca commitar o `.agent_obsidian`.**
@@ -88,6 +90,13 @@ quando parece incompleta, temporária ou fora do padrão.
 
 ## Movimentação de cards no board
 
+- **O card mantém a subpasta de projeto ao mudar de estado.** O caminho relativo
+  à pasta de estado é preservado: `1.not_started/{projeto}/card.md` →
+  `2.in_progress/{projeto}/card.md`. Card que está na raiz da pasta de estado
+  continua na raiz. Criar a subpasta de destino quando ela não existir.
+- **A busca de card por nome é recursiva.** Cards vivem em subpastas de projeto;
+  procurar só na raiz da pasta de estado não encontra card nenhum num board
+  organizado por projeto. Vale para toda busca por nome em pasta de estado.
 - **Nunca considerar o movimento concluído sem verificar o resultado:** deve
   existir **exatamente um** arquivo do card, no destino e com o frontmatter
   atualizado. Remova qualquer cópia na pasta de origem.

@@ -1,8 +1,8 @@
 # Card Work Types
 
 `work_type` é o contrato de execução do card. O campo fica no frontmatter e aceita
-**exatamente** um de quatro valores: `implementation`, `report`, `investigation`
-ou `experiment`.
+**exatamente** um de cinco valores: `implementation`, `report`, `investigation`,
+`experiment` ou `epic`.
 
 Este arquivo é a **fonte única de verdade** do que cada tipo pode fazer. Os
 comandos consumidores (`/create-card`, `/start-card`, `/work-on-card`,
@@ -33,6 +33,8 @@ somente o que está autorizado para ele.
   estiver ambíguo; o card criado sempre grava `work_type` no frontmatter.
 - `/orchestrate-cards` processa `implementation` e cards sem `work_type`; valor
   inválido é reportado como erro, nunca tratado como implementação.
+- `epic` não entra nessa lista como card de trabalho: ele é a **entrada** do
+  lote, a fonte das ondas. Os cards executados são os filhos.
 
 ## Allowlist por tipo
 
@@ -67,6 +69,16 @@ somente o que está autorizado para ele.
 - Concluir diretamente de `2.in_progress` para `4.done`, sem `3.in_review`.
 - Manter os artefatos na pasta atual até limpeza manual.
 
+### `epic`
+- Ler o board e os cards filhos, sem alterar código de projeto.
+- Criar e atualizar os cards filhos (escopo, tarefas, `depends_on`/`dependents`).
+- Manter a seção de ondas do próprio card — formato, grupos de PR e local em
+  `templates/card/epic.md`, `## Ondas`.
+- Atualizar as seções do card (Descrição, Tarefas, Discussões).
+- Concluir quando todos os cards das ondas estiverem em `4.done`.
+- **Nenhum** comando Git, branch, PR ou escrita em memória: o épico não altera
+  repositório nenhum. `repo:` e `branch:` ficam vazios.
+
 `{projeto}` é o nome do diretório raiz do projeto normalizado para lowercase,
 com espaços e hífens substituídos por underscore, igual ao nome da memória de
 projeto. Os documentos de relatório e investigação ficam no vault central, não
@@ -78,23 +90,27 @@ Cada comando executa apenas as ações da allowlist do tipo; ação fora da list
 interrompe o comando com erro explícito, sem efeito colateral.
 
 - `/start-card`: `implementation` troca branch, faz pull e cria branch;
-  `report`, `investigation` e `experiment` movem para `2.in_progress` e atualizam
-  `status`/`started`, mantendo `branch:` vazio.
+  `report`, `investigation`, `experiment` e `epic` movem para `2.in_progress` e
+  atualizam `status`/`started`, mantendo `branch:` vazio.
 - `/work-on-card`: `implementation` executa as tarefas e commita
   incrementalmente; `report` produz o documento em `docs/{projeto}/reports/`;
   `investigation` registra descobertas no card; `experiment` cria a ferramenta
-  na pasta atual e valida localmente quando útil.
+  na pasta atual e valida localmente quando útil; `epic` mantém os cards filhos e
+  as ondas, sem tocar em código.
 - `/load-context`: carrega contexto em todos os tipos; sincroniza branch e
   apresenta estado Git apenas para `implementation`.
 - `/review-card`: aplica-se apenas a `implementation`; os demais tipos concluem
-  diretamente com `/complete-card`.
+  diretamente com `/complete-card`. `epic` não tem PR para revisar.
 - `/complete-card`: `implementation` exige PR merged, volta para a branch default
-  e apaga a branch local; os demais tipos concluem de `2.in_progress` para
-  `4.done`. Só limpa `.agent_obsidian.current_card` quando ele aponta para o
-  card concluído.
+  e apaga a branch local; `epic` conclui de `2.in_progress` para `4.done` quando
+  todos os cards das ondas estão em `4.done`; `report`, `investigation` e
+  `experiment` concluem direto. Só limpa `.agent_obsidian.current_card` quando
+  ele aponta para o card concluído.
 - `/condense-memory`: processa apenas `implementation` (e `investigation`
-  nomeada explicitamente, como confirmação). `report` e `experiment` nunca são
-  consolidados.
+  nomeada explicitamente, como confirmação). `report`, `experiment` e `epic`
+  nunca são consolidados.
+- `/orchestrate-cards`: executa as ondas de um `epic`; sem épico indicado, uma
+  onda só com os `implementation` de `1.not_started/`.
 
 `3.in_review` é exclusivo de `implementation`. Uma investigação que descobrir
 trabalho de código cria um novo card relacionado com `work_type: implementation`;

@@ -20,12 +20,14 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
 
 3. **Ler e validar o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
-   - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/2.in_progress/`
+   - Se foi passado nome, procurar **recursivamente** em
+     `$OBSIDIAN_VAULT_PATH/board/2.in_progress/` e, se não achar, nas demais
+     pastas de estado (`guidelines/conduct.md` §Movimentação de cards no board)
    - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
    - Ler `guidelines/card work types.md`
    - Card sem `work_type` é `implementation`; valor desconhecido interrompe o fluxo com erro explícito
-   - Para `report`, `investigation` e `experiment`, não criar commit/push/PR nem mover para `3.in_review`; informar que esses tipos vão diretamente para `/complete-card`
-   - Para `experiment`, não executar nenhum comando Git
+   - Para `report`, `investigation`, `experiment` e `epic`, não criar commit/push/PR nem mover para `3.in_review`; informar que esses tipos vão diretamente para `/complete-card`
+   - Para `experiment` e `epic`, não executar nenhum comando Git
    - Só após confirmar `implementation`, verificar o repositório Git e se há alterações para revisar
    - Verificar se todas as tarefas `- [ ]` foram completadas `- [x]` — as tarefas
      concluídas são leitura sob demanda, então lê-las aqui é o caso de uso previsto.
@@ -138,8 +140,25 @@ Preparar um card para revisão, movendo-o de "2.in_progress" para "3.in_review" 
 7. **Mover o card:**
    - Mover arquivo de `$OBSIDIAN_VAULT_PATH/board/2.in_progress/card.md`
    - Para: `$OBSIDIAN_VAULT_PATH/board/3.in_review/card.md`
+   - Preservar a subpasta de projeto e verificar o resultado:
+     `guidelines/conduct.md` §Movimentação de cards no board
 
-8. **Confirmar:**
+8. **Limpar a worktree (modo orquestrado):**
+   - Aplicável somente quando o trabalho rodou em `git worktree`, preparada pelo
+     `/orchestrate-cards`. Identificação: no diretório atual, `.git` é um
+     **arquivo** e não um diretório (`git rev-parse --git-dir` ≠ `.git`). Em
+     trabalho normal fora do lote, o diretório atual é o repositório e este passo
+     não roda
+   - Remover `<worktree>/.agent_obsidian`, criado pelo `/start-card` dentro da
+     worktree: é untracked e impede a remoção limpa
+   - Executar, **do repositório principal** (o caminho vem no prompt do
+     subagente): `git -C {repo-principal} worktree remove {worktree}`
+     - Recusa por arquivo não commitado → **não forçar** com `--force`: reportar
+       o que sobrou e deixar a decisão com o usuário (`guidelines/conduct.md`)
+   - A branch `feature/{nome-do-card}` **não** é apagada aqui: o `/complete-card`
+     roda depois, no repositório principal, e é ele quem apaga após o merge
+
+9. **Confirmar:**
    ```
    ✅ Card movido para revisão!
 

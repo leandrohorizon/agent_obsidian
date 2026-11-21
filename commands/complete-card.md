@@ -20,23 +20,30 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
 
 3. **Ler e validar o card:**
    - Se veio do `.agent_obsidian`, usar o path direto: Read `current_card.path`
-   - Se foi passado nome, procurar em `$OBSIDIAN_VAULT_PATH/board/3.in_review/` e `2.in_progress/`
+   - Se foi passado nome, procurar **recursivamente** em
+     `$OBSIDIAN_VAULT_PATH/board/3.in_review/` e `2.in_progress/`
+     (`guidelines/conduct.md` §Movimentação de cards no board)
    - Ler o card pela **leitura enxuta** (`guidelines/IA best practices.md` §6)
    - Ler `guidelines/card work types.md`
    - Card sem `work_type` é `implementation`; valor desconhecido interrompe sem mover o card ou alterar estado
    - Verificar se o PR foi merged somente para `implementation`, se houver PR
-   - `report`, `investigation` e `experiment` podem ser concluídos diretamente de `2.in_progress`, sem PR
-   - Para `experiment`, não executar nenhum comando Git
+   - **PR compartilhado por grupo:** um único PR pode cobrir vários cards
+     (`**PR …**` no plano do épico). Cada card do grupo carrega o mesmo `pr_url`;
+     basta validar que ele está merged, sem exigir um PR por card
+   - São carregadas as guidelines e o contexto de card conforme `guidelines/conduct.md`
+   - `report`, `investigation`, `experiment` e `epic` podem ser concluídos diretamente de `2.in_progress`, sem PR
+   - Para `experiment` e `epic`, não executar nenhum comando Git
 
 4. **Validar completude:**
    - Para `implementation`: todas as tarefas **da seção `### Tarefas`** (a seção `### Verificação Pós-Deploy` não entra nesta validação — verificação pode falhar sem que o card deixe de estar concluído), "Descrição Técnica do que Foi Feito", "Conhecimento Adquirido pela IA" e PR (`pr_url`) conforme o fluxo existente
    - Para `report`: todas as tarefas concluídas, documento presente em `docs/{projeto}/reports/` no vault e caminho registrado em "Documento Produzido"
    - Para `investigation`: todas as tarefas concluídas; descobertas, conclusões e referências registradas em "Descobertas e Conclusões" e "Referências"; documento em `docs/{projeto}/investigations/` é opcional
    - Para `experiment`: todas as tarefas concluídas; ferramenta e resultado presentes na pasta atual; caminho relativo e instruções de uso registrados em "Ferramenta e Resultado"
+   - Para `epic`: todas as tarefas concluídas e **todos os cards das ondas em `4.done`**. Card de onda ainda em `1.not_started`, `2.in_progress` ou `3.in_review` impede a conclusão — o épico é o último a fechar
    - ✅ Seção "Discussões" documentada? (leitura sob demanda)
 
 5. **Verificar pós-deploy (antes de mover para `4.done`):**
-   - Aplicável somente a `implementation`. `report`, `investigation` e `experiment` pulam este passo
+   - Aplicável somente a `implementation`. `report`, `investigation`, `experiment` e `epic` pulam este passo
    - **Dois testes combinados** decidem se a seção vale. Os dois precisam ser verdadeiros:
      - **Teste 1 — o projeto tem deploy:** existe evidência no repositório (`.github/workflows/*deploy*.yml`, `docker-compose*.yml`, `Procfile`, hook `post-receive`) ou na memória (`condensed memory/projects/{projeto}.md` e `condensed memory/features/{feature}.md` descrevendo deploy)
      - **Teste 2 — a mudança é observável em execução:** algo muda em log, resposta de endpoint, estado de banco, agendamento ou consumo de recurso. Refactor sem mudança de comportamento, documentação e typo **não** passam
@@ -75,7 +82,9 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
 
 8. **Mover o card:**
    - `implementation`: mover de `3.in_review/` para `4.done/`
-   - `report`, `investigation` e `experiment`: mover de `2.in_progress/` para `4.done/`
+   - `report`, `investigation`, `experiment` e `epic`: mover de `2.in_progress/` para `4.done/`
+   - Preservar a subpasta de projeto e verificar o resultado:
+     `guidelines/conduct.md` §Movimentação de cards no board
 
 9. **Limpar .agent_obsidian:**
    - Ler `.agent_obsidian` do diretório atual (se existir)
@@ -84,7 +93,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Escrever de volta usando Write tool preservando estrutura completa
 
 10. **Voltar para a branch default e apagar a branch do card:**
-   - Aplicável somente a `implementation`. Para `report`, `investigation` e `experiment`, não executar nenhum comando Git.
+   - Aplicável somente a `implementation`. Para `report`, `investigation`, `experiment` e `epic`, não executar nenhum comando Git.
    - Detectar a branch default do repositório (`main`/`master`), preferindo `main` quando ambas existirem
    - Ler a branch do card no frontmatter (`branch:`)
    - Verificar alterações não commitadas: `git status --short`
@@ -94,6 +103,11 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
      - Se o pull falhar (conflito, sem upstream, sem remote), **parar e reportar**. Não apagar a branch sobre estado desatualizado
      - Se não houver remote configurado, avisar e seguir
    - Apagar a branch do card: `git branch -d {branch-do-card}`
+     - **Branch compartilhada por grupo de PR:** quando o card faz parte de um
+       grupo (`/orchestrate-cards` com `**PR …**` no épico), vários cards apontam
+       para a mesma branch. Se ela já não existir, foi apagada ao concluir o card
+       anterior do grupo: **não é erro** — confirmar com
+       `git branch --list {branch-do-card}` e seguir
      - Usar `-d` (não `-D`): se o git recusar por commits não mergeados, **parar e reportar** em vez de forçar. Branch não mergeada apagada com `-D` perde trabalho
      - **Squash merge faz o `-d` recusar mesmo com o PR merged.** O squash cria um commit novo na base, então os commits da branch não são ancestrais dela e o git não os reconhece como mergeados. Antes de reportar como problema, confirmar que o conteúdo está na base: `git diff --stat {branch} {default}` deve vir vazio. Se vier vazio, o merge está completo e a recusa é esperada — informar o usuário e deixar a decisão de apagar com `-D` para ele, já que `-D` é destrutivo
      - Se a branch do card for a própria branch default, não apagar nada
@@ -103,7 +117,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - `implementation`: manter o fluxo atual e executar `/condense-memory "{nome-do-card}"` automaticamente
    - `report`: não chamar `/condense-memory`
    - `investigation`: se houver conhecimento potencialmente reutilizável, perguntar se o usuário confirma a consolidação. Só após resposta afirmativa executar `/condense-memory "{nome-do-card}"`; resposta negativa conclui o card sem memória
-   - `experiment`: nunca chamar `/condense-memory`, mesmo após pedido explícito; conhecimento, resultados e referências permanecem somente no card
+   - `experiment` e `epic`: nunca chamar `/condense-memory`, mesmo após pedido explícito; conhecimento, resultados e referências permanecem somente no card
 
 12. **Confirmar:**
    ```
@@ -128,6 +142,7 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Sempre informar o desfecho da verificação pós-deploy para `implementation`: quando não se aplica, dizer qual dos dois testes falhou; quando tem item falhando, repetir a sugestão de card de correção; quando a janela de deploy fechou, dizer que o card **não** foi concluído e que a chamada deve ser repetida
    - Para `report` e `investigation`, informar o caminho dos documentos no vault e que nenhum Git foi executado; memória de relatório: não aplicável; investigação: indicar se o usuário confirmou ou recusou a consolidação
    - Para `experiment`, informar que o card foi concluído sem Git ou consolidação de memória e que os artefatos continuam na pasta atual até limpeza manual
+   - Para `epic`, informar quantos cards filhos foram concluídos, que nenhum Git foi executado e que a coordenação terminou
 
 ## Notas Importantes
 - Não delete informações ao mover o card, preserve todo o histórico

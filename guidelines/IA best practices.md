@@ -69,6 +69,11 @@ entregável substitui "Descrição Técnica do que Foi Feito": "Documento Produz
 (experiment). "Conhecimento Adquirido pela IA" só existe em `implementation` e
 `investigation`.
 
+**Card `epic` tem um recorte próprio.** O `/orchestrate-cards` lê **apenas** a
+seção de ondas (`## Ondas`) do épico — Descrição, Tarefas e Discussões são do
+trabalho normal de quem cria e mantém os filhos. Ler o épico inteiro para saber a
+ordem de execução é o mesmo desperdício que §6 elimina nos outros tipos.
+
 O `pr_url` do frontmatter é a fonte única do PR — cards antigos podem ter uma seção de PRs no corpo, mas ela é redundante e não é mais criada.
 
 **Procedimento:**
@@ -134,3 +139,45 @@ avisar e não criar propriedade vazia.
 **Ruído a ignorar:** dentro das seções antigas, o blockquote do template (`>`) e
 a prosa ("— o que ele fornece", "dependências externas") não são dependência de
 card. Só `[[link]]` que resolve para card do board conta.
+
+**Leitura de campo de lista:** `depends_on` e `dependents` são listas YAML. Não
+use `parse_frontmatter()` para lê-las — ele casa só a linha `campo: valor` e
+devolve vazio quando o valor vem nas linhas seguintes. Use
+`parse_frontmatter_list()` (`commands/lib/common.sh`), que devolve um item por
+linha já reduzido ao alvo do wikilink.
+
+**O link com o épico é parentesco, não dependência de execução.** O card filho
+pode declarar o épico em `depends_on` para a correlação aparecer nas duas mãos,
+mas o épico não é pré-requisito do filho: ele é o contrário — só conclui quando
+os filhos concluem. Tratar esse link como dependência comum cria ciclo (o filho
+espera o épico, que espera o filho) e nenhum dos dois roda. Quem monta ordem de
+execução ignora o link que aponta para card `work_type: epic` e usa as ondas do
+épico.
+
+**A mão autoritativa do épico é o `dependents` dele**, não o `depends_on` de cada
+filho. Um épico tem muitos filhos e manter N cards atualizados é onde a
+divergência nasce; a lista no próprio épico tem um lugar só para corrigir.
+`depends_on` do filho apontando para o épico é opcional e, quando ausente, não é
+erro.
+
+## 9. Sobreposição de arquivo entre cards
+
+Dois cards que editam o mesmo arquivo **não rodam em paralelo**. Worktree isola a
+working tree durante o trabalho e não faz nada contra o conflito no merge: o
+segundo PR nasce de uma base que não tem o primeiro, e o merge conflita.
+
+- **Como saber:** o card pode declarar `## Arquivos` com os caminhos que pretende
+  tocar. Sem declaração, inferir do texto — caminho de arquivo, nome de
+  blueprint, tabela, endpoint, componente.
+- **Arquivo de estrutura compartilhada quase sempre colide:** `__init__.py` do
+  app que registra blueprints, `schema.sql`, `Makefile`, `requirements.txt`,
+  `conftest.py`. Tratar como colisão mesmo quando os cards não se citam.
+- **Colisão se resolve de duas formas, e só dessas duas:** os cards vão para o
+  **mesmo PR** (e rodam em sequência no mesmo worktree) ou ficam em **ondas
+  diferentes**. Em grupos/PRs distintos dentro da mesma onda, nunca.
+- **Quem decide o agrupamento é o usuário**, no refinamento do épico — review é o
+  passo caro do fluxo e um PR por card multiplica o custo. O comando propõe a
+  partir das colisões e o plano fica registrado no épico.
+- **Colisão descoberta na execução não vira escolha do agente:** o orquestrador
+  para o grupo e reporta. Reagrupar por conta própria muda o que o usuário
+  confirmou.
