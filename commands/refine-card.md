@@ -166,6 +166,54 @@ A ideia central deste comando é **não deixar a IA supor o funcionamento do có
 
    d) **Registrar na seção Discussões** junto com as dúvidas (ver passo 7)
 
+6.2. **Card `work_type: epic` — apresentar o plano antes de criar os filhos:**
+
+   Só roda quando o card é um épico. Refinar um épico é decidir a **forma** dele,
+   e a forma inclui quantos cards serão criados e quantos PRs eles vão gerar:
+   review é o passo caro do fluxo e um PR por card multiplica o custo.
+
+   a) **Listar os cards filhos previstos**, a partir do que Descrição e Tarefas já
+      declaram, com o escopo em uma linha cada.
+
+   b) **Montar o resumo, sempre explícito:**
+      - **{N} cards filhos** a criar
+      - **{X} ondas** e a distribuição por onda
+      - **{Y} PRs** na proposta
+      - repositórios envolvidos e quantos cards em cada
+
+   c) **Detectar sobreposição de arquivo** entre os filhos
+      (`guidelines/IA best practices.md` §9):
+      - usar o que o card declarar em `## Arquivos`; na falta, inferir do texto
+        das tarefas — caminho, nome de arquivo, blueprint, tabela, endpoint
+      - listar os arquivos que 2+ filhos tocam
+      - tratar arquivo de estrutura compartilhada como colisão mesmo sem menção
+        explícita: `__init__.py` que registra blueprint, `schema.sql`, `Makefile`,
+        `requirements.txt`, `conftest.py`
+      - **dois cards que disputam o mesmo arquivo não podem rodar em paralelo**
+
+   d) **Propor o agrupamento de PRs e perguntar.** O agrupamento é decisão do
+      usuário — o comando propõe a partir das colisões, não decide sozinho:
+      ```
+      {N} cards filhos · {X} ondas. Proposta de PRs:
+
+      - PR 1 — {nome}: {cards}   (compartilham: {arquivos})
+      - PR 2 — {nome}: {cards}
+
+      1. Aceitar a proposta
+      2. Um PR por card
+      3. Um PR por onda
+      4. Outro agrupamento (informar)
+      ```
+      - A proposta agrupa quem colide; cards sem sobreposição e de repositórios
+        diferentes ficam em PRs separados e podem rodar em paralelo
+      - **Aguardar a resposta.** Não criar os filhos antes dela
+
+   e) **Registrar a decisão no card**, não só em Discussões:
+      - `## Ondas` com os grupos `**PR {nome}**` (formato em
+        `templates/card/epic.md`)
+      - o resumo `{N} cards · {X} ondas · {Y} PRs` no topo da seção
+      - em "Discussões": a proposta, a escolha do usuário e o motivo
+
 7. **Adicionar dúvidas na seção Discussões:**
 
    - Obter timestamp: `date +"%Y-%m-%d %H:%M"`

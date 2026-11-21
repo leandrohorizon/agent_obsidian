@@ -72,7 +72,7 @@ somente o que está autorizado para ele.
 ### `epic`
 - Ler o board e os cards filhos, sem alterar código de projeto.
 - Criar e atualizar os cards filhos (escopo, tarefas, `depends_on`/`dependents`).
-- Manter a seção de ondas do próprio card — formato e local em
+- Manter a seção de ondas do próprio card — formato, grupos de PR e local em
   `templates/card/epic.md`, `## Ondas`.
 - Atualizar as seções do card (Descrição, Tarefas, Discussões).
 - Concluir quando todos os cards das ondas estiverem em `4.done`.

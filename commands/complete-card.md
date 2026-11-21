@@ -27,6 +27,9 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
    - Ler `guidelines/card work types.md`
    - Card sem `work_type` é `implementation`; valor desconhecido interrompe sem mover o card ou alterar estado
    - Verificar se o PR foi merged somente para `implementation`, se houver PR
+   - **PR compartilhado por grupo:** um único PR pode cobrir vários cards
+     (`**PR …**` no plano do épico). Cada card do grupo carrega o mesmo `pr_url`;
+     basta validar que ele está merged, sem exigir um PR por card
    - São carregadas as guidelines e o contexto de card conforme `guidelines/conduct.md`
    - `report`, `investigation`, `experiment` e `epic` podem ser concluídos diretamente de `2.in_progress`, sem PR
    - Para `experiment` e `epic`, não executar nenhum comando Git
@@ -100,6 +103,11 @@ Finalizar um card, movendo-o para "4.done" e garantindo que os entregáveis corr
      - Se o pull falhar (conflito, sem upstream, sem remote), **parar e reportar**. Não apagar a branch sobre estado desatualizado
      - Se não houver remote configurado, avisar e seguir
    - Apagar a branch do card: `git branch -d {branch-do-card}`
+     - **Branch compartilhada por grupo de PR:** quando o card faz parte de um
+       grupo (`/orchestrate-cards` com `**PR …**` no épico), vários cards apontam
+       para a mesma branch. Se ela já não existir, foi apagada ao concluir o card
+       anterior do grupo: **não é erro** — confirmar com
+       `git branch --list {branch-do-card}` e seguir
      - Usar `-d` (não `-D`): se o git recusar por commits não mergeados, **parar e reportar** em vez de forçar. Branch não mergeada apagada com `-D` perde trabalho
      - **Squash merge faz o `-d` recusar mesmo com o PR merged.** O squash cria um commit novo na base, então os commits da branch não são ancestrais dela e o git não os reconhece como mergeados. Antes de reportar como problema, confirmar que o conteúdo está na base: `git diff --stat {branch} {default}` deve vir vazio. Se vier vazio, o merge está completo e a recusa é esperada — informar o usuário e deixar a decisão de apagar com `-D` para ele, já que `-D` é destrutivo
      - Se a branch do card for a própria branch default, não apagar nada

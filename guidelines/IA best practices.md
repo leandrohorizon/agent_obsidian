@@ -159,3 +159,25 @@ filho. Um épico tem muitos filhos e manter N cards atualizados é onde a
 divergência nasce; a lista no próprio épico tem um lugar só para corrigir.
 `depends_on` do filho apontando para o épico é opcional e, quando ausente, não é
 erro.
+
+## 9. Sobreposição de arquivo entre cards
+
+Dois cards que editam o mesmo arquivo **não rodam em paralelo**. Worktree isola a
+working tree durante o trabalho e não faz nada contra o conflito no merge: o
+segundo PR nasce de uma base que não tem o primeiro, e o merge conflita.
+
+- **Como saber:** o card pode declarar `## Arquivos` com os caminhos que pretende
+  tocar. Sem declaração, inferir do texto — caminho de arquivo, nome de
+  blueprint, tabela, endpoint, componente.
+- **Arquivo de estrutura compartilhada quase sempre colide:** `__init__.py` do
+  app que registra blueprints, `schema.sql`, `Makefile`, `requirements.txt`,
+  `conftest.py`. Tratar como colisão mesmo quando os cards não se citam.
+- **Colisão se resolve de duas formas, e só dessas duas:** os cards vão para o
+  **mesmo PR** (e rodam em sequência no mesmo worktree) ou ficam em **ondas
+  diferentes**. Em grupos/PRs distintos dentro da mesma onda, nunca.
+- **Quem decide o agrupamento é o usuário**, no refinamento do épico — review é o
+  passo caro do fluxo e um PR por card multiplica o custo. O comando propõe a
+  partir das colisões e o plano fica registrado no épico.
+- **Colisão descoberta na execução não vira escolha do agente:** o orquestrador
+  para o grupo e reporta. Reagrupar por conta própria muda o que o usuário
+  confirmou.
